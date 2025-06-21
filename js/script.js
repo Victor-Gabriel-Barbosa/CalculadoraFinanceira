@@ -197,13 +197,12 @@ class CalculadoraFinanceira {
       }, 500);
     }
   }
-
   // Resolve a equação financeira para encontrar a variável faltante
   resolverEqFinanceira(variavelFaltante) {
     const { pv, fv, pmt, i, n } = this.valoresFinanceiros;
 
-    // Converte taxa de juros de percentual para decimal se necessário
-    const taxa = i !== null ? (i > 1 ? i / 100 : i) : null;
+    // Sempre converte taxa de juros de percentual para decimal
+    const taxa = i !== null ? i / 100 : null;
 
     const operacoes = {
       pv: () => this.calcularVP(fv, pmt, taxa, n),
@@ -216,41 +215,38 @@ class CalculadoraFinanceira {
     if (operacoes[variavelFaltante]) return operacoes[variavelFaltante]();
     else throw new Error('Variável desconhecida');
   }
-
   /**
    * Calcula Valor Presente (PV)
    * PV = FV / (1 + i)^n - PMT * [(1 + i)^n - 1] / [i * (1 + i)^n]
    */
   calcularVP(fv, pmt, i, n) {
-    if (i === 0) return (fv || 0) - (pmt || 0) * n;
+    if (i === 0) return -((fv || 0) + (pmt || 0) * n);
 
     const fator = Math.pow(1 + i, n);
     let pv = 0;
 
-    if (fv !== null && fv !== 0) pv += fv / fator;
+    if (fv !== null && fv !== 0) pv += (fv || 0) / fator;
 
-    if (pmt !== null && pmt !== 0) pv -= pmt * (fator - 1) / (i * fator);
+    if (pmt !== null && pmt !== 0) pv += (pmt || 0) * (fator - 1) / (i * fator);
 
-    return -pv; // Convenção financeira: PV é negativo se for investimento
+    return -pv; // Retorna negativo conforme convenção financeira
   }
-
   /**
    * Calcula Valor Futuro (FV)
    * FV = PV * (1 + i)^n + PMT * [(1 + i)^n - 1] / i
    */
   calcularVF(pv, pmt, i, n) {
-    if (i === 0) return -(pv || 0) + (pmt || 0) * n;
+    if (i === 0) return -((pv || 0) + (pmt || 0) * n);
 
     const fator = Math.pow(1 + i, n);
     let fv = 0;
 
-    if (pv !== null && pv !== 0) fv += pv * fator;
+    if (pv !== null && pv !== 0) fv += (pv || 0) * fator;
 
-    if (pmt !== null && pmt !== 0) fv += pmt * (fator - 1) / i;
+    if (pmt !== null && pmt !== 0) fv += (pmt || 0) * (fator - 1) / i;
 
-    return -fv; // Convenção financeira
+    return -fv; // Retorna negativo conforme convenção financeira
   }
-
   /**
    * Calcula Pagamento (PMT)
    * PMT = [PV * i * (1 + i)^n + FV * i] / [(1 + i)^n - 1]
@@ -259,10 +255,10 @@ class CalculadoraFinanceira {
     if (i === 0) return -((pv || 0) + (fv || 0)) / n;
 
     const fator = Math.pow(1 + i, n);
-    const numerador = (pv || 0) * i * fator + (fv || 0) * i;
+    const numerador = -(pv || 0) * i * fator - (fv || 0) * i;
     const denominador = fator - 1;
 
-    return -numerador / denominador;
+    return numerador / denominador;
   }
   
   // Calcula Taxa de Juros (i) usando método de Newton-Raphson
