@@ -218,7 +218,7 @@ class CalculadoraFinanceira {
     if (operacoes[variavelFaltante]) return operacoes[variavelFaltante]();
     else throw new Error('Variável desconhecida');
   }
-  
+
   /**
    * Calcula Valor Presente (PV)
    * PV = FV / (1 + i)^n - PMT * [(1 + i)^n - 1] / [i * (1 + i)^n]
@@ -707,7 +707,5 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Foca na calculadora para permitir eventos de cola
   const elementoCalculadora = document.getElementById('calculator');
-  if (elementoCalculadora) {
-    elementoCalculadora.focus();
-  }
+  if (elementoCalculadora) elementoCalculadora.focus();
 });
