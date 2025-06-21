@@ -21,15 +21,37 @@ body {
 }
 
 .calculator {
-  background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
-  border-radius: 15px;
+  background: linear-gradient(145deg, #434343, #2a2a2a, #1a1a1a);
+  border-radius: 20px;
   padding: 25px;
   box-shadow:
-    0 15px 30px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  border: 2px solid #555;
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 10px 20px rgba(0, 0, 0, 0.2),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.3);
   width: 400px;
   max-width: 95vw;
+  position: relative;
+}
+
+/* Efeito de luz ambiente */
+.calculator::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    rgba(52, 152, 219, 0.1), 
+    rgba(155, 89, 182, 0.1), 
+    rgba(52, 152, 219, 0.1));
+  border-radius: 22px;
+  z-index: -1;
+  filter: blur(8px);
 }
 
 /* Header da calculadora */
@@ -46,14 +68,32 @@ body {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* Display principal */
+/* Display principal com efeito 3D */
 .display-section {
-  background: #1a1a1a;
-  border: 2px inset #444;
-  border-radius: 8px;
+  background: linear-gradient(145deg, #0a0a0a, #1a1a1a, #2a2a2a);
+  border: 3px inset #444;
+  border-radius: 12px;
   padding: 15px;
   margin-bottom: 15px;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 
+    inset 0 4px 8px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.display-section::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent);
+  border-radius: 8px 8px 0 0;
 }
 
 .operation-display {
@@ -128,11 +168,17 @@ body {
   font-size: 10px;
 }
 
-/* Teclado */
+/* Teclado com efeito 3D */
 .keypad {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  padding: 8px;
+  background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+  border-radius: 12px;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .keypad-row {
@@ -145,115 +191,243 @@ body {
   grid-column: span 2;
 }
 
-/* Botões */
+/* Botões com efeito 3D */
 .btn {
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 15px 8px;
   font-size: 14px;
   font-weight: bold;
   cursor: pointer;
-  transition: all 0.1s ease;
-  box-shadow:
-    0 3px 0 rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.15s ease;
   position: relative;
   min-height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  
+  /* Efeito 3D principal */
+  box-shadow:
+    0 6px 0 rgba(0, 0, 0, 0.2),
+    0 8px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  
+  /* Borda 3D */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 7px 0 rgba(0, 0, 0, 0.2),
+    0 10px 15px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 
 .btn:active {
-  transform: translateY(2px);
+  transform: translateY(4px);
   box-shadow:
-    0 1px 0 rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 2px 0 rgba(0, 0, 0, 0.2),
+    0 3px 5px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* Botões de números */
+/* Botões de números com efeito 3D aprimorado */
 .number-btn {
-  background: linear-gradient(145deg, #5a5a5a, #4a4a4a);
+  background: linear-gradient(145deg, #6a6a6a, #4a4a4a, #3a3a3a);
   color: #fff;
-  border: 1px solid #666;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-top-color: rgba(255, 255, 255, 0.4) !important;
+  border-bottom-color: rgba(0, 0, 0, 0.4) !important;
+  
+  /* Sombra interna para efeito côncavo/convexo */
+  box-shadow:
+    0 6px 0 #2a2a2a,
+    0 8px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    inset 1px 0 0 rgba(255, 255, 255, 0.1),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
 .number-btn:hover {
-  background: linear-gradient(145deg, #6a6a6a, #5a5a5a);
+  background: linear-gradient(145deg, #7a7a7a, #5a5a5a, #4a4a4a);
+  box-shadow:
+    0 7px 0 #2a2a2a,
+    0 10px 15px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    inset 1px 0 0 rgba(255, 255, 255, 0.2),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
-/* Botões financeiros */
+/* Botões financeiros com efeito 3D aprimorado */
 .financial-btn {
-  background: linear-gradient(145deg, #3498db, #2980b9);
+  background: linear-gradient(145deg, #5dade2, #3498db, #2980b9);
   color: #fff;
-  border: 1px solid #2471a3;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  border-top-color: rgba(255, 255, 255, 0.5) !important;
+  border-bottom-color: rgba(0, 0, 0, 0.3) !important;
   font-size: 13px;
+  
+  box-shadow:
+    0 6px 0 #1f4e79,
+    0 8px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.2),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
 .financial-btn:hover {
-  background: linear-gradient(145deg, #5dade2, #3498db);
+  background: linear-gradient(145deg, #7bb3e8, #5dade2, #3498db);
+  box-shadow:
+    0 7px 0 #1f4e79,
+    0 10px 15px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.3),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
 .financial-btn.active {
-  background: linear-gradient(145deg, #e74c3c, #c0392b);
+  background: linear-gradient(145deg, #ec7063, #e74c3c, #c0392b);
   box-shadow:
-    0 1px 0 rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 2px 0 #922b21,
+    0 3px 5px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  transform: translateY(4px);
 }
 
-/* Botões de operação */
+/* Botões de operação com efeito 3D aprimorado */
 .operation-btn {
-  background: linear-gradient(145deg, #95a5a6, #7f8c8d);
+  background: linear-gradient(145deg, #b2babb, #95a5a6, #7f8c8d);
   color: #2c3e50;
-  border: 1px solid #6c7b7d;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  border-top-color: rgba(255, 255, 255, 0.4) !important;
+  border-bottom-color: rgba(0, 0, 0, 0.3) !important;
   font-size: 16px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  
+  box-shadow:
+    0 6px 0 #566573,
+    0 8px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.2),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
 .operation-btn:hover {
-  background: linear-gradient(145deg, #a5b5b6, #95a5a6);
+  background: linear-gradient(145deg, #c8d6db, #b2babb, #95a5a6);
+  box-shadow:
+    0 7px 0 #566573,
+    0 10px 15px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.3),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
 .operation-btn.active-operation {
-  background: linear-gradient(145deg, #f39c12, #e67e22);
+  background: linear-gradient(145deg, #f7c52d, #f39c12, #e67e22);
   color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
   box-shadow:
-    0 1px 0 rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 0 10px rgba(243, 156, 18, 0.5);
-  transform: translateY(1px);
+    0 2px 0 #b7950b,
+    0 3px 5px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 0 15px rgba(243, 156, 18, 0.4);
+  transform: translateY(4px);
 }
 
-/* Botão CPT especial */
+/* Botão CPT especial com efeito 3D */
 .btn[data-function="cpt"] {
-  background: linear-gradient(145deg, #e67e22, #d35400);
+  background: linear-gradient(145deg, #f7c52d, #e67e22, #d35400);
   color: #fff;
   font-size: 16px;
   font-weight: bold;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+  
+  box-shadow:
+    0 6px 0 #a04000,
+    0 8px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.2),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
 .btn[data-function="cpt"]:hover {
-  background: linear-gradient(145deg, #f39c12, #e67e22);
+  background: linear-gradient(145deg, #f8c471, #f7c52d, #e67e22);
+  box-shadow:
+    0 7px 0 #a04000,
+    0 10px 15px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.3),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
-/* Botão AC especial */
+/* Botão AC especial com efeito 3D */
 .btn[data-function="ac"] {
-  background: linear-gradient(145deg, #e74c3c, #c0392b);
+  background: linear-gradient(145deg, #ec7063, #e74c3c, #c0392b);
   color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+  
+  box-shadow:
+    0 6px 0 #922b21,
+    0 8px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.2),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
 .btn[data-function="ac"]:hover {
-  background: linear-gradient(145deg, #ec7063, #e74c3c);
+  background: linear-gradient(145deg, #f1948a, #ec7063, #e74c3c);
+  box-shadow:
+    0 7px 0 #922b21,
+    0 10px 15px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.3),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
-/* Botão equals */
+/* Botão equals com efeito 3D */
 .equals-btn {
-  background: linear-gradient(145deg, #27ae60, #229954);
+  background: linear-gradient(145deg, #58d68d, #27ae60, #229954) !important;
   color: #fff !important;
   font-size: 18px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+  
+  box-shadow:
+    0 6px 0 #186a3b,
+    0 8px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.2),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1) !important;
 }
 
 .equals-btn:hover {
-  background: linear-gradient(145deg, #58d68d, #27ae60);
+  background: linear-gradient(145deg, #7dcea0, #58d68d, #27ae60) !important;
+  box-shadow:
+    0 7px 0 #186a3b,
+    0 10px 15px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.3),
+    inset -1px 0 0 rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Instruções */
