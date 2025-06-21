@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="images/favicon/favicon.ico">
+  <link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/png" href="images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="images/favicon/favicon.svg">
+  <link rel="apple-touch-icon" href="images/favicon/apple-touch-icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Financeira</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="calculator-container">
+    <div class="calculator">
+      <!-- Header da calculadora -->
+      <div class="calculator-header">
+        <h2>CALCULADORA FINANCEIRA</h2>
+      </div> 
+      
+      <!-- Display principal -->
+      <div class="display-section">
+        <div class="operation-display" id="operationDisplay"></div>
+        <div class="main-display" id="mainDisplay">0</div>
+        <div class="variable-display" id="variableDisplay">-</div>
+      </div>
+
+      <!-- Status dos valores financeiros -->
+      <div class="status-display">
+        <div class="status-item">
+          <span class="label">PV:</span>
+          <span class="value" id="pvValue">-</span>
+        </div>
+        <div class="status-item">
+          <span class="label">FV:</span>
+          <span class="value" id="fvValue">-</span>
+        </div>
+        <div class="status-item">
+          <span class="label">PMT:</span>
+          <span class="value" id="pmtValue">-</span>
+        </div>
+        <div class="status-item">
+          <span class="label">i:</span>
+          <span class="value" id="iValue">-</span>
+        </div>
+        <div class="status-item">
+          <span class="label">n:</span>
+          <span class="value" id="nValue">-</span>
+        </div>
+      </div>
+
+      <!-- Teclado da calculadora -->
+      <div class="keypad">
+        <!-- Primeira linha - Funções financeiras -->
+        <div class="keypad-row">
+          <button class="btn financial-btn" data-function="pv">PV</button>
+          <button class="btn financial-btn" data-function="fv">FV</button>
+          <button class="btn financial-btn" data-function="pmt">PMT</button>
+          <button class="btn financial-btn" data-function="i">i</button>
+          <button class="btn financial-btn" data-function="n">n</button>
+        </div>
+
+        <!-- Segunda linha - Operações especiais -->
+        <div class="keypad-row">
+          <button class="btn operation-btn" data-function="cpt">CPT</button>
+          <button class="btn operation-btn" data-function="ac">AC</button>
+          <button class="btn operation-btn" data-function="ce">CE</button>
+          <button class="btn operation-btn" data-function="sinal">+/-</button>
+          <button class="btn operation-btn" data-function="porcento">%</button>
+        </div>
+
+        <!-- Terceira linha - Números -->
+        <div class="keypad-row">
+          <button class="btn number-btn" data-number="7">7</button>
+          <button class="btn number-btn" data-number="8">8</button>
+          <button class="btn number-btn" data-number="9">9</button>
+          <button class="btn operation-btn" data-function="divide">÷</button>
+          <button class="btn operation-btn" data-function="limpa">←</button>
+        </div>
+
+        <!-- Quarta linha - Números -->
+        <div class="keypad-row">
+          <button class="btn number-btn" data-number="4">4</button>
+          <button class="btn number-btn" data-number="5">5</button>
+          <button class="btn number-btn" data-number="6">6</button>
+          <button class="btn operation-btn" data-function="multiplica">×</button>
+          <button class="btn operation-btn" data-function="raiz">√</button>
+        </div>
+
+        <!-- Quinta linha - Números -->
+        <div class="keypad-row">
+          <button class="btn number-btn" data-number="1">1</button>
+          <button class="btn number-btn" data-number="2">2</button>
+          <button class="btn number-btn" data-number="3">3</button>
+          <button class="btn operation-btn" data-function="subtrai">-</button>
+          <button class="btn operation-btn" data-function="potencia">x²</button>
+        </div>
+
+        <!-- Sexta linha - Zero e decimal -->
+        <div class="keypad-row">
+          <button class="btn number-btn zero-btn" data-number="0">0</button>
+          <button class="btn operation-btn" data-function="decimal">.</button>
+          <button class="btn operation-btn" data-function="soma">+</button>
+          <button class="btn operation-btn equals-btn" data-function="igual">=</button>
+        </div>
+      </div>
+
+      <!-- Instruções de uso -->
+      <div class="instructions">
+        <p><strong>Como usar:</strong></p>
+        <p>1. Digite um valor e pressione uma variável (PV, FV, PMT, i, n)</p>
+        <p>2. Repita para outras variáveis conhecidas</p>
+        <p>3. Pressione CPT para calcular a variável desconhecida</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+
+</html>
