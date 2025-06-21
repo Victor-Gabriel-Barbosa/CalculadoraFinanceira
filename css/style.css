@@ -35,6 +35,8 @@ body {
   width: 400px;
   max-width: 95vw;
   position: relative;
+  /* Remove outline quando focado para manter aparência limpa */
+  outline: none;
 }
 
 /* Efeito de luz ambiente */
@@ -126,6 +128,19 @@ body {
   justify-content: flex-end;
   text-shadow: 0 0 5px #00ff00;
   overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.main-display.pasted {
+  background: #001a00;
+  box-shadow: 0 0 10px #00ff00;
+  transform: scale(1.02);
+}
+
+@keyframes paste-flash {
+  0% { box-shadow: 0 0 10px #00ff00; }
+  50% { box-shadow: 0 0 20px #00ff00, inset 0 0 10px #00ff00; }
+  100% { box-shadow: 0 0 10px #00ff00; }
 }
 
 .variable-display {

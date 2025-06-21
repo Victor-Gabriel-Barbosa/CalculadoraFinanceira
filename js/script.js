@@ -63,11 +63,14 @@ class CalculadoraFinanceira {
       btn.addEventListener('click', () => {
         this.executarOp(btn.dataset.function);
       });
-    });
-
-    // Suporte a teclado
+    });    // Suporte a teclado
     document.addEventListener('keydown', (evento) => {
       this.manipularTeclado(evento);
+    });
+
+    // Suporte a colar (paste)
+    document.addEventListener('paste', (evento) => {
+      this.manipularColar(evento);
     });
   }
 
@@ -215,6 +218,7 @@ class CalculadoraFinanceira {
     if (operacoes[variavelFaltante]) return operacoes[variavelFaltante]();
     else throw new Error('Variável desconhecida');
   }
+  
   /**
    * Calcula Valor Presente (PV)
    * PV = FV / (1 + i)^n - PMT * [(1 + i)^n - 1] / [i * (1 + i)^n]
@@ -231,6 +235,7 @@ class CalculadoraFinanceira {
 
     return -pv; // Retorna negativo conforme convenção financeira
   }
+
   /**
    * Calcula Valor Futuro (FV)
    * FV = PV * (1 + i)^n + PMT * [(1 + i)^n - 1] / i
@@ -247,6 +252,7 @@ class CalculadoraFinanceira {
 
     return -fv; // Retorna negativo conforme convenção financeira
   }
+
   /**
    * Calcula Pagamento (PMT)
    * PMT = [PV * i * (1 + i)^n + FV * i] / [(1 + i)^n - 1]
@@ -561,8 +567,107 @@ class CalculadoraFinanceira {
     if (this.mensagemErro) {
       this.mensagemErro.remove();
       this.mensagemErro = null;
+    }    this.displayPrincipal.classList.remove('error');
+  }
+
+  // Manipula o evento de colar (paste)
+  manipularColar(evento) {
+    evento.preventDefault();
+    
+    // Obtém o texto colado
+    const textoColado = (evento.clipboardData || window.clipboardData).getData('text');
+    
+    // Limpa espaços em branco
+    const texto = textoColado.trim();
+    
+    if (!texto) return;
+    
+    // Verifica se é apenas um número
+    if (this.isNumeroValido(texto)) {
+      this.colarNumero(texto);
+      return;
     }
-    this.displayPrincipal.classList.remove('error');
+    
+    // Verifica se é uma expressão matemática simples
+    if (this.isExpressaoValida(texto)) {
+      this.processarExpressao(texto);
+      return;
+    }
+    
+    // Se não for um número ou expressão válida, ignora
+    this.mostrarErro('Conteúdo inválido para colar');
+  }
+
+  // Verifica se o texto é um número válido
+  isNumeroValido(texto) {
+    // Remove caracteres de formatação comuns
+    const numeroLimpo = texto.replace(/[,\s]/g, '').replace(',', '.');
+    return !isNaN(numeroLimpo) && numeroLimpo !== '';
+  }
+
+  // Verifica se o texto é uma expressão matemática válida
+  isExpressaoValida(texto) {
+    // Permite números, operadores básicos, parênteses, pontos e vírgulas
+    const regex = /^[\d+\-*/().,\s]+$/;
+    return regex.test(texto) && /[+\-*/]/.test(texto);
+  }
+
+  // Cola um número no display
+  colarNumero(texto) {
+    // Substitui vírgula por ponto e remove espaços
+    const numeroLimpo = texto.replace(/[,\s]/g, '').replace(',', '.');
+    
+    // Verifica se é um número válido
+    if (!isNaN(numeroLimpo) && numeroLimpo !== '') {
+      this.limparErro();
+      this.entradaAtual = numeroLimpo;
+      this.novaEntrada = false;
+      this.atualizarDisplay();
+      this.mostrarFeedbackCola();
+    }
+  }
+
+  // Processa uma expressão matemática simples
+  processarExpressao(texto) {
+    try {
+      // Substitui símbolos comuns por operadores válidos
+      let expressao = texto
+        .replace(/×/g, '*')
+        .replace(/÷/g, '/')
+        .replace(/,/g, '.')
+        .replace(/\s/g, '');
+      
+      // Verifica se a expressão é segura (apenas números e operadores básicos)
+      if (!/^[\d+\-*/().]+$/.test(expressao)) {
+        this.mostrarErro('Expressão inválida');
+        return;
+      }
+      
+      // Avalia a expressão
+      const resultado = Function('"use strict"; return (' + expressao + ')')();
+      
+      if (isNaN(resultado) || !isFinite(resultado)) {
+        this.mostrarErro('Resultado inválido');
+        return;
+      }
+      
+      this.limparErro();
+      this.entradaAtual = resultado.toString();
+      this.novaEntrada = false;
+      this.atualizarDisplay();
+      this.mostrarFeedbackCola();
+      
+    } catch (erro) {
+      this.mostrarErro('Erro ao processar expressão');
+    }
+  }
+
+  // Mostra feedback visual quando algo é colado
+  mostrarFeedbackCola() {
+    this.displayPrincipal.classList.add('pasted');
+    setTimeout(() => {
+      this.displayPrincipal.classList.remove('pasted');
+    }, 300);
   }
 
   // Manipula eventos de teclado para entrada de números e operações
@@ -598,5 +703,11 @@ class CalculadoraFinanceira {
 
 // Inicializa calculadora quando DOM estiver carregado
 document.addEventListener('DOMContentLoaded', () => {
-  new CalculadoraFinanceira();
+  const calculadora = new CalculadoraFinanceira();
+  
+  // Foca na calculadora para permitir eventos de cola
+  const elementoCalculadora = document.getElementById('calculator');
+  if (elementoCalculadora) {
+    elementoCalculadora.focus();
+  }
 });

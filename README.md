@@ -24,6 +24,13 @@ Uma calculadora financeira completa no estilo de calculadora física tradicional
 - Entrada decimal
 - Backspace para correção
 
+### Entrada de Dados
+- **Teclado**: Digite números e operações diretamente
+- **Colar (Ctrl+V)**: Cole números ou expressões matemáticas simples
+  - Suporte a números decimais (com vírgula ou ponto)
+  - Suporte a expressões básicas (ex: 100+50, 200*0.05)
+  - Feedback visual quando algo é colado
+
 ## 🚀 Como Usar
 
 1. **Definir Valores Conhecidos:**
