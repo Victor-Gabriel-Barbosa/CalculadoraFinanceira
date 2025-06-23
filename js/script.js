@@ -218,59 +218,77 @@ class CalculadoraFinanceira {
     if (operacoes[variavelFaltante]) return operacoes[variavelFaltante]();
     else throw new Error('Variável desconhecida');
   }
-
   /**
    * Calcula Valor Presente (PV)
-   * PV = FV / (1 + i)^n - PMT * [(1 + i)^n - 1] / [i * (1 + i)^n]
+   * PV = -[FV / (1 + i)^n + PMT * [(1 + i)^n - 1] / [i * (1 + i)^n]]
    */
   calcularVP(fv, pmt, i, n) {
+    // Caso especial: taxa zero
     if (i === 0) return -((fv || 0) + (pmt || 0) * n);
 
     const fator = Math.pow(1 + i, n);
     let pv = 0;
 
-    if (fv !== null && fv !== 0) pv += (fv || 0) / fator;
+    // Componente do valor futuro
+    if (fv !== null && fv !== 0) {
+      pv += (fv || 0) / fator;
+    }
 
-    if (pmt !== null && pmt !== 0) pv += (pmt || 0) * (fator - 1) / (i * fator);
+    // Componente dos pagamentos periódicos (anuidade)
+    if (pmt !== null && pmt !== 0) {
+      pv += (pmt || 0) * (fator - 1) / (i * fator);
+    }
 
     return -pv; // Retorna negativo conforme convenção financeira
   }
-
   /**
    * Calcula Valor Futuro (FV)
-   * FV = PV * (1 + i)^n + PMT * [(1 + i)^n - 1] / i
+   * FV = -[PV * (1 + i)^n + PMT * [(1 + i)^n - 1] / i]
    */
   calcularVF(pv, pmt, i, n) {
+    // Caso especial: taxa zero
     if (i === 0) return -((pv || 0) + (pmt || 0) * n);
 
     const fator = Math.pow(1 + i, n);
     let fv = 0;
 
-    if (pv !== null && pv !== 0) fv += (pv || 0) * fator;
+    // Componente do valor presente
+    if (pv !== null && pv !== 0) {
+      fv += (pv || 0) * fator;
+    }
 
-    if (pmt !== null && pmt !== 0) fv += (pmt || 0) * (fator - 1) / i;
+    // Componente dos pagamentos periódicos (anuidade)
+    if (pmt !== null && pmt !== 0) {
+      fv += (pmt || 0) * (fator - 1) / i;
+    }
 
     return -fv; // Retorna negativo conforme convenção financeira
   }
-
   /**
    * Calcula Pagamento (PMT)
-   * PMT = [PV * i * (1 + i)^n + FV * i] / [(1 + i)^n - 1]
+   * PMT = -[PV * i * (1 + i)^n + FV * i] / [(1 + i)^n - 1]
    */
   calcularPMT(pv, fv, i, n) {
-    if (i === 0) return -((pv || 0) + (fv || 0)) / n;
+    // Caso especial: taxa zero
+    if (i === 0) {
+      if (n === 0) throw new Error('Número de períodos não pode ser zero');
+      return -((pv || 0) + (fv || 0)) / n;
+    }
 
     const fator = Math.pow(1 + i, n);
-    const numerador = -(pv || 0) * i * fator - (fv || 0) * i;
     const denominador = fator - 1;
+    
+    if (denominador === 0) throw new Error('Denominador zero no cálculo do PMT');
+    
+    const numerador = -(pv || 0) * i * fator - (fv || 0) * i;
 
     return numerador / denominador;
   }
-  
-  // Calcula Taxa de Juros (i) usando método de Newton-Raphson
+    // Calcula Taxa de Juros (i) usando método de Newton-Raphson
   calcularTaxaJuros(pv, fv, pmt, n) {
-    // Estimativa inicial
-    let i = 0.1;
+    // Estimativa inicial melhorada
+    let i = this.estimativaInicialTaxa(pv, fv, pmt, n);
+    
     const maxIteracoes = 100;
     const tolerancia = 1e-10;
 
@@ -282,12 +300,36 @@ class CalculadoraFinanceira {
 
       const novoI = i - f / df;
 
-      if (Math.abs(novoI - i) < tolerancia) return novoI * 100; // Retorna como percentual
+      // Verifica convergência
+      if (Math.abs(novoI - i) < tolerancia) {
+        return novoI * 100; // Retorna como percentual
+      }
 
-      i = novoI;
+      // Limita o valor da taxa para evitar divergência
+      i = Math.max(-0.99, Math.min(10, novoI));
     }
 
     return i * 100; // Retorna como percentual
+  }
+
+  // Calcula uma estimativa inicial melhor para a taxa de juros
+  estimativaInicialTaxa(pv, fv, pmt, n) {
+    const pvVal = pv || 0;
+    const fvVal = fv || 0;
+    const pmtVal = pmt || 0;
+    
+    // Se há apenas PV e FV (sem pagamentos)
+    if (pmtVal === 0 && pvVal !== 0 && fvVal !== 0) {
+      return Math.pow(Math.abs(fvVal / pvVal), 1 / n) - 1;
+    }
+    
+    // Estimativa simples baseada nos valores
+    if (pvVal !== 0 && pmtVal !== 0) {
+      return Math.abs(pmtVal / pvVal) / n;
+    }
+    
+    // Estimativa padrão
+    return 0.1; // 10%
   }
 
   // Função financeira para cálculo de taxa de juros
@@ -313,16 +355,48 @@ class CalculadoraFinanceira {
 
     return derivada;
   }
-
   // Calcula Número de Períodos (n)
   calcularN(pv, fv, pmt, i) {
-    if (i === 0) return -((pv || 0) + (fv || 0)) / (pmt || 0);
+    // Caso especial: taxa zero
+    if (i === 0) {
+      if ((pmt || 0) === 0) throw new Error('PMT não pode ser zero quando i = 0');
+      return -((pv || 0) + (fv || 0)) / (pmt || 0);
+    }
 
-    const numerador = Math.log(1 - (fv || 0) * i / (pmt || 0));
+    // Validações
+    if ((pmt || 0) === 0) throw new Error('PMT não pode ser zero');
+    
+    // Para calcular N, usamos a fórmula correta baseada no tipo de fluxo de caixa
+    const pvVal = pv || 0;
+    const fvVal = fv || 0;
+    const pmtVal = pmt || 0;
+    
+    // Se não há valor futuro, calculamos baseado apenas em PV e PMT
+    if (fvVal === 0) {
+      if (pvVal === 0) throw new Error('PV e FV não podem ser ambos zero');
+      
+      const ratio = -pvVal * i / pmtVal;
+      if (ratio <= 0) throw new Error('Não é possível calcular n com estes valores (ratio <= 0)');
+      
+      const numerador = Math.log(1 + ratio);
+      const denominador = Math.log(1 + i);
+      
+      if (numerador <= 0 || denominador === 0) throw new Error('Não é possível calcular n com estes valores');
+      
+      return numerador / denominador;
+    }
+    
+    // Fórmula geral para quando temos FV
+    const termo1 = fvVal + pmtVal / i;
+    const termo2 = pvVal + pmtVal / i;
+    
+    if (termo1 <= 0 || termo2 <= 0) throw new Error('Não é possível calcular n com estes valores (termos negativos)');
+    
+    const numerador = Math.log(termo1 / termo2);
     const denominador = Math.log(1 + i);
-
-    if (numerador <= 0 || denominador <= 0) throw new Error('Não é possível calcular n com estes valores');
-
+    
+    if (denominador === 0) throw new Error('Taxa de juros inválida para cálculo de n');
+    
     return numerador / denominador;
   }
 
@@ -567,7 +641,8 @@ class CalculadoraFinanceira {
     if (this.mensagemErro) {
       this.mensagemErro.remove();
       this.mensagemErro = null;
-    }    this.displayPrincipal.classList.remove('error');
+    }    
+    this.displayPrincipal.classList.remove('error');
   }
 
   // Manipula o evento de colar (paste)
@@ -632,7 +707,7 @@ class CalculadoraFinanceira {
     try {
       // Substitui símbolos comuns por operadores válidos
       let expressao = texto
-        .replace(/×/g, '*')
+        .replace(/x/g, '*')
         .replace(/÷/g, '/')
         .replace(/,/g, '.')
         .replace(/\s/g, '');
