@@ -211,7 +211,7 @@ body {
   border: none;
   border-radius: 12px;
   padding: 15px 8px;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -289,7 +289,7 @@ body {
   border-color: rgba(255, 255, 255, 0.2) !important;
   border-top-color: rgba(255, 255, 255, 0.5) !important;
   border-bottom-color: rgba(0, 0, 0, 0.3) !important;
-  font-size: 13px;
+  font-size: 16px;
   
   box-shadow:
     0 6px 0 #1f4e79,
@@ -323,12 +323,11 @@ body {
 
 /* Botões de operação com efeito 3D aprimorado */
 .operation-btn {
-  background: linear-gradient(145deg, #b2babb, #95a5a6, #7f8c8d);
-  color: #2c3e50;
+  background: linear-gradient(145deg, #b2babb, #95a5a6, #7f8c8d);  color: #2c3e50;
   border-color: rgba(255, 255, 255, 0.2) !important;
   border-top-color: rgba(255, 255, 255, 0.4) !important;
   border-bottom-color: rgba(0, 0, 0, 0.3) !important;
-  font-size: 16px;
+  font-size: 20px;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
   
   box-shadow:
@@ -368,7 +367,7 @@ body {
 .btn[data-function="cpt"] {
   background: linear-gradient(145deg, #f7c52d, #e67e22, #d35400);
   color: #fff;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: bold;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
   
@@ -422,7 +421,7 @@ body {
 .equals-btn {
   background: linear-gradient(145deg, #58d68d, #27ae60, #229954) !important;
   color: #fff !important;
-  font-size: 18px;
+  font-size: 22px;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
   
   box-shadow:
@@ -451,10 +450,9 @@ body {
     padding: 15px;
     width: 100%;
   }
-
   .btn {
     padding: 12px 6px;
-    font-size: 12px;
+    font-size: 16px;
     min-height: 45px;
   }
 

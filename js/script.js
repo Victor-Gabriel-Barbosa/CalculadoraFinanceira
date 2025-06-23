@@ -3,7 +3,6 @@
  * Sistema completo para cálculos financeiros baseado em juros compostos
  * Suporta cálculo de Valor Presente (PV), Valor Futuro (FV) e Pagamento Periódico (PMT)
  */
-
 class CalculadoraFinanceira {  
   constructor() {
     // Elementos do DOM
@@ -63,7 +62,9 @@ class CalculadoraFinanceira {
       btn.addEventListener('click', () => {
         this.executarOp(btn.dataset.function);
       });
-    });    // Suporte a teclado
+    });    
+    
+    // Suporte a teclado
     document.addEventListener('keydown', (evento) => {
       this.manipularTeclado(evento);
     });
@@ -200,6 +201,7 @@ class CalculadoraFinanceira {
       }, 500);
     }
   }
+
   // Resolve a equação financeira para encontrar a variável faltante
   resolverEqFinanceira(variavelFaltante) {
     const { pv, fv, pmt, i, n } = this.valoresFinanceiros;
@@ -218,6 +220,7 @@ class CalculadoraFinanceira {
     if (operacoes[variavelFaltante]) return operacoes[variavelFaltante]();
     else throw new Error('Variável desconhecida');
   }
+
   /**
    * Calcula Valor Presente (PV)
    * PV = -[FV / (1 + i)^n + PMT * [(1 + i)^n - 1] / [i * (1 + i)^n]]
@@ -235,12 +238,11 @@ class CalculadoraFinanceira {
     }
 
     // Componente dos pagamentos periódicos (anuidade)
-    if (pmt !== null && pmt !== 0) {
-      pv += (pmt || 0) * (fator - 1) / (i * fator);
-    }
+    if (pmt !== null && pmt !== 0) pv += (pmt || 0) * (fator - 1) / (i * fator);
 
     return -pv; // Retorna negativo conforme convenção financeira
   }
+
   /**
    * Calcula Valor Futuro (FV)
    * FV = -[PV * (1 + i)^n + PMT * [(1 + i)^n - 1] / i]
@@ -253,17 +255,14 @@ class CalculadoraFinanceira {
     let fv = 0;
 
     // Componente do valor presente
-    if (pv !== null && pv !== 0) {
-      fv += (pv || 0) * fator;
-    }
+    if (pv !== null && pv !== 0) fv += (pv || 0) * fator;
 
     // Componente dos pagamentos periódicos (anuidade)
-    if (pmt !== null && pmt !== 0) {
-      fv += (pmt || 0) * (fator - 1) / i;
-    }
+    if (pmt !== null && pmt !== 0) fv += (pmt || 0) * (fator - 1) / i;
 
     return -fv; // Retorna negativo conforme convenção financeira
   }
+
   /**
    * Calcula Pagamento (PMT)
    * PMT = -[PV * i * (1 + i)^n + FV * i] / [(1 + i)^n - 1]
@@ -284,7 +283,8 @@ class CalculadoraFinanceira {
 
     return numerador / denominador;
   }
-    // Calcula Taxa de Juros (i) usando método de Newton-Raphson
+
+  // Calcula Taxa de Juros (i) usando método de Newton-Raphson
   calcularTaxaJuros(pv, fv, pmt, n) {
     // Estimativa inicial melhorada
     let i = this.estimativaInicialTaxa(pv, fv, pmt, n);
@@ -301,9 +301,7 @@ class CalculadoraFinanceira {
       const novoI = i - f / df;
 
       // Verifica convergência
-      if (Math.abs(novoI - i) < tolerancia) {
-        return novoI * 100; // Retorna como percentual
-      }
+      if (Math.abs(novoI - i) < tolerancia) return novoI * 100; // Retorna como percentual
 
       // Limita o valor da taxa para evitar divergência
       i = Math.max(-0.99, Math.min(10, novoI));
@@ -319,14 +317,10 @@ class CalculadoraFinanceira {
     const pmtVal = pmt || 0;
     
     // Se há apenas PV e FV (sem pagamentos)
-    if (pmtVal === 0 && pvVal !== 0 && fvVal !== 0) {
-      return Math.pow(Math.abs(fvVal / pvVal), 1 / n) - 1;
-    }
+    if (pmtVal === 0 && pvVal !== 0 && fvVal !== 0) return Math.pow(Math.abs(fvVal / pvVal), 1 / n) - 1;
     
     // Estimativa simples baseada nos valores
-    if (pvVal !== 0 && pmtVal !== 0) {
-      return Math.abs(pmtVal / pvVal) / n;
-    }
+    if (pvVal !== 0 && pmtVal !== 0) return Math.abs(pmtVal / pvVal) / n;
     
     // Estimativa padrão
     return 0.1; // 10%
@@ -355,6 +349,7 @@ class CalculadoraFinanceira {
 
     return derivada;
   }
+  
   // Calcula Número de Períodos (n)
   calcularN(pv, fv, pmt, i) {
     // Caso especial: taxa zero
