@@ -34,9 +34,18 @@ class CalculadoraFinanceira {
       n: null     // Número de períodos
     };
 
+    // Sistema de conversão de taxas
+    this.modoCapitalizacao = 'simples'; // 'simples' ou 'composta'
+
     // Inicializa eventos
     this.inicializarEventos();
     this.atualizarDisplay();
+    this.atualizarIndicadorModo();
+  }
+
+  // Atualiza o indicador de modo de capitalização
+  atualizarIndicadorModo() {
+    this.atualizarDisplayOperacao();
   }
 
   // Inicializa todos os event listeners dos botões
@@ -59,6 +68,13 @@ class CalculadoraFinanceira {
     document.querySelectorAll('.operation-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         this.executarOp(btn.dataset.function);
+      });
+    });
+
+    // Botões de conversão de taxas
+    document.querySelectorAll('.conversion-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.converterTaxa(btn.dataset.function);
       });
     });    
     
@@ -137,6 +153,7 @@ class CalculadoraFinanceira {
       subtrai: () => this.operacaoBasica('subtrai'),
       multiplica: () => this.operacaoBasica('multiplica'),
       divide: () => this.operacaoBasica('divide'),
+      'toggle-mode': () => this.alternarModoCapitalizacao(),
     };
 
     if (operacoes[operacao]) operacoes[operacao]();
@@ -448,9 +465,154 @@ class CalculadoraFinanceira {
     this.limparOp();
   }
 
+  // Alterna entre modo de capitalização simples e composta
+  alternarModoCapitalizacao() {
+    this.modoCapitalizacao = this.modoCapitalizacao === 'simples' ? 'composta' : 'simples';
+    
+    // Atualiza o display de operação
+    this.atualizarDisplayOperacao();
+    
+    // Mostra feedback temporário
+    const modoTexto = this.modoCapitalizacao.toUpperCase();
+    this.displayOp.innerHTML = `<span style="color: #3498db; font-weight: bold;">${modoTexto}</span><span style="color: #e74c3c;"> ALTERADO</span>`;
+    setTimeout(() => {
+      this.atualizarDisplayOperacao();
+    }, 2000);
+  }
+
+  // Converte taxas entre dia, mês e ano
+  converterTaxa(tipoConversao) {
+    this.limparErro();
+    
+    const taxaAtual = parseFloat(this.entradaAtual);
+    if (isNaN(taxaAtual) || taxaAtual < 0) {
+      this.mostrarErro('Taxa inválida');
+      return;
+    }
+
+    // Remove destaque de outros botões de conversão
+    document.querySelectorAll('.conversion-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+
+    // Destaca o botão atual
+    const btn = document.querySelector(`[data-function="${tipoConversao}"]`);
+    if (btn) {
+      btn.classList.add('active');
+      setTimeout(() => btn.classList.remove('active'), 1000);
+    }
+
+    // Sistema inteligente de conversão baseado na magnitude da taxa
+    let resultado;
+    let descricao;
+    let tipoOrigem = this.detectarTipoTaxa(taxaAtual);
+
+    switch (tipoConversao) {
+      case 'taxa-dia':
+        resultado = this.converterPara('dia', taxaAtual, tipoOrigem);
+        descricao = 'Taxa diária';
+        break;
+      case 'taxa-mes':
+        resultado = this.converterPara('mes', taxaAtual, tipoOrigem);
+        descricao = 'Taxa mensal';
+        break;
+      case 'taxa-ano':
+        resultado = this.converterPara('ano', taxaAtual, tipoOrigem);
+        descricao = 'Taxa anual';
+        break;
+      default:
+        this.mostrarErro('Tipo de conversão inválido');
+        return;
+    }
+
+    // Atualiza o display
+    this.entradaAtual = resultado.toFixed(6);
+    this.novaEntrada = true;
+    this.atualizarDisplay();
+    
+    // Mostra informação da conversão
+    this.displayOp.textContent = `${descricao} (${this.modoCapitalizacao}) - De: ${tipoOrigem}`;
+  }
+
+  // Detecta o tipo de taxa baseado na magnitude do valor
+  detectarTipoTaxa(taxa) {
+    if (taxa <= 1) {
+      return 'dia';
+    } else if (taxa <= 15) {
+      return 'mes';
+    } else {
+      return 'ano';
+    }
+  }
+
+  // Converte taxa de um período para outro
+  converterPara(tipoDestino, taxa, tipoOrigem) {
+    // Se já é o tipo desejado, retorna a taxa
+    if (tipoOrigem === tipoDestino) {
+      return taxa;
+    }
+
+    // Primeiro converte para taxa anual
+    let taxaAnual;
+    switch (tipoOrigem) {
+      case 'dia':
+        taxaAnual = this.modoCapitalizacao === 'simples' 
+          ? taxa * 360 
+          : (Math.pow(1 + taxa / 100, 360) - 1) * 100;
+        break;
+      case 'mes':
+        taxaAnual = this.modoCapitalizacao === 'simples' 
+          ? taxa * 12 
+          : (Math.pow(1 + taxa / 100, 12) - 1) * 100;
+        break;
+      case 'ano':
+        taxaAnual = taxa;
+        break;
+    }
+
+    // Depois converte da taxa anual para o tipo desejado
+    switch (tipoDestino) {
+      case 'dia':
+        return this.modoCapitalizacao === 'simples' 
+          ? taxaAnual / 360 
+          : (Math.pow(1 + taxaAnual / 100, 1/360) - 1) * 100;
+      case 'mes':
+        return this.modoCapitalizacao === 'simples' 
+          ? taxaAnual / 12 
+          : (Math.pow(1 + taxaAnual / 100, 1/12) - 1) * 100;
+      case 'ano':
+        return taxaAnual;
+      default:
+        return taxa;
+    }
+  }
+
+  // Atualiza o display de operação com modo e operação atual
+  atualizarDisplayOperacao() {
+    const modoTexto = this.modoCapitalizacao.toUpperCase();
+    let operacaoTexto = '';
+    
+    if (this.operando !== undefined && this.operacaoAtual) {
+      const simbolosOp = {
+        'soma': '+',
+        'subtrai': '-',
+        'multiplica': '×',
+        'divide': '÷'
+      };
+      operacaoTexto = `${this.formatarNumero(this.operando)} ${simbolosOp[this.operacaoAtual] || this.operacaoAtual}`;
+    }
+    
+    // Cria o HTML com modo à esquerda e operação à direita
+    this.displayOp.innerHTML = `<span style="color: #3498db; font-weight: bold;">${modoTexto}</span><span>${operacaoTexto}</span>`;
+  }
+
   // Atualiza o display de operação
   atualizarDisplayOp(simbolo) {
-    if (this.operando !== undefined) this.displayOp.textContent = `${this.formatarNumero(this.operando)} ${simbolo}`;
+    if (this.operando !== undefined) {
+      const modoTexto = this.modoCapitalizacao.toUpperCase();
+      const operacaoTexto = `${this.formatarNumero(this.operando)} ${simbolo}`;
+      this.displayOp.innerHTML = `<span style="color: #3498db; font-weight: bold;">${modoTexto}</span><span>${operacaoTexto}</span>`;
+    }
   }
 
   // Limpa a operação atual
@@ -458,7 +620,7 @@ class CalculadoraFinanceira {
     this.operacaoAtual = null;
     this.operando = undefined;
     this.ultimaOp = null;
-    this.displayOp.textContent = '';
+    this.atualizarDisplayOperacao();
     
     // Remove destaque do botão
     if (this.btnOpAtivo) {
