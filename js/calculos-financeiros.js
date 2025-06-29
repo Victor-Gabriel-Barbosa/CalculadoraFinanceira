@@ -153,9 +153,7 @@ class CalculosFinanceiros {
    */
   converterTaxa(tipoDestino, taxa, tipoOrigem) {
     // Se já é o tipo desejado, retorna a taxa
-    if (tipoOrigem === tipoDestino) {
-      return taxa;
-    }
+    if (tipoOrigem === tipoDestino) return taxa;
 
     // Primeiro converte para taxa anual
     let taxaAnual;

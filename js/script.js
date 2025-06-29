@@ -797,7 +797,7 @@ class CalculadoraFinanceira {
   converterPeriodo(valor, periodoOrigem, periodoDestino) {
     if (periodoOrigem === periodoDestino) return valor;
 
-    const diasPorPeriodo = { day: 1, month: 30, year: 365 };
+    const diasPorPeriodo = { day: 1, month: 30, year: 360 };
 
     // Converte o valor para dias
     const valorEmDias = valor * diasPorPeriodo[periodoOrigem];
