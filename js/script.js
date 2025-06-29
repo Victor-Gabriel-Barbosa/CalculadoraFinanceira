@@ -15,6 +15,17 @@ class CalculadoraFinanceira {
       i: document.getElementById('iValue'),
       n: document.getElementById('nValue')
     };
+    
+    // Elemento do seletor de taxa
+    this.seletorTaxa = document.getElementById('rateSelector');
+    
+    // Elementos dos outros seletores
+    this.seletorPV = document.getElementById('pvSelector');
+    this.seletorFV = document.getElementById('fvSelector');
+    this.seletorPeriodo = document.getElementById('periodSelector');
+    
+    // Seletor de modo
+    this.seletorModo = document.getElementById('modeSelector');
 
     // Estado da calculadora
     this.entradaAtual = '0';
@@ -33,6 +44,14 @@ class CalculadoraFinanceira {
       i: null,    // Taxa de juros (por período)
       n: null     // Número de períodos
     };
+    
+    // Período atual da taxa (day, month, year)
+    this.periodoTaxa = 'month';
+    
+    // Tipos de conversão para valores e períodos
+    this.tipoMoedaPV = 'real';
+    this.tipoMoedaFV = 'real';
+    this.tipoPeriodo = 'month';
 
     // Sistema de cálculos financeiros
     this.calculosFinanceiros = new CalculosFinanceiros();
@@ -41,6 +60,8 @@ class CalculadoraFinanceira {
     this.inicializarEventos();
     this.atualizarDisplay();
     this.atualizarIndicadorModo();
+    this.atualizarVisibilidadeSeletores();
+    this.inicializarSeletorModo();
   }
 
   // Atualiza o indicador de modo de capitalização
@@ -77,6 +98,36 @@ class CalculadoraFinanceira {
         this.converterTaxa(btn.dataset.function);
       });
     });    
+    
+    // Seletor de taxa
+    this.seletorTaxa.addEventListener('change', (evento) => {
+      console.log('Seletor taxa mudou para:', evento.target.value);
+      this.alterarPeriodoTaxa();
+    });
+    
+    // Seletor de moeda PV
+    this.seletorPV.addEventListener('change', (evento) => {
+      console.log('Seletor PV mudou para:', evento.target.value);
+      this.alterarMoedaPV();
+    });
+    
+    // Seletor de moeda FV
+    this.seletorFV.addEventListener('change', (evento) => {
+      console.log('Seletor FV mudou para:', evento.target.value);
+      this.alterarMoedaFV();
+    });
+    
+    // Seletor de período
+    this.seletorPeriodo.addEventListener('change', (evento) => {
+      console.log('Seletor período mudou para:', evento.target.value);
+      this.alterarTipoPeriodo();
+    });
+    
+    // Seletor de modo
+    this.seletorModo.addEventListener('change', (evento) => {
+      console.log('Seletor modo mudou para:', evento.target.value);
+      this.alterarModoCalculadora();
+    });
     
     // Suporte a teclado
     document.addEventListener('keydown', (evento) => {
@@ -128,6 +179,7 @@ class CalculadoraFinanceira {
 
     this.valoresFinanceiros[variavel] = valor;
     this.ultimaVariavel = variavel;
+    
     this.atualizarDisplayStatus();
     this.displayVariavel.textContent = `${variavel.toUpperCase()}: ${this.formatarNumero(valor)}`;
 
@@ -235,6 +287,30 @@ class CalculadoraFinanceira {
     this.limparOp();
   }
 
+  // Inicializa o seletor de modo com o valor atual
+  inicializarSeletorModo() {
+    const modoAtual = this.calculosFinanceiros.getModoCapitalizacao();
+    this.seletorModo.value = modoAtual;
+  }
+
+  // Altera o modo da calculadora através do seletor
+  alterarModoCalculadora() {
+    const novoModo = this.seletorModo.value;
+    
+    // Define o modo no sistema de cálculos
+    this.calculosFinanceiros.setModoCapitalizacao(novoModo === 'simples' ? 'simples' : 'composto');
+    
+    // Atualiza o display de operação
+    this.atualizarDisplayOperacao();
+    
+    // Mostra feedback temporário
+    const modoTexto = novoModo === 'simples' ? 'JUROS SIMPLES' : 'JUROS COMPOSTOS';
+    this.displayOp.innerHTML = `<span style="color: #f39c12; font-weight: bold;">${modoTexto}</span>`;
+    setTimeout(() => {
+      this.atualizarDisplayOperacao();
+    }, 2000);
+  }
+
   // Alterna entre modo de capitalização simples e composta
   alternarModoCapitalizacao() {
     const modoAnterior = this.calculosFinanceiros.getModoCapitalizacao();
@@ -250,7 +326,9 @@ class CalculadoraFinanceira {
       this.atualizarDisplayOperacao();
     }, 2000);
   }
-  operacaoBasica(op) {
+
+  // Define uma operação matemática básica (soma, subtração, multiplicação, divisão)
+  operacaoBasica(op) { 
     // Remove destaque do botão anterior
     if (this.btnOpAtivo) this.btnOpAtivo.classList.remove('active-operation');
 
@@ -405,24 +483,6 @@ class CalculadoraFinanceira {
     if (!this.operacaoAtual) this.displayOp.textContent = '';
   }
 
-  // Limpa todos os valores e reinicia a calculadora
-  limparTudo() {
-    this.entradaAtual = '0';
-    this.novaEntrada = true;
-    this.ultimaVariavel = null;
-    this.valoresFinanceiros = {
-      pv: null,
-      fv: null,
-      i: null,
-      n: null
-    };
-    this.displayVariavel.textContent = '-';
-    this.atualizarDisplay();
-    this.atualizarDisplayStatus();
-    this.limparErro();
-    this.limparOp();
-  }
-
   // Converte taxas entre dia, mês e ano
   converterTaxa(tipoConversao) {
     this.limparErro();
@@ -515,6 +575,218 @@ class CalculadoraFinanceira {
       const valor = this.valoresFinanceiros[chave];
       this.valoresStatus[chave].textContent = valor !== null ? this.formatarNumero(valor) : '-';
     });
+    
+    // Mostra os seletores para campos que têm valores definidos
+    this.atualizarVisibilidadeSeletores();
+  }
+
+  // Atualiza a visibilidade dos seletores baseado nos valores definidos
+  atualizarVisibilidadeSeletores() {
+    // PV - mostra seletor se há valor definido
+    if (this.valoresFinanceiros.pv !== null) this.mostrarSeletorPV();
+    else this.seletorPV.style.display = 'none';
+    
+    // FV - mostra seletor se há valor definido
+    if (this.valoresFinanceiros.fv !== null) this.mostrarSeletorFV();
+    else this.seletorFV.style.display = 'none';
+    
+    // i - mostra seletor se há valor definido
+    if (this.valoresFinanceiros.i !== null) this.mostrarSeletorTaxa();
+    else this.seletorTaxa.style.display = 'none';
+    
+    // n - mostra seletor se há valor definido
+    if (this.valoresFinanceiros.n !== null) this.mostrarSeletorPeriodo();
+    else this.seletorPeriodo.style.display = 'none';
+  }
+
+  // Mostra o seletor de taxa quando o usuário clica em 'i'
+  mostrarSeletorTaxa() {
+    this.seletorTaxa.style.display = 'block';
+    // Só define o valor se ainda não estiver definido
+    if (!this.seletorTaxa.value || this.seletorTaxa.value === '') this.seletorTaxa.value = this.periodoTaxa;
+  }
+
+  // Mostra o seletor de moeda PV
+  mostrarSeletorPV() {
+    this.seletorPV.style.display = 'block';
+    // Só define o valor se ainda não estiver definido
+    if (!this.seletorPV.value || this.seletorPV.value === '') this.seletorPV.value = this.tipoMoedaPV;
+  }
+
+  // Mostra o seletor de moeda FV
+  mostrarSeletorFV() {
+    this.seletorFV.style.display = 'block';
+    // Só define o valor se ainda não estiver definido
+    if (!this.seletorFV.value || this.seletorFV.value === '') this.seletorFV.value = this.tipoMoedaFV;
+  }
+
+  // Mostra o seletor de período
+  mostrarSeletorPeriodo() {
+    this.seletorPeriodo.style.display = 'block';
+    // Só define o valor se ainda não estiver definido
+    if (!this.seletorPeriodo.value || this.seletorPeriodo.value === '') this.seletorPeriodo.value = this.tipoPeriodo;
+  }
+
+  // Esconde todos os seletores
+  esconderTodosSeletores() {
+    this.seletorTaxa.style.display = 'none';
+    this.seletorPV.style.display = 'none';
+    this.seletorFV.style.display = 'none';
+    this.seletorPeriodo.style.display = 'none';
+  }
+
+  // Esconde o seletor de taxa
+  esconderSeletorTaxa() {
+    this.seletorTaxa.style.display = 'none';
+  }
+
+  // Altera o período da taxa (dia, mês, ano)
+  alterarPeriodoTaxa() {
+    const novoperiodo = this.seletorTaxa.value;
+    const valorAtualI = this.valoresFinanceiros.i;
+    
+    // Atualiza a propriedade interna primeiro
+    const periodoAnterior = this.periodoTaxa;
+    this.periodoTaxa = novoperiodo;
+    
+    if (valorAtualI !== null) {
+      // Converte a taxa atual para o novo período
+      const taxaConvertida = this.converterTaxaEntrePeriodos(valorAtualI, periodoAnterior, novoperiodo);
+      this.valoresFinanceiros.i = taxaConvertida;
+      this.atualizarDisplayStatus();
+      
+      // Atualiza o display da variável
+      this.displayVariavel.textContent = `I(${this.obterNomePeriodo(novoperiodo)}): ${this.formatarNumero(taxaConvertida)}%`;
+    }
+  }
+
+  // Altera a moeda do PV
+  alterarMoedaPV() {
+    const novaMoeda = this.seletorPV.value;
+    const valorAtualPV = this.valoresFinanceiros.pv;
+    
+    // Atualiza a propriedade interna primeiro
+    const moedaAnterior = this.tipoMoedaPV;
+    this.tipoMoedaPV = novaMoeda;
+    
+    if (valorAtualPV !== null) {
+      // Converte o valor para a nova moeda
+      const valorConvertido = this.converterMoeda(valorAtualPV, moedaAnterior, novaMoeda);
+      this.valoresFinanceiros.pv = valorConvertido;
+      this.atualizarDisplayStatus();
+      
+      // Atualiza o display da variável
+      this.displayVariavel.textContent = `PV(${this.obterSimboloMoeda(novaMoeda)}): ${this.formatarNumero(valorConvertido)}`;
+    }
+  }
+
+  // Altera a moeda do FV
+  alterarMoedaFV() {
+    const novaMoeda = this.seletorFV.value;
+    const valorAtualFV = this.valoresFinanceiros.fv;
+    
+    // Atualiza a propriedade interna primeiro
+    const moedaAnterior = this.tipoMoedaFV;
+    this.tipoMoedaFV = novaMoeda;
+    
+    if (valorAtualFV !== null) {
+      // Converte o valor para a nova moeda
+      const valorConvertido = this.converterMoeda(valorAtualFV, moedaAnterior, novaMoeda);
+      this.valoresFinanceiros.fv = valorConvertido;
+      this.atualizarDisplayStatus();
+      
+      // Atualiza o display da variável
+      this.displayVariavel.textContent = `FV(${this.obterSimboloMoeda(novaMoeda)}): ${this.formatarNumero(valorConvertido)}`;
+    }
+  }
+
+  // Altera o tipo de período
+  alterarTipoPeriodo() {
+    const novoPeriodo = this.seletorPeriodo.value;
+    const valorAtualN = this.valoresFinanceiros.n;
+    
+    // Atualiza a propriedade interna primeiro
+    const periodoAnterior = this.tipoPeriodo;
+    this.tipoPeriodo = novoPeriodo;
+    
+    if (valorAtualN !== null) {
+      // Converte o período para o novo tipo
+      const periodoConvertido = this.converterPeriodo(valorAtualN, periodoAnterior, novoPeriodo);
+      this.valoresFinanceiros.n = periodoConvertido;
+      this.atualizarDisplayStatus();
+      
+      // Atualiza o display da variável
+      this.displayVariavel.textContent = `N(${this.obterNomePeriodo(novoPeriodo)}): ${this.formatarNumero(periodoConvertido)}`;
+    }
+  }
+
+  // Converte taxa entre diferentes períodos
+  converterTaxaEntrePeriodos(taxa, periodoOrigem, periodoDestino) {
+    if (periodoOrigem === periodoDestino) return taxa;
+
+    // Mapeamento de períodos para número de dias
+    const diasPorPeriodo = { day: 1, month: 30, year: 360 };
+
+    // Converte taxa para decimal
+    const taxaDecimal = taxa / 100;
+
+    // Calcula fator de conversão
+    const diasOrigem = diasPorPeriodo[periodoOrigem];
+    const diasDestino = diasPorPeriodo[periodoDestino];
+
+    // Converte taxa para equivalente no novo período (juros compostos)
+    const taxaConvertida = Math.pow(1 + taxaDecimal, diasDestino / diasOrigem) - 1;
+
+    return taxaConvertida * 100; // Retorna em porcentagem
+  }
+
+  // Retorna o nome do período em português
+  obterNomePeriodo(periodo) {
+    const nomes = {
+      day: 'Dia',
+      month: 'Mês',
+      year: 'Ano'
+    };
+    return nomes[periodo] || 'Mês';
+  }
+
+  // Converte valores entre moedas (taxas fixas para demonstração)
+  converterMoeda(valor, moedaOrigem, moedaDestino) {
+    if (moedaOrigem === moedaDestino) return valor;
+    
+    // Taxas de conversão aproximadas (para demonstração)
+    const taxas = {
+      real: 1,
+      dollar: 5.2,    // 1 USD = 5.2 BRL
+      euro: 5.8       // 1 EUR = 5.8 BRL
+    };
+    
+    // Converte para real primeiro, depois para moeda destino
+    const valorEmReal = valor * taxas[moedaOrigem];
+    return valorEmReal / taxas[moedaDestino];
+  }
+
+  // Retorna o símbolo da moeda
+  obterSimboloMoeda(moeda) {
+    const simbolos = {
+      real: 'R$',
+      dollar: 'US$',
+      euro: '€'
+    };
+    return simbolos[moeda] || 'R$';
+  }
+
+  // Converte períodos entre diferentes unidades
+  converterPeriodo(valor, periodoOrigem, periodoDestino) {
+    if (periodoOrigem === periodoDestino) return valor;
+
+    const diasPorPeriodo = { day: 1, month: 30, year: 365 };
+
+    // Converte o valor para dias
+    const valorEmDias = valor * diasPorPeriodo[periodoOrigem];
+
+    // Converte de dias para o período de destino
+    return valorEmDias / diasPorPeriodo[periodoDestino];
   }
 
   // Formata números para exibição

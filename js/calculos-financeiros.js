@@ -199,9 +199,7 @@ class CalculosFinanceiros {
    * @returns {Object} Resultado da conversão com valor e descrições
    */
   converterTaxaAutomatica(tipoConversao, taxaAtual) {
-    if (isNaN(taxaAtual) || taxaAtual < 0) {
-      throw new Error('Taxa inválida');
-    }
+    if (isNaN(taxaAtual) || taxaAtual < 0) throw new Error('Taxa inválida');
 
     // Sistema inteligente de conversão baseado na magnitude da taxa
     let resultado;

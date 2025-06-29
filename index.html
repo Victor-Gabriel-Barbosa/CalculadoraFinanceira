@@ -18,6 +18,13 @@
       <!-- Header da calculadora -->
       <div class="calculator-header">
         <h2>CALCULADORA FINANCEIRA</h2>
+        <div class="mode-selector-container">
+          <label for="modeSelector">Modo:</label>
+          <select class="mode-selector" id="modeSelector">
+            <option value="composto">Juros Compostos</option>
+            <option value="simples">Juros Simples</option>
+          </select>
+        </div>
       </div> 
       
       <!-- Display principal -->
@@ -32,31 +39,43 @@
         <div class="status-item">
           <span class="label">PV:</span>
           <span class="value" id="pvValue">-</span>
+          <select class="value-selector" id="pvSelector" style="display: none;">
+            <option value="real">Real (R$)</option>
+            <option value="dollar">Dólar (US$)</option>
+            <option value="euro">Euro (€)</option>
+          </select>
         </div>
         <div class="status-item">
           <span class="label">FV:</span>
           <span class="value" id="fvValue">-</span>
+          <select class="value-selector" id="fvSelector" style="display: none;">
+            <option value="real">Real (R$)</option>
+            <option value="dollar">Dólar (US$)</option>
+            <option value="euro">Euro (€)</option>
+          </select>
         </div>
         <div class="status-item">
           <span class="label">i:</span>
           <span class="value" id="iValue">-</span>
+          <select class="rate-selector" id="rateSelector" style="display: none;">
+            <option value="day">Dia</option>
+            <option value="month" selected>Mês</option>
+            <option value="year">Ano</option>
+          </select>
         </div>
         <div class="status-item">
           <span class="label">n:</span>
           <span class="value" id="nValue">-</span>
+          <select class="period-selector" id="periodSelector" style="display: none;">
+            <option value="day">Dias</option>
+            <option value="month" selected>Meses</option>
+            <option value="year">Anos</option>
+          </select>
         </div>
       </div>
 
       <!-- Teclado da calculadora -->
       <div class="keypad">
-        <!-- Nova linha - Conversão de taxas -->
-        <div class="keypad-row conversion-row">
-          <button class="btn conversion-btn" data-function="taxa-dia">Taxa/Dia</button>
-          <button class="btn conversion-btn" data-function="taxa-mes">Taxa/Mês</button>
-          <button class="btn conversion-btn" data-function="taxa-ano">Taxa/Ano</button>
-          <button class="btn operation-btn" data-function="toggle-mode">Modo</button>
-        </div>
-
         <!-- Primeira linha - Funções financeiras -->
         <div class="keypad-row">
           <button class="btn financial-btn" data-function="pv">PV</button>
