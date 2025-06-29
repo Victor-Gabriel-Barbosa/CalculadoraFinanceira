@@ -658,10 +658,25 @@ class CalculadoraFinanceira {
   manipularTeclado(evento) {
     const tecla = evento.key;
 
+    // Lista de teclas que devem ser ignoradas pela calculadora
+    const teclasIgnoradas = [
+      'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
+      'Tab', 'CapsLock', 'Shift', 'Control', 'Alt', 'Meta', 'ContextMenu',
+      'Home', 'End', 'PageUp', 'PageDown', 'Insert', 'Delete',
+      'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'
+    ];
+
+    // Se a tecla deve ser ignorada, não interfere
+    if (teclasIgnoradas.includes(tecla)) return;
+
+    // Se há modificadores (Ctrl, Alt, etc.) pressionados, também ignora
+    if (evento.ctrlKey || evento.altKey || evento.metaKey) return;
+
     // Números
     if (/[0-9]/.test(tecla)) {
       this.inserirNumero(tecla);
       evento.preventDefault();
+      return;
     }
 
     // Operações
