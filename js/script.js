@@ -200,6 +200,7 @@ class CalculadoraFinanceira {
       porcento: () => this.converterParaPorcentagem(),
       raiz: () => this.raizQuadrada(),
       potencia: () => this.potencia(),
+      log: () => this.logaritmo(),
       igual: () => this.igual(),
       soma: () => this.operacaoBasica('soma'),
       subtrai: () => this.operacaoBasica('subtrai'),
@@ -471,6 +472,23 @@ class CalculadoraFinanceira {
         this.displayOp.textContent = '';
       }, 2000);
     }
+  }
+
+  // Calcula o logaritmo do valor atual
+  logaritmo() {
+    const valor = parseFloat(this.entradaAtual);
+    if (!isNaN(valor) && valor > 0) {
+      const resultado = Math.log10(valor);
+      this.displayOp.textContent = `log(${this.formatarNumero(valor)}) = ${this.formatarNumero(resultado)}`;
+      this.entradaAtual = resultado.toString();
+      this.atualizarDisplay();
+      this.novaEntrada = true;
+      
+      // Limpa o display de operação após 2 segundos
+      setTimeout(() => {
+        this.displayOp.textContent = '';
+      }, 2000);
+    } else this.mostrarErro('Logaritmo só é definido para números positivos');
   }
 
   // Limpa a entrada atual
