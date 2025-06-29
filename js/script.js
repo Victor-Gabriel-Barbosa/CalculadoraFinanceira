@@ -34,8 +34,8 @@ class CalculadoraFinanceira {
       n: null     // Número de períodos
     };
 
-    // Sistema de conversão de taxas
-    this.modoCapitalizacao = 'simples'; // 'simples' ou 'composta'
+    // Sistema de cálculos financeiros
+    this.calculosFinanceiros = new CalculosFinanceiros();
 
     // Inicializa eventos
     this.inicializarEventos();
@@ -187,7 +187,7 @@ class CalculadoraFinanceira {
       this.displayPrincipal.classList.add('calculating');
       this.displayOp.textContent = `Calculando ${variavelFaltante.toUpperCase()}...`;
 
-      const resultado = this.resolverEqFinanceira(variavelFaltante);
+      const resultado = this.calculosFinanceiros.resolverEqFinanceira(variavelFaltante, this.valoresFinanceiros);
 
       if (resultado === null || isNaN(resultado) || !isFinite(resultado)) {
         this.mostrarErro('Não foi possível calcular com estes valores');
@@ -217,81 +217,39 @@ class CalculadoraFinanceira {
     }
   }
 
-  // Resolve a equação financeira para encontrar a variável faltante
-  resolverEqFinanceira(variavelFaltante) {
-    const { pv, fv, i, n } = this.valoresFinanceiros;
-
-    // Sempre converte taxa de juros de percentual para decimal
-    const taxa = i !== null ? i / 100 : null;
-
-    const operacoes = {
-      pv: () => this.calcularVP(fv, taxa, n),
-      fv: () => this.calcularVF(pv, taxa, n),
-      i: () => this.calcularTaxaJuros(pv, fv, n),
-      n: () => this.calcularN(pv, fv, taxa),
+  // Limpa todos os valores e reinicia a calculadora
+  limparTudo() {
+    this.entradaAtual = '0';
+    this.novaEntrada = true;
+    this.ultimaVariavel = null;
+    this.valoresFinanceiros = {
+      pv: null,
+      fv: null,
+      i: null,
+      n: null
     };
-
-    if (operacoes[variavelFaltante]) return operacoes[variavelFaltante]();
-    else throw new Error('Variável desconhecida');
+    this.displayVariavel.textContent = '-';
+    this.atualizarDisplay();
+    this.atualizarDisplayStatus();
+    this.limparErro();
+    this.limparOp();
   }
 
-  /**
-   * Calcula Valor Presente (PV)
-   * PV = -FV / (1 + i)^n
-   */
-  calcularVP(fv, i, n) {
-    // Caso especial: taxa zero
-    if (i === 0) return -(fv || 0);
-
-    const fator = Math.pow(1 + i, n);
-    return -(fv || 0) / fator;
-  }
-
-  /**
-   * Calcula Valor Futuro (FV)
-   * FV = -PV * (1 + i)^n
-   */
-  calcularVF(pv, i, n) {
-    // Caso especial: taxa zero
-    if (i === 0) return -(pv || 0);
-
-    const fator = Math.pow(1 + i, n);
-    return -(pv || 0) * fator;
-  }
-
-  // Calcula Taxa de Juros (i) usando método de Newton-Raphson
-  calcularTaxaJuros(pv, fv, n) {
-    // Validações básicas
-    if (n === 0) throw new Error('Número de períodos não pode ser zero');
-    if (pv === 0 || fv === 0) throw new Error('PV e FV não podem ser zero');
-    if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
-
-    // Cálculo direto para juros compostos simples: i = (FV/PV)^(1/n) - 1
-    const taxa = Math.pow(Math.abs(fv / pv), 1 / n) - 1;
+  // Alterna entre modo de capitalização simples e composta
+  alternarModoCapitalizacao() {
+    const modoAnterior = this.calculosFinanceiros.getModoCapitalizacao();
+    const novoModo = this.calculosFinanceiros.alternarModoCapitalizacao();
     
-    if (isNaN(taxa) || !isFinite(taxa)) throw new Error('Não é possível calcular a taxa com estes valores');
+    // Atualiza o display de operação
+    this.atualizarDisplayOperacao();
     
-    return taxa * 100; // Retorna como percentual
+    // Mostra feedback temporário
+    const modoTexto = novoModo.toUpperCase();
+    this.displayOp.innerHTML = `<span style="color: #3498db; font-weight: bold;">${modoTexto}</span><span style="color: #e74c3c;"> ALTERADO</span>`;
+    setTimeout(() => {
+      this.atualizarDisplayOperacao();
+    }, 2000);
   }
-
-  // Calcula Número de Períodos (n)
-  calcularN(pv, fv, i) {
-    // Validações básicas
-    if (i === 0) throw new Error('Taxa de juros não pode ser zero');
-    if (pv === 0 || fv === 0) throw new Error('PV e FV não podem ser zero');
-    if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
-
-    // Cálculo direto: n = ln(FV/PV) / ln(1 + i)
-    const numerador = Math.log(Math.abs(fv / pv));
-    const denominador = Math.log(1 + i);
-    
-    if (denominador === 0) throw new Error('Taxa de juros inválida para cálculo de n');
-    if (numerador <= 0) throw new Error('Não é possível calcular n com estes valores');
-    
-    return numerador / denominador;
-  }
-
-  // Operações básicas da calculadora
   operacaoBasica(op) {
     // Remove destaque do botão anterior
     if (this.btnOpAtivo) this.btnOpAtivo.classList.remove('active-operation');
@@ -465,21 +423,6 @@ class CalculadoraFinanceira {
     this.limparOp();
   }
 
-  // Alterna entre modo de capitalização simples e composta
-  alternarModoCapitalizacao() {
-    this.modoCapitalizacao = this.modoCapitalizacao === 'simples' ? 'composta' : 'simples';
-    
-    // Atualiza o display de operação
-    this.atualizarDisplayOperacao();
-    
-    // Mostra feedback temporário
-    const modoTexto = this.modoCapitalizacao.toUpperCase();
-    this.displayOp.innerHTML = `<span style="color: #3498db; font-weight: bold;">${modoTexto}</span><span style="color: #e74c3c;"> ALTERADO</span>`;
-    setTimeout(() => {
-      this.atualizarDisplayOperacao();
-    }, 2000);
-  }
-
   // Converte taxas entre dia, mês e ano
   converterTaxa(tipoConversao) {
     this.limparErro();
@@ -502,94 +445,25 @@ class CalculadoraFinanceira {
       setTimeout(() => btn.classList.remove('active'), 1000);
     }
 
-    // Sistema inteligente de conversão baseado na magnitude da taxa
-    let resultado;
-    let descricao;
-    let tipoOrigem = this.detectarTipoTaxa(taxaAtual);
-
-    switch (tipoConversao) {
-      case 'taxa-dia':
-        resultado = this.converterPara('dia', taxaAtual, tipoOrigem);
-        descricao = 'Taxa diária';
-        break;
-      case 'taxa-mes':
-        resultado = this.converterPara('mes', taxaAtual, tipoOrigem);
-        descricao = 'Taxa mensal';
-        break;
-      case 'taxa-ano':
-        resultado = this.converterPara('ano', taxaAtual, tipoOrigem);
-        descricao = 'Taxa anual';
-        break;
-      default:
-        this.mostrarErro('Tipo de conversão inválido');
-        return;
-    }
-
-    // Atualiza o display
-    this.entradaAtual = resultado.toFixed(6);
-    this.novaEntrada = true;
-    this.atualizarDisplay();
-    
-    // Mostra informação da conversão
-    this.displayOp.textContent = `${descricao} (${this.modoCapitalizacao}) - De: ${tipoOrigem}`;
-  }
-
-  // Detecta o tipo de taxa baseado na magnitude do valor
-  detectarTipoTaxa(taxa) {
-    if (taxa <= 1) {
-      return 'dia';
-    } else if (taxa <= 15) {
-      return 'mes';
-    } else {
-      return 'ano';
-    }
-  }
-
-  // Converte taxa de um período para outro
-  converterPara(tipoDestino, taxa, tipoOrigem) {
-    // Se já é o tipo desejado, retorna a taxa
-    if (tipoOrigem === tipoDestino) {
-      return taxa;
-    }
-
-    // Primeiro converte para taxa anual
-    let taxaAnual;
-    switch (tipoOrigem) {
-      case 'dia':
-        taxaAnual = this.modoCapitalizacao === 'simples' 
-          ? taxa * 360 
-          : (Math.pow(1 + taxa / 100, 360) - 1) * 100;
-        break;
-      case 'mes':
-        taxaAnual = this.modoCapitalizacao === 'simples' 
-          ? taxa * 12 
-          : (Math.pow(1 + taxa / 100, 12) - 1) * 100;
-        break;
-      case 'ano':
-        taxaAnual = taxa;
-        break;
-    }
-
-    // Depois converte da taxa anual para o tipo desejado
-    switch (tipoDestino) {
-      case 'dia':
-        return this.modoCapitalizacao === 'simples' 
-          ? taxaAnual / 360 
-          : (Math.pow(1 + taxaAnual / 100, 1/360) - 1) * 100;
-      case 'mes':
-        return this.modoCapitalizacao === 'simples' 
-          ? taxaAnual / 12 
-          : (Math.pow(1 + taxaAnual / 100, 1/12) - 1) * 100;
-      case 'ano':
-        return taxaAnual;
-      default:
-        return taxa;
+    try {
+      // Usa a nova classe para conversão
+      const conversao = this.calculosFinanceiros.converterTaxaAutomatica(tipoConversao, taxaAtual);
+      
+      // Atualiza o display
+      this.entradaAtual = conversao.resultado.toFixed(6);
+      this.novaEntrada = true;
+      this.atualizarDisplay();
+      
+      // Mostra informação da conversão
+      this.displayOp.textContent = `${conversao.descricao} (${conversao.modo}) - De: ${conversao.tipoOrigem}`;
+    } catch (erro) {
+      this.mostrarErro(erro.message);
     }
   }
 
   // Atualiza o display de operação com modo e operação atual
   atualizarDisplayOperacao() {
-    const modoTexto = this.modoCapitalizacao.toUpperCase();
+    const modoTexto = this.calculosFinanceiros.getModoCapitalizacao().toUpperCase();
     let operacaoTexto = '';
     
     if (this.operando !== undefined && this.operacaoAtual) {
@@ -609,7 +483,7 @@ class CalculadoraFinanceira {
   // Atualiza o display de operação
   atualizarDisplayOp(simbolo) {
     if (this.operando !== undefined) {
-      const modoTexto = this.modoCapitalizacao.toUpperCase();
+      const modoTexto = this.calculosFinanceiros.getModoCapitalizacao().toUpperCase();
       const operacaoTexto = `${this.formatarNumero(this.operando)} ${simbolo}`;
       this.displayOp.innerHTML = `<span style="color: #3498db; font-weight: bold;">${modoTexto}</span><span>${operacaoTexto}</span>`;
     }
