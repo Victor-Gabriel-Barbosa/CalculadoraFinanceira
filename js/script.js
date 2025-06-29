@@ -452,9 +452,8 @@ class CalculadoraFinanceira {
       setTimeout(() => {
         this.displayOp.textContent = '';
       }, 2000);
-    } else {
-      this.mostrarErro('Não é possível calcular raiz de número negativo');
-    }
+    } else this.mostrarErro('Não é possível calcular raiz de número negativo');
+
   }
 
   // Calcula o quadrado do valor atual
