@@ -668,12 +668,12 @@ class CalculadoraFinanceira {
     
     if (valorAtualI !== null) {
       // Converte a taxa atual para o novo período
-      const taxaConvertida = this.converterTaxaEntrePeriodos(valorAtualI, periodoAnterior, novoperiodo);
+      const taxaConvertida = this.calculosFinanceiros.converterTaxaEntrePeriodos(valorAtualI, periodoAnterior, novoperiodo);
       this.valoresFinanceiros.i = taxaConvertida;
       this.atualizarDisplayStatus();
       
       // Atualiza o display da variável
-      this.displayVariavel.textContent = `I(${this.obterNomePeriodo(novoperiodo)}): ${this.formatarNumero(taxaConvertida)}%`;
+      this.displayVariavel.textContent = `I(${this.calculosFinanceiros.obterNomePeriodo(novoperiodo)}): ${this.formatarNumero(taxaConvertida)}%`;
     }
   }
 
@@ -688,12 +688,12 @@ class CalculadoraFinanceira {
     
     if (valorAtualPV !== null) {
       // Converte o valor para a nova moeda
-      const valorConvertido = this.converterMoeda(valorAtualPV, moedaAnterior, novaMoeda);
+      const valorConvertido = this.calculosFinanceiros.converterMoeda(valorAtualPV, moedaAnterior, novaMoeda);
       this.valoresFinanceiros.pv = valorConvertido;
       this.atualizarDisplayStatus();
       
       // Atualiza o display da variável
-      this.displayVariavel.textContent = `PV(${this.obterSimboloMoeda(novaMoeda)}): ${this.formatarNumero(valorConvertido)}`;
+      this.displayVariavel.textContent = `PV(${this.calculosFinanceiros.obterSimboloMoeda(novaMoeda)}): ${this.formatarNumero(valorConvertido)}`;
     }
   }
 
@@ -708,12 +708,12 @@ class CalculadoraFinanceira {
     
     if (valorAtualFV !== null) {
       // Converte o valor para a nova moeda
-      const valorConvertido = this.converterMoeda(valorAtualFV, moedaAnterior, novaMoeda);
+      const valorConvertido = this.calculosFinanceiros.converterMoeda(valorAtualFV, moedaAnterior, novaMoeda);
       this.valoresFinanceiros.fv = valorConvertido;
       this.atualizarDisplayStatus();
       
       // Atualiza o display da variável
-      this.displayVariavel.textContent = `FV(${this.obterSimboloMoeda(novaMoeda)}): ${this.formatarNumero(valorConvertido)}`;
+      this.displayVariavel.textContent = `FV(${this.calculosFinanceiros.obterSimboloMoeda(novaMoeda)}): ${this.formatarNumero(valorConvertido)}`;
     }
   }
 
@@ -728,82 +728,13 @@ class CalculadoraFinanceira {
     
     if (valorAtualN !== null) {
       // Converte o período para o novo tipo
-      const periodoConvertido = this.converterPeriodo(valorAtualN, periodoAnterior, novoPeriodo);
+      const periodoConvertido = this.calculosFinanceiros.converterPeriodo(valorAtualN, periodoAnterior, novoPeriodo);
       this.valoresFinanceiros.n = periodoConvertido;
       this.atualizarDisplayStatus();
       
       // Atualiza o display da variável
-      this.displayVariavel.textContent = `N(${this.obterNomePeriodo(novoPeriodo)}): ${this.formatarNumero(periodoConvertido)}`;
+      this.displayVariavel.textContent = `N(${this.calculosFinanceiros.obterNomePeriodo(novoPeriodo)}): ${this.formatarNumero(periodoConvertido)}`;
     }
-  }
-
-  // Converte taxa entre diferentes períodos
-  converterTaxaEntrePeriodos(taxa, periodoOrigem, periodoDestino) {
-    if (periodoOrigem === periodoDestino) return taxa;
-
-    // Mapeamento de períodos para número de dias
-    const diasPorPeriodo = { day: 1, month: 30, year: 360 };
-
-    // Converte taxa para decimal
-    const taxaDecimal = taxa / 100;
-
-    // Calcula fator de conversão
-    const diasOrigem = diasPorPeriodo[periodoOrigem];
-    const diasDestino = diasPorPeriodo[periodoDestino];
-
-    // Converte taxa para equivalente no novo período (juros compostos)
-    const taxaConvertida = Math.pow(1 + taxaDecimal, diasDestino / diasOrigem) - 1;
-
-    return taxaConvertida * 100; // Retorna em porcentagem
-  }
-
-  // Retorna o nome do período em português
-  obterNomePeriodo(periodo) {
-    const nomes = {
-      day: 'Dia',
-      month: 'Mês',
-      year: 'Ano'
-    };
-    return nomes[periodo] || 'Mês';
-  }
-
-  // Converte valores entre moedas (taxas fixas para demonstração)
-  converterMoeda(valor, moedaOrigem, moedaDestino) {
-    if (moedaOrigem === moedaDestino) return valor;
-    
-    // Taxas de conversão aproximadas (para demonstração)
-    const taxas = {
-      real: 1,
-      dollar: 5.2,    // 1 USD = 5.2 BRL
-      euro: 5.8       // 1 EUR = 5.8 BRL
-    };
-    
-    // Converte para real primeiro, depois para moeda destino
-    const valorEmReal = valor * taxas[moedaOrigem];
-    return valorEmReal / taxas[moedaDestino];
-  }
-
-  // Retorna o símbolo da moeda
-  obterSimboloMoeda(moeda) {
-    const simbolos = {
-      real: 'R$',
-      dollar: 'US$',
-      euro: '€'
-    };
-    return simbolos[moeda] || 'R$';
-  }
-
-  // Converte períodos entre diferentes unidades
-  converterPeriodo(valor, periodoOrigem, periodoDestino) {
-    if (periodoOrigem === periodoDestino) return valor;
-
-    const diasPorPeriodo = { day: 1, month: 30, year: 360 };
-
-    // Converte o valor para dias
-    const valorEmDias = valor * diasPorPeriodo[periodoOrigem];
-
-    // Converte de dias para o período de destino
-    return valorEmDias / diasPorPeriodo[periodoDestino];
   }
 
   // Formata números para exibição

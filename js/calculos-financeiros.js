@@ -228,4 +228,99 @@ class CalculosFinanceiros {
       modo: this.modoCapitalizacao
     };
   }
+
+  /**
+   * Converte taxa entre diferentes períodos (day, month, year)
+   * @param {number} taxa - Taxa a ser convertida
+   * @param {string} periodoOrigem - Período de origem
+   * @param {string} periodoDestino - Período de destino
+   * @returns {number} Taxa convertida
+   */
+  converterTaxaEntrePeriodos(taxa, periodoOrigem, periodoDestino) {
+    if (periodoOrigem === periodoDestino) return taxa;
+
+    // Mapeamento de períodos para número de dias
+    const diasPorPeriodo = { day: 1, month: 30, year: 360 };
+
+    // Converte taxa para decimal
+    const taxaDecimal = taxa / 100;
+
+    // Calcula fator de conversão
+    const diasOrigem = diasPorPeriodo[periodoOrigem];
+    const diasDestino = diasPorPeriodo[periodoDestino];
+
+    // Converte taxa para equivalente no novo período (juros compostos)
+    const taxaConvertida = Math.pow(1 + taxaDecimal, diasDestino / diasOrigem) - 1;
+
+    return taxaConvertida * 100; // Retorna em porcentagem
+  }
+
+  /**
+   * Retorna o nome do período em português
+   * @param {string} periodo - Código do período (day, month, year)
+   * @returns {string} Nome do período em português
+   */
+  obterNomePeriodo(periodo) {
+    const nomes = {
+      day: 'Dia',
+      month: 'Mês',
+      year: 'Ano'
+    };
+    return nomes[periodo] || 'Mês';
+  }
+
+  /**
+   * Converte valores entre moedas (taxas fixas para demonstração)
+   * @param {number} valor - Valor a ser convertido
+   * @param {string} moedaOrigem - Moeda de origem
+   * @param {string} moedaDestino - Moeda de destino
+   * @returns {number} Valor convertido
+   */
+  converterMoeda(valor, moedaOrigem, moedaDestino) {
+    if (moedaOrigem === moedaDestino) return valor;
+    
+    // Taxas de conversão aproximadas (para demonstração)
+    const taxas = {
+      real: 1,
+      dollar: 5.2,    // 1 USD = 5.2 BRL
+      euro: 5.8       // 1 EUR = 5.8 BRL
+    };
+    
+    // Converte para real primeiro, depois para moeda destino
+    const valorEmReal = valor * taxas[moedaOrigem];
+    return valorEmReal / taxas[moedaDestino];
+  }
+
+  /**
+   * Retorna o símbolo da moeda
+   * @param {string} moeda - Código da moeda
+   * @returns {string} Símbolo da moeda
+   */
+  obterSimboloMoeda(moeda) {
+    const simbolos = {
+      real: 'R$',
+      dollar: 'US$',
+      euro: '€'
+    };
+    return simbolos[moeda] || 'R$';
+  }
+
+  /**
+   * Converte períodos entre diferentes unidades
+   * @param {number} valor - Valor do período a ser convertido
+   * @param {string} periodoOrigem - Unidade de origem
+   * @param {string} periodoDestino - Unidade de destino
+   * @returns {number} Valor convertido
+   */
+  converterPeriodo(valor, periodoOrigem, periodoDestino) {
+    if (periodoOrigem === periodoDestino) return valor;
+
+    const diasPorPeriodo = { day: 1, month: 30, year: 360 };
+
+    // Converte o valor para dias
+    const valorEmDias = valor * diasPorPeriodo[periodoOrigem];
+
+    // Converte de dias para o período de destino
+    return valorEmDias / diasPorPeriodo[periodoDestino];
+  }
 }
