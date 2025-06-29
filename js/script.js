@@ -1,7 +1,7 @@
 /**
  * CALCULADORA FINANCEIRA
  * Sistema completo para cálculos financeiros baseado em juros compostos
- * Suporta cálculo de Valor Presente (PV), Valor Futuro (FV) e Pagamento Periódico (PMT)
+ * Suporta cálculo de Valor Presente (PV), Valor Futuro (FV), Taxa de Juros (i) e Número de Períodos (n)
  */
 class CalculadoraFinanceira {  
   constructor() {
@@ -12,7 +12,6 @@ class CalculadoraFinanceira {
     this.valoresStatus = {
       pv: document.getElementById('pvValue'),
       fv: document.getElementById('fvValue'),
-      pmt: document.getElementById('pmtValue'),
       i: document.getElementById('iValue'),
       n: document.getElementById('nValue')
     };
@@ -31,7 +30,6 @@ class CalculadoraFinanceira {
     this.valoresFinanceiros = {
       pv: null,   // Valor Presente
       fv: null,   // Valor Futuro
-      pmt: null,  // Pagamento Periódico
       i: null,    // Taxa de juros (por período)
       n: null     // Número de períodos
     };
@@ -150,12 +148,12 @@ class CalculadoraFinanceira {
     // Conta quantas variáveis estão definidas
     const valoresDefinidos = Object.values(this.valoresFinanceiros).filter(v => v !== null);
 
-    if (valoresDefinidos.length < 4) {
-      this.mostrarErro('Defina pelo menos 4 variáveis para calcular');
+    if (valoresDefinidos.length < 3) {
+      this.mostrarErro('Defina pelo menos 3 variáveis para calcular');
       return;
     }
 
-    if (valoresDefinidos.length === 5) {
+    if (valoresDefinidos.length === 4) {
       this.mostrarErro('Todas as variáveis já estão definidas');
       return;
     }
@@ -204,17 +202,16 @@ class CalculadoraFinanceira {
 
   // Resolve a equação financeira para encontrar a variável faltante
   resolverEqFinanceira(variavelFaltante) {
-    const { pv, fv, pmt, i, n } = this.valoresFinanceiros;
+    const { pv, fv, i, n } = this.valoresFinanceiros;
 
     // Sempre converte taxa de juros de percentual para decimal
     const taxa = i !== null ? i / 100 : null;
 
     const operacoes = {
-      pv: () => this.calcularVP(fv, pmt, taxa, n),
-      fv: () => this.calcularVF(pv, pmt, taxa, n),
-      pmt: () => this.calcularPMT(pv, fv, taxa, n),
-      i: () => this.calcularTaxaJuros(pv, fv, pmt, n),
-      n: () => this.calcularN(pv, fv, pmt, taxa),
+      pv: () => this.calcularVP(fv, taxa, n),
+      fv: () => this.calcularVF(pv, taxa, n),
+      i: () => this.calcularTaxaJuros(pv, fv, n),
+      n: () => this.calcularN(pv, fv, taxa),
     };
 
     if (operacoes[variavelFaltante]) return operacoes[variavelFaltante]();
@@ -223,174 +220,56 @@ class CalculadoraFinanceira {
 
   /**
    * Calcula Valor Presente (PV)
-   * PV = -[FV / (1 + i)^n + PMT * [(1 + i)^n - 1] / [i * (1 + i)^n]]
+   * PV = -FV / (1 + i)^n
    */
-  calcularVP(fv, pmt, i, n) {
+  calcularVP(fv, i, n) {
     // Caso especial: taxa zero
-    if (i === 0) return -((fv || 0) + (pmt || 0) * n);
+    if (i === 0) return -(fv || 0);
 
     const fator = Math.pow(1 + i, n);
-    let pv = 0;
-
-    // Componente do valor futuro
-    if (fv !== null && fv !== 0) {
-      pv += (fv || 0) / fator;
-    }
-
-    // Componente dos pagamentos periódicos (anuidade)
-    if (pmt !== null && pmt !== 0) pv += (pmt || 0) * (fator - 1) / (i * fator);
-
-    return -pv; // Retorna negativo conforme convenção financeira
+    return -(fv || 0) / fator;
   }
 
   /**
    * Calcula Valor Futuro (FV)
-   * FV = -[PV * (1 + i)^n + PMT * [(1 + i)^n - 1] / i]
+   * FV = -PV * (1 + i)^n
    */
-  calcularVF(pv, pmt, i, n) {
+  calcularVF(pv, i, n) {
     // Caso especial: taxa zero
-    if (i === 0) return -((pv || 0) + (pmt || 0) * n);
+    if (i === 0) return -(pv || 0);
 
     const fator = Math.pow(1 + i, n);
-    let fv = 0;
-
-    // Componente do valor presente
-    if (pv !== null && pv !== 0) fv += (pv || 0) * fator;
-
-    // Componente dos pagamentos periódicos (anuidade)
-    if (pmt !== null && pmt !== 0) fv += (pmt || 0) * (fator - 1) / i;
-
-    return -fv; // Retorna negativo conforme convenção financeira
-  }
-
-  /**
-   * Calcula Pagamento (PMT)
-   * PMT = -[PV * i * (1 + i)^n + FV * i] / [(1 + i)^n - 1]
-   */
-  calcularPMT(pv, fv, i, n) {
-    // Caso especial: taxa zero
-    if (i === 0) {
-      if (n === 0) throw new Error('Número de períodos não pode ser zero');
-      return -((pv || 0) + (fv || 0)) / n;
-    }
-
-    const fator = Math.pow(1 + i, n);
-    const denominador = fator - 1;
-    
-    if (denominador === 0) throw new Error('Denominador zero no cálculo do PMT');
-    
-    const numerador = -(pv || 0) * i * fator - (fv || 0) * i;
-
-    return numerador / denominador;
+    return -(pv || 0) * fator;
   }
 
   // Calcula Taxa de Juros (i) usando método de Newton-Raphson
-  calcularTaxaJuros(pv, fv, pmt, n) {
-    // Estimativa inicial melhorada
-    let i = this.estimativaInicialTaxa(pv, fv, pmt, n);
+  calcularTaxaJuros(pv, fv, n) {
+    // Validações básicas
+    if (n === 0) throw new Error('Número de períodos não pode ser zero');
+    if (pv === 0 || fv === 0) throw new Error('PV e FV não podem ser zero');
+    if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
+
+    // Cálculo direto para juros compostos simples: i = (FV/PV)^(1/n) - 1
+    const taxa = Math.pow(Math.abs(fv / pv), 1 / n) - 1;
     
-    const maxIteracoes = 100;
-    const tolerancia = 1e-10;
-
-    for (let iteracao = 0; iteracao < maxIteracoes; iteracao++) {
-      const f = this.funcaoFinanceira(pv, fv, pmt, n, i);
-      const df = this.derivadaFuncaoFinanceira(pv, fv, pmt, n, i);
-
-      if (Math.abs(df) < tolerancia) break;
-
-      const novoI = i - f / df;
-
-      // Verifica convergência
-      if (Math.abs(novoI - i) < tolerancia) return novoI * 100; // Retorna como percentual
-
-      // Limita o valor da taxa para evitar divergência
-      i = Math.max(-0.99, Math.min(10, novoI));
-    }
-
-    return i * 100; // Retorna como percentual
+    if (isNaN(taxa) || !isFinite(taxa)) throw new Error('Não é possível calcular a taxa com estes valores');
+    
+    return taxa * 100; // Retorna como percentual
   }
 
-  // Calcula uma estimativa inicial melhor para a taxa de juros
-  estimativaInicialTaxa(pv, fv, pmt, n) {
-    const pvVal = pv || 0;
-    const fvVal = fv || 0;
-    const pmtVal = pmt || 0;
-    
-    // Se há apenas PV e FV (sem pagamentos)
-    if (pmtVal === 0 && pvVal !== 0 && fvVal !== 0) return Math.pow(Math.abs(fvVal / pvVal), 1 / n) - 1;
-    
-    // Estimativa simples baseada nos valores
-    if (pvVal !== 0 && pmtVal !== 0) return Math.abs(pmtVal / pvVal) / n;
-    
-    // Estimativa padrão
-    return 0.1; // 10%
-  }
-
-  // Função financeira para cálculo de taxa de juros
-  funcaoFinanceira(pv, fv, pmt, n, i) {
-    if (Math.abs(i) < 1e-10) return (pv || 0) + (fv || 0) + (pmt || 0) * n;
-
-    const fator = Math.pow(1 + i, n);
-    return (pv || 0) * fator + (pmt || 0) * (fator - 1) / i + (fv || 0);
-  }
-
-  // Derivada da função financeira
-  derivadaFuncaoFinanceira(pv, fv, pmt, n, i) {
-    const fator = Math.pow(1 + i, n);
-    const derivadaFator = n * Math.pow(1 + i, n - 1);
-
-    let derivada = (pv || 0) * derivadaFator;
-
-    if (Math.abs(i) > 1e-10) {
-      const termo1 = (pmt || 0) * derivadaFator / i;
-      const termo2 = -(pmt || 0) * (fator - 1) / (i * i);
-      derivada += termo1 + termo2;
-    } else derivada += (pmt || 0) * n * (n - 1) / 2;
-
-    return derivada;
-  }
-  
   // Calcula Número de Períodos (n)
-  calcularN(pv, fv, pmt, i) {
-    // Caso especial: taxa zero
-    if (i === 0) {
-      if ((pmt || 0) === 0) throw new Error('PMT não pode ser zero quando i = 0');
-      return -((pv || 0) + (fv || 0)) / (pmt || 0);
-    }
+  calcularN(pv, fv, i) {
+    // Validações básicas
+    if (i === 0) throw new Error('Taxa de juros não pode ser zero');
+    if (pv === 0 || fv === 0) throw new Error('PV e FV não podem ser zero');
+    if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
 
-    // Validações
-    if ((pmt || 0) === 0) throw new Error('PMT não pode ser zero');
-    
-    // Para calcular N, usamos a fórmula correta baseada no tipo de fluxo de caixa
-    const pvVal = pv || 0;
-    const fvVal = fv || 0;
-    const pmtVal = pmt || 0;
-    
-    // Se não há valor futuro, calculamos baseado apenas em PV e PMT
-    if (fvVal === 0) {
-      if (pvVal === 0) throw new Error('PV e FV não podem ser ambos zero');
-      
-      const ratio = -pvVal * i / pmtVal;
-      if (ratio <= 0) throw new Error('Não é possível calcular n com estes valores (ratio <= 0)');
-      
-      const numerador = Math.log(1 + ratio);
-      const denominador = Math.log(1 + i);
-      
-      if (numerador <= 0 || denominador === 0) throw new Error('Não é possível calcular n com estes valores');
-      
-      return numerador / denominador;
-    }
-    
-    // Fórmula geral para quando temos FV
-    const termo1 = fvVal + pmtVal / i;
-    const termo2 = pvVal + pmtVal / i;
-    
-    if (termo1 <= 0 || termo2 <= 0) throw new Error('Não é possível calcular n com estes valores (termos negativos)');
-    
-    const numerador = Math.log(termo1 / termo2);
+    // Cálculo direto: n = ln(FV/PV) / ln(1 + i)
+    const numerador = Math.log(Math.abs(fv / pv));
     const denominador = Math.log(1 + i);
     
     if (denominador === 0) throw new Error('Taxa de juros inválida para cálculo de n');
+    if (numerador <= 0) throw new Error('Não é possível calcular n com estes valores');
     
     return numerador / denominador;
   }
@@ -559,7 +438,6 @@ class CalculadoraFinanceira {
     this.valoresFinanceiros = {
       pv: null,
       fv: null,
-      pmt: null,
       i: null,
       n: null
     };
