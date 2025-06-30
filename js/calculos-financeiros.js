@@ -133,6 +133,272 @@ class CalculosFinanceiros {
     return numerador / denominador;
   }
 
+  // ==================== FUNÇÕES DE DESCONTO ====================
+
+  /**
+   * Calcula desconto racional (por dentro)
+   * Desconto Racional = Valor Nominal × Taxa × Tempo / (1 + Taxa × Tempo)
+   * @param {number} valorNominal - Valor nominal do título
+   * @param {number} taxa - Taxa de desconto (percentual)
+   * @param {number} tempo - Tempo até o vencimento
+   * @returns {Object} Objeto com desconto, valor atual e informações
+   */
+
+  calcularDescontoRacional(valorNominal, taxa, tempo) {
+    // Validações
+    if (valorNominal <= 0) throw new Error('Valor nominal deve ser positivo');
+    if (taxa < 0) throw new Error('Taxa não pode ser negativa');
+    if (tempo < 0) throw new Error('Tempo não pode ser negativo');
+
+    // Converte taxa para decimal
+    const taxaDecimal = taxa / 100;
+
+    // Cálculo do desconto racional (por dentro)
+    const denominador = 1 + (taxaDecimal * tempo);
+    const desconto = (valorNominal * taxaDecimal * tempo) / denominador;
+    const valorAtual = ValorNominal - desconto;
+
+    return {
+      desconto: desconto,
+      valorAtual: valorAtual,
+      taxa: taxa,
+      tempo: tempo,
+      tipo: 'Desconto Racional (Por Dentro)',
+      formula: 'Dr = N x i x n / (1 + i x n)'
+    };
+  }
+
+  /**
+   * Calcula desconto comercial (por fora)
+   * Desconto Comercial = Valor Nominal × Taxa × Tempo
+   * @param {number} valorNominal - Valor nominal do título
+   * @param {number} taxa - Taxa de desconto (percentual)
+   * @param {number} tempo - Tempo até o vencimento
+   * @returns {Object} Objeto com desconto, valor atual e informações
+   */
+
+  calcularDescontoComercial(valorNominal, taxa, tempo) {
+    // Validações
+    if (valorNominal <= 0) throw new Error('Valor nominal deve ser positivo');
+    if (taxa < 0) throw new Error('Taxa não pode ser negativa');
+    if (tempo < 0) throw new Error('Tempo não pode ser negativo');
+
+    // Converte taxa para decimal
+    const taxaDecimal = taxa / 100;
+
+    // Cálculo do desconto comercial (por fora)
+    const desconto = valorNominal * TaxaDecimal * tempo;
+    const valorAtual = valorNominal - desconto;
+
+    // Validação para evitar valor atual negativo
+    if (valorAtual < 0) {
+      throw new Error('Taxa e tempo muito altos resultam em desconto maio que o valor nominal');
+    }
+
+    return {
+      desconto: desconto,
+      valorAtual: valorAtual,
+      valorNominal: valorNominal,
+      taxa: taxa,
+      tempo: tempo,
+      tipo: 'Desconto Comercial (Por Fora)',
+      formula: 'Dc = N x i x n'
+    };
+  }
+
+  /**
+   * Calcula valor nominal a partir do valor atual (desconto racional)
+   * @param {number} valorAtual - Valor atual do título
+   * @param {number} taxa - Taxa de desconto (percentual)
+   * @param {number} tempo - Tempo até o vencimento
+   * @returns {Object} Valor nominal e informações do desconto
+   */
+
+  calcularValorNominalRacional(valorAtual, taxa, tempo) {
+    // Validações
+    if (valorAtual <= 0) throw new Error('Valor atual deve ser positivo');
+    if (taxa < 0) throw new Error('Taxa não pode ser negativa');
+    if (tempo < 0) throw new Error('Tempo não pode ser negativo');
+
+    const taxaDecimal = taxa / 100;
+
+    // Fórmula: N = Va x (1 + i x n)
+    const valorNominal = valorAtual * (1 + taxaDecimal * tempo);
+    const desconto = valorNominal - valorAtual;
+
+    return {
+      valorNominal: valorNominal,
+      valorAtual: valorAtual,
+      desconto: desconto,
+      taxa: taxa,
+      tempo: tempo,
+      tipo: 'Valor Nominal (Desconto Racional)',
+      formula: 'N = Va x (1 + i x n)'
+    };
+  }
+
+  /**
+   * Calcula valor nominal a partir do valor atual (desconto comercial)
+   * @param {number} valorAtual - Valor atual do título
+   * @param {number} taxa - Taxa de desconto (percentual)
+   * @param {number} tempo - Tempo até o vencimento
+   * @returns {Object} Valor nominal e informações do desconto
+   */
+
+  calcularValorNominalComercial(valorAtual, taxa, tempo) {
+    // Validações
+    if (valorAtual <= 0) throw new Error('Valor atual deve ser positivo');
+    if (taxa < 0) throw new Error('Taxa não pode ser negativa');
+    if (tempo < 0) throw new Error('Tempo não pode ser negativo');
+
+    const taxaDecimal = taxa / 100;
+
+    // Validação para evitar divisão por zero ou valor negativo
+    const denominador = 1 - (taxaDecimal * tempo);
+    if (denominador <= 0) {
+      throw new Error ('Taxa e tempo muito altos para calcular valor nominal');
+    }
+
+    // Fórmula: N = Va / (1 - i x n)
+    const valorNominal = valorAtual / denominador;
+    const desconto = valorNominal - valorAtual;
+
+    return {
+      valorNominal: valorNominal,
+      valorAtual: valorAtual,
+      desconto: desconto,
+      taxa: taxa,
+      tempo: tempo,
+      tipo: 'Valor Nominal (Desconto Comercial)',
+      formula: 'N = Va / (1 - i × n)'
+    };
+  }
+
+  /**
+   * Calcula taxa de desconto racional
+   * @param {number} valorNominal - Valor nominal do título
+   * @param {number} valorAtual - Valor atual do título
+   * @param {number} tempo - Tempo até o vencimento
+   * @returns {Object} Taxa de desconto e informações
+   */
+
+  calcularTaxaDescontoRacional(valorNominal, valorAtual, tempo) {
+    // Validações
+    if (valorNominal <= 0) throw new Error('Valor nominal deve ser positivo');
+    if (valorAtual <= 0) throw new Error('Valor atual deve ser positivo');
+    if (valorAtual >= valorNominal) throw new Error('Valor atual deve ser menor que o valor nominal');
+    if (tempo <= 0) throw new Error('Tempo deve ser positivo');
+
+    // Fórmula: i = (N - Va) / (Va x n)
+    const taxa = ((valorNominal - valorAtual) / (valorAtual * tempo)) * 100;
+    const desconto = valorNominal - valorAtual
+
+    return {
+      taxa: taxa,
+      valorNominal: valorNominal,
+      valorAtual: valorAtual,
+      desconto: desconto,
+      tempo: tempo,
+      tipo: 'Taxa de Desconto Racional',
+      formula: 'i = (N - Va) / (Va × t)'
+    };
+  }
+
+  /**
+   * Calcula taxa de desconto comercial
+   * @param {number} valorNominal - Valor nominal do título
+   * @param {number} valorAtual - Valor atual do título
+   * @param {number} tempo - Tempo até o vencimento
+   * @returns {Object} Taxa de desconto e informações
+   */
+
+  calcularTaxaDescontoComercial(valorNominal, valorAtual, tempo) {
+    // Validações
+    if (valorNominal <= 0) throw new Error('Valor nominal deve ser positivo');
+    if (valorAtual <= 0) throw new Error('Valor atual deve ser positivo');
+    if (valorAtual >= valorNominal) throw new Error('Valor atual deve ser menor que o valor nominal');
+    if (tempo <= 0) throw new Error('Tempo deve ser positivo');
+
+    // Fórmula: i = (N - Va) / (N x n)
+    const taxa = ((valorNominal - valorAtual) / (valorNominal * tempo)) * 100
+    const desconto = valorNominal - valorAtual;
+
+    return {
+      taxa: taxa,
+      valorNominal: valorNominal,
+      valorAtual: valorAtual,
+      desconto: desconto,
+      tempo: tempo,
+      tipo: 'Taxa de Desconto Comercial',
+      formula: 'i = (N - Va) / (N × n)'
+    };
+  }
+
+  /**
+   * Calcula tempo para desconto racional
+   * @param {number} valorNominal - Valor nominal do título
+   * @param {number} valorAtual - Valor atual do título
+   * @param {number} taxa - Taxa de desconto (percentual)
+   * @returns {Object} Tempo e informações do desconto
+   */
+
+  calcularTempoDescontoRacional(valorNominal, valorAtual, taxa) {
+    // Validações
+    if (valorNominal <= 0) throw new Error('Valor nominal deve ser positivo');
+    if (valorAtual <= 0) throw new Error('Valor atual deve ser positivo');
+    if (valorAtual >= valorNominal) throw new Error('Valor atual deve ser menor que o valor nominal');
+    if (taxa <= 0) throw new Error('Taxa deve ser positiva');
+
+    const taxaDecimal = taxa / 100;
+
+    // Fórmula: n = (N - Va) / (Va x i)
+    const tempo = (valorNominal - valorAtual) / (valorAtual * taxaDecimal);
+    const desconto = valorNominal - valorAtual;
+
+    return {
+      tempo: tempo,
+      valorNominal: valorNominal,
+      valorAtual: valorAtual,
+      desconto: desconto,
+      taxa: taxa,
+      tipo: 'Tempo para Desconto Racional',
+      formula: 'n = (N - Va) / (Va × i)'
+    };
+  }
+
+  /**
+   * Calcula tempo para desconto comercial
+   * @param {number} valorNominal - Valor nominal do título
+   * @param {number} valorAtual - Valor atual do título
+   * @param {number} taxa - Taxa de desconto (percentual)
+   * @returns {Object} Tempo e informações do desconto
+   */
+  calcularTempoDescontoComercial(valorNominal, valorAtual, taxa) {
+    // Validações
+    if (valorNominal <= 0) throw new Error('Valor nominal deve ser positivo');
+    if (valorAtual <= 0) throw new Error('Valor atual deve ser positivo');
+    if (valorAtual >= valorNominal) throw new Error('Valor atual deve ser menor que o valor nominal');
+    if (taxa <= 0) throw new Error('Taxa deve ser positiva');
+
+    const taxaDecimal = taxa / 100;
+
+    // Fórmula: n = (N - Va) / (N x i)
+    const tempo = (valorNominal - valorAtual) / (valorNominal * taxaDecimal)
+    const desconto = valorNominal - valorAtual;
+
+    return {
+      tempo: tempo,
+      valorNominal: valorNominal,
+      valorAtual: valorAtual,
+      desconto: desconto,
+      taxa: taxa,
+      tipo: 'Tempo para Desconto Comercial',
+      formula: 't = (N - Va) / (N × n)'
+    };
+  }
+
+  // ==================== FUNÇÕES ORIGINAIS ====================
+  
   /**
    * Detecta o tipo de taxa baseado na magnitude do valor
    * @param {number} taxa - Taxa a ser analisada
