@@ -299,14 +299,48 @@ class CalculadoraFinanceira {
     const novoModo = this.seletorModo.value;
     
     // Define o modo no sistema de cálculos
-    this.calculosFinanceiros.setModoCapitalizacao(novoModo === 'simples' ? 'simples' : 'composto');
-    
+    switch(novoModo) {
+      case 'simples':
+        this.calculosFinanceiros.setModoCapitalizacao('simples');
+        break;
+      case 'composto':
+        this.calculosFinanceiros.setModoCapitalizacao('composto');
+        break;
+      case 'desconto-racional':
+        this.calculosFinanceiros.setModoCapitalizacao('desconto-racional');
+        break;
+      case 'desconto-comercial':
+        this.calculosFinanceiros.setModoCapitalizacao('desconto-comercial');
+        break;
+      default:
+        this.calculosFinanceiros.setModoCapitalizacao('simples');
+    }
+
     // Atualiza o display de operação
     this.atualizarDisplayOperacao();
-    
-    // Mostra feedback temporário
-    const modoTexto = novoModo === 'simples' ? 'JUROS SIMPLES' : 'JUROS COMPOSTOS';
-    this.displayOp.innerHTML = `<span style="color: #f39c12; font-weight: bold;">${modoTexto}</span>`;
+
+    // Define o texto de feedback baseado no modo selecionado
+    const textosModo = {
+      'simples': 'JUROS SIMPLES',
+      'composto': 'JUROS COMPOSTOS',
+      'desconto-racional': 'DESCONTO RACIONAL',
+      'desconto-comercial': 'DESCONTO COMERCIAL'
+    };
+
+    const modoTexto = textosModo[novoModo] || 'JUROS SIMPLES';
+
+    // Mostra feedback temporário com cores diferentes para cada modo
+    const coresModo = {
+      'simples': '#3498db',
+      'composto': '#2ecc71',
+      'desconto-racional': '#f39c12',
+      'desconto-comercial': '#e74c3c'
+    };
+
+    const cor = coresModo[novoModo] || '#3498db';
+
+    this.displayOp.innerHTML = `<span style="color: ${cor}; font-weight: bold;">${modoTexto}</span>`;
+
     setTimeout(() => {
       this.atualizarDisplayOperacao();
     }, 2000);
@@ -553,8 +587,6 @@ class CalculadoraFinanceira {
       operacaoTexto = `${this.formatarNumero(this.operando)} ${simbolosOp[this.operacaoAtual] || this.operacaoAtual}`;
     }
     
-    // Cria o HTML com modo à esquerda e operação à direita
-    this.displayOp.innerHTML = `<span style="color: #3498db; font-weight: bold;">${modoTexto}</span><span>${operacaoTexto}</span>`;
   }
 
   // Atualiza o display de operação
