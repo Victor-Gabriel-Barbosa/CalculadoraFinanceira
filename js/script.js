@@ -45,6 +45,19 @@ class CalculadoraFinanceira {
       n: null     // Número de períodos
     };
     
+    // Valores para desconto (usando nomes diferentes para evitar conflito)
+    this.valoresDesconto = {
+      N: null,    // Valor Nominal
+      Va: null,   // Valor Atual
+      i: null,    // Taxa de desconto
+      n: null,    // Tempo
+      D: null     // Desconto
+    };
+    
+    // Estado atual do modo (para controlar os botões)
+    this.modoAtual = 'composto';
+    this.botoesOriginais = null;  // Para guardar os botões originais
+    
     // Período atual da taxa (day, month, year)
     this.periodoTaxa = 'month';
     
@@ -291,7 +304,8 @@ class CalculadoraFinanceira {
   // Inicializa o seletor de modo com o valor atual
   inicializarSeletorModo() {
     const modoAtual = this.calculosFinanceiros.getModoCapitalizacao();
-    this.seletorModo.value = modoAtual;
+    this.seletorModo.value = 'composto'; // Define valor padrão
+    this.modoAtual = 'composto'; // Inicializa o modo atual
   }
 
   // Altera o modo da calculadora através do seletor
@@ -299,22 +313,14 @@ class CalculadoraFinanceira {
     const novoModo = this.seletorModo.value;
     
     // Define o modo no sistema de cálculos
-    switch(novoModo) {
-      case 'simples':
-        this.calculosFinanceiros.setModoCapitalizacao('simples');
-        break;
-      case 'composto':
-        this.calculosFinanceiros.setModoCapitalizacao('composto');
-        break;
-      case 'desconto-racional':
-        this.calculosFinanceiros.setModoCapitalizacao('desconto-racional');
-        break;
-      case 'desconto-comercial':
-        this.calculosFinanceiros.setModoCapitalizacao('desconto-comercial');
-        break;
-      default:
-        this.calculosFinanceiros.setModoCapitalizacao('simples');
-    }
+    this.calculosFinanceiros.setModoCapitalizacao(novoModo);
+
+    // Guarda o modo anterior e atualiza o novo
+    const modoAnterior = this.modoAtual;
+    this.modoAtual = novoModo;
+
+    // Troca os botões se necessário
+    this.atualizarBotoesPorModo(modoAnterior, novoModo);
 
     // Atualiza o display de operação
     this.atualizarDisplayOperacao();
@@ -360,6 +366,301 @@ class CalculadoraFinanceira {
     setTimeout(() => {
       this.atualizarDisplayOperacao();
     }, 2000);
+  }
+
+  // ==================== GESTÃO DE MODOS E BOTÕES ====================
+
+  /**
+   * Atualiza os botões baseado no modo selecionado
+   * @param {string} modoAnterior - Modo anterior
+   * @param {string} novoModo - Novo modo selecionado
+   */
+  atualizarBotoesPorModo(modoAnterior, novoModo) {
+    const ehModoDesconto = (modo) => modo === 'desconto-racional' || modo === 'desconto-comercial';
+    
+    // Se mudou de modo normal para desconto
+    if (!ehModoDesconto(modoAnterior) && ehModoDesconto(novoModo)) {
+      this.salvarBotoesOriginais();
+      this.criarBotoesDesconto();
+      this.limparValoresFinanceiros();
+      this.atualizarLabelsParaDesconto();
+    }
+    // Se mudou de modo desconto para normal
+    else if (ehModoDesconto(modoAnterior) && !ehModoDesconto(novoModo)) {
+      this.restaurarBotoesOriginais();
+      this.limparValoresDesconto();
+      this.restaurarLabelsStatus();
+    }
+    // Se mudou entre modos de desconto atualiza os event listeners
+    else if (ehModoDesconto(modoAnterior) && ehModoDesconto(novoModo))this.atualizarEventListenersDesconto();
+  }
+
+  // Salva o HTML dos botões originais
+  salvarBotoesOriginais() {
+    const primeiraLinha = document.querySelector('.keypad-row:first-child');
+    if (primeiraLinha && !this.botoesOriginais) this.botoesOriginais = primeiraLinha.innerHTML;
+  }
+
+  /**
+   * Cria os botões específicos para modos de desconto
+   */
+  criarBotoesDesconto() {
+    const primeiraLinha = document.querySelector('.keypad-row:first-child');
+    if (!primeiraLinha) return;
+
+    primeiraLinha.innerHTML = `
+      <button class="btn financial-btn" data-function="N">N</button>
+      <button class="btn financial-btn" data-function="Va">Va</button>
+      <button class="btn financial-btn" data-function="i">i</button>
+      <button class="btn financial-btn" data-function="n">n</button>
+      <button class="btn operation-btn" data-function="cpt">CPT</button>
+    `;
+
+    // Atualiza event listeners para os novos botões
+    this.atualizarEventListenersDesconto();
+  }
+
+  /**
+   * Restaura os botões originais
+   */
+  restaurarBotoesOriginais() {
+    const primeiraLinha = document.querySelector('.keypad-row:first-child');
+    if (primeiraLinha && this.botoesOriginais) {
+      primeiraLinha.innerHTML = this.botoesOriginais;
+      
+      // Reativa os event listeners originais
+      this.reativarEventListenersOriginais();
+    }
+  }
+
+  /**
+   * Atualiza os event listeners para os botões de desconto
+   */
+  atualizarEventListenersDesconto() {
+    // Remove listeners antigos e adiciona novos para botões financeiros
+    document.querySelectorAll('.financial-btn').forEach(btn => {
+      // Clona o botão para remover todos os listeners
+      const novoBotao = btn.cloneNode(true);
+      btn.parentNode.replaceChild(novoBotao, btn);
+      
+      // Adiciona o novo listener
+      novoBotao.addEventListener('click', () => {
+        this.definirVariavelDesconto(novoBotao.dataset.function);
+      });
+    });
+
+    // Atualiza listener do CPT
+    const btnCpt = document.querySelector('[data-function="cpt"]');
+    if (btnCpt) {
+      const novoBtnCpt = btnCpt.cloneNode(true);
+      btnCpt.parentNode.replaceChild(novoBtnCpt, btnCpt);
+      
+      novoBtnCpt.addEventListener('click', () => {
+        this.calcularDescontoFaltante();
+      });
+    }
+  }
+
+  // Reativa os event listeners originais
+  reativarEventListenersOriginais() {
+    // Botões financeiros originais
+    document.querySelectorAll('.financial-btn').forEach(btn => {
+      const novoBotao = btn.cloneNode(true);
+      btn.parentNode.replaceChild(novoBotao, btn);
+      
+      novoBotao.addEventListener('click', () => {
+        this.definirVariavelFinanceira(novoBotao.dataset.function);
+      });
+    });
+
+    // Botão CPT original
+    const btnCpt = document.querySelector('[data-function="cpt"]');
+    if (btnCpt) {
+      const novoBtnCpt = btnCpt.cloneNode(true);
+      btnCpt.parentNode.replaceChild(novoBtnCpt, btnCpt);
+      
+      novoBtnCpt.addEventListener('click', () => {
+        this.calcularValorFaltante();
+      });
+    }
+  }
+
+  /**
+   * Define variável de desconto com o valor atual
+   * @param {string} variavel - Variável de desconto (N, Va, i, n, D)
+   */
+  definirVariavelDesconto(variavel) {
+    this.limparErro();
+
+    const valor = parseFloat(this.entradaAtual);
+    if (isNaN(valor)) {
+      this.mostrarErro('Valor inválido');
+      return;
+    }
+
+    // Remove destaque de outros botões
+    document.querySelectorAll('.financial-btn').forEach(btn => {
+      btn.classList.remove('active-variable');
+    });
+
+    // Destaca o botão atual
+    const btn = document.querySelector(`[data-function="${variavel}"]`);
+    if (btn) {
+      btn.classList.add('active-variable');
+    }
+
+    this.valoresDesconto[variavel] = valor;
+    this.ultimaVariavel = variavel;
+    
+    this.atualizarDisplayStatusDesconto();
+    
+    // Mapeia os nomes para exibição
+    const nomesExibicao = {
+      N: 'Valor Nominal',
+      Va: 'Valor Atual', 
+      i: 'Taxa',
+      n: 'Tempo',
+      D: 'Desconto'
+    };
+    
+    this.displayVariavel.textContent = `${nomesExibicao[variavel]}: ${this.formatarNumero(valor)}`;
+    this.novaEntrada = true;
+  }
+
+  // Calcula a variável de desconto faltante usando CPT
+  calcularDescontoFaltante() {
+    // Conta quantas variáveis estão definidas
+    const valoresDefinidos = Object.values(this.valoresDesconto).filter(v => v !== null);
+
+    if (valoresDefinidos.length < 3) {
+      this.mostrarErro('É necessário definir pelo menos 3 valores para calcular');
+      return;
+    }
+
+    if (valoresDefinidos.length === 5) {
+      this.mostrarErro('Todos os valores já estão definidos');
+      return;
+    }
+
+    // Identifica qual variável está faltando
+    const variavelFaltante = Object.keys(this.valoresDesconto).find(chave => this.valoresDesconto[chave] === null);
+
+    if (!variavelFaltante) {
+      this.mostrarErro('Nenhuma variável faltante encontrada');
+      return;
+    }
+
+    try {
+      // Determina o tipo de desconto baseado no modo atual
+      const tipoDesconto = this.modoAtual === 'desconto-racional' ? 'racional' : 'comercial';
+      
+      const resultado = this.calculosFinanceiros.resolverEqDesconto(
+        variavelFaltante, 
+        this.valoresDesconto, 
+        tipoDesconto
+      );
+
+      // Extrai o valor calculado baseado na variável
+      let valorCalculado;
+      // Mapeamento direto entre variáveis e propriedades do resultado
+      const mapeamentoResultado = {
+        N: 'valorNominal',
+        Va: 'valorAtual', 
+        i: 'taxa',
+        n: 'tempo',
+        D: 'desconto'
+      };
+      
+      valorCalculado = resultado[mapeamentoResultado[variavelFaltante]];
+
+      this.valoresDesconto[variavelFaltante] = valorCalculado;
+      this.entradaAtual = valorCalculado.toString();
+      
+      // Mapeia os nomes para exibição
+      const nomesExibicao = {
+        N: 'Valor Nominal',
+        Va: 'Valor Atual',
+        i: 'Taxa',
+        n: 'Tempo', 
+        D: 'Desconto'
+      };
+      
+      this.displayVariavel.textContent = `${nomesExibicao[variavelFaltante]} = ${this.formatarNumero(valorCalculado)}`;
+      this.atualizarDisplay();
+      this.atualizarDisplayStatusDesconto();
+      
+      this.novaEntrada = true;
+      
+    } catch (erro) {
+      this.mostrarErro(erro.message);
+    } finally {
+      // Remove destaque de todos os botões
+      document.querySelectorAll('.financial-btn').forEach(btn => {
+        btn.classList.remove('active-variable');
+      });
+    }
+  }
+
+  // Atualiza o display de status com os valores de desconto
+  atualizarDisplayStatusDesconto() {
+    // Mapeia as variáveis de desconto para os elementos do status
+    const mapeamento = {
+      N: 'pvValue',    // Usa o espaço do PV para mostrar N
+      Va: 'fvValue',   // Usa o espaço do FV para mostrar Va
+      i: 'iValue',     // Mantém o i
+      n: 'nValue'      // Mantém o n
+      // D não é mostrado no status, apenas calculado
+    };
+
+    Object.keys(mapeamento).forEach(chave => {
+      const elemento = document.getElementById(mapeamento[chave]);
+      if (elemento) {
+        const valor = this.valoresDesconto[chave];
+        elemento.textContent = valor !== null ? this.formatarNumero(valor) : '-';
+      }
+    });
+  }
+
+  // Atualiza os labels para refletir o modo de desconto
+  atualizarLabelsParaDesconto() {
+    const labelPV = document.querySelector('.status-item:first-child .label');
+    const labelFV = document.querySelector('.status-item:nth-child(2) .label');
+    
+    if (labelPV) labelPV.textContent = 'N:';
+    if (labelFV) labelFV.textContent = 'Va:';
+  }
+
+  // Restaura os labels originais do status
+  restaurarLabelsStatus() {
+    const labelPV = document.querySelector('.status-item:first-child .label');
+    const labelFV = document.querySelector('.status-item:nth-child(2) .label');
+    
+    if (labelPV) labelPV.textContent = 'PV:';
+    if (labelFV) labelFV.textContent = 'FV:';
+  }
+
+  // Limpa os valores financeiros e restaura labels
+  limparValoresFinanceiros() {
+    this.valoresFinanceiros = {
+      pv: null,
+      fv: null, 
+      i: null,
+      n: null
+    };
+    this.atualizarDisplayStatus();
+  }
+
+  // Limpa os valores de desconto e restaura labels
+  limparValoresDesconto() {
+    this.valoresDesconto = {
+      N: null,
+      Va: null,
+      i: null, 
+      n: null,
+      D: null
+    };
+    this.restaurarLabelsStatus();
+    this.atualizarDisplayStatus();
   }
 
   // Define uma operação matemática básica (soma, subtração, multiplicação, divisão)
@@ -581,7 +882,7 @@ class CalculadoraFinanceira {
       const simbolosOp = {
         'soma': '+',
         'subtrai': '-',
-        'multiplica': '×',
+        'multiplica': 'x',
         'divide': '÷'
       };
       operacaoTexto = `${this.formatarNumero(this.operando)} ${simbolosOp[this.operacaoAtual] || this.operacaoAtual}`;
@@ -620,10 +921,17 @@ class CalculadoraFinanceira {
 
   // Atualiza o display de status com os valores financeiros
   atualizarDisplayStatus() {
-    Object.keys(this.valoresFinanceiros).forEach(chave => {
-      const valor = this.valoresFinanceiros[chave];
-      this.valoresStatus[chave].textContent = valor !== null ? this.formatarNumero(valor) : '-';
-    });
+    // Verifica se está em modo de desconto
+    const ehModoDesconto = this.modoAtual === 'desconto-racional' || this.modoAtual === 'desconto-comercial';
+    
+    if (ehModoDesconto) {
+      this.atualizarDisplayStatusDesconto();
+    } else {
+      Object.keys(this.valoresFinanceiros).forEach(chave => {
+        const valor = this.valoresFinanceiros[chave];
+        this.valoresStatus[chave].textContent = valor !== null ? this.formatarNumero(valor) : '-';
+      });
+    }
     
     // Mostra os seletores para campos que têm valores definidos
     this.atualizarVisibilidadeSeletores();

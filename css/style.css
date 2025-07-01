@@ -672,3 +672,82 @@ body {
   font-size: 12px;
   text-align: center;
 }
+
+/* Botões em estado ativo/selecionado */
+/* Botão ativo - Variável (azul) */
+.btn.active-variable {
+  background: linear-gradient(145deg, #5dade2, #3498db, #2980b9) !important;
+  box-shadow:
+    0 6px 0 #1f618d,
+    0 8px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    inset 1px 0 0 rgba(255, 255, 255, 0.4),
+    inset -1px 0 0 rgba(0, 0, 0, 0.2),
+    0 0 0 2px rgba(52, 152, 219, 0.5) !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
+  transform: translateY(-1px) !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn.active-variable:hover {
+  background: linear-gradient(145deg, #7fb3d3, #5499c7, #2e86c1) !important;
+  box-shadow:
+    0 7px 0 #1b4f72,
+    0 10px 15px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    inset 1px 0 0 rgba(255, 255, 255, 0.5),
+    inset -1px 0 0 rgba(0, 0, 0, 0.2),
+    0 0 0 3px rgba(52, 152, 219, 0.7) !important;
+  transform: translateY(-2px) !important;
+}
+
+.btn.active-variable:active {
+  transform: translateY(0) !important;
+  box-shadow:
+    0 3px 0 #1f618d,
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Botão ativo - Operação (verde) */
+.btn.active-operation {
+  background: linear-gradient(145deg, #58d68d, #27ae60, #229954) !important;
+  box-shadow:
+    0 6px 0 #186a3b,
+    0 8px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    inset 1px 0 0 rgba(255, 255, 255, 0.4),
+    inset -1px 0 0 rgba(0, 0, 0, 0.2),
+    0 0 0 2px rgba(39, 174, 96, 0.5) !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
+  transform: translateY(-1px) !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn.active-operation:hover {
+  background: linear-gradient(145deg, #7dcea0, #52b788, #2d5a3d) !important;
+  box-shadow:
+    0 7px 0 #145a32,
+    0 10px 15px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    inset 1px 0 0 rgba(255, 255, 255, 0.5),
+    inset -1px 0 0 rgba(0, 0, 0, 0.2),
+    0 0 0 3px rgba(39, 174, 96, 0.7) !important;
+  transform: translateY(-2px) !important;
+}
+
+.btn.active-operation:active {
+  transform: translateY(0) !important;
+  box-shadow:
+    0 3px 0 #186a3b,
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4) !important;
+}

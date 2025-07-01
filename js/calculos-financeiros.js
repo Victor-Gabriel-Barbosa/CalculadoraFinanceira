@@ -133,11 +133,87 @@ class CalculosFinanceiros {
     return numerador / denominador;
   }
 
+  /**
+   * Resolve a equação de desconto para encontrar a variável faltante
+   * @param {string} variavelFaltante - variável a ser calculada ('N', 'Va', 'i', 'n', 'D')
+   * @param {Object} valores - objeto com os valores conhecidos
+   * @param {string} tipoDesconto - tipo de desconto ('racional' ou 'comercial')
+   * @returns {Object} resultado com valor calculado e informações
+   */
+  resolverEqDesconto(variavelFaltante, valores, tipoDesconto) {
+    const { N, Va, i, n, D } = valores;
+
+    // Define as operações baseadas no tipo de desconto
+    const operacoes = {
+      racional: {
+        N: () => this.calcularValorNominalRacional(Va, i, n),
+        Va: () => {
+          const resultado = this.calcularDescontoRacional(N, i, n);
+          return {
+            valorAtual: resultado.valorAtual,
+            valorNominal: N,
+            desconto: resultado.desconto,
+            taxa: i,
+            tempo: n,
+            tipo: 'Valor Atual (Desconto Racional)',
+            formula: 'Va = N - Dr'
+          };
+        },
+        i: () => this.calcularTaxaDescontoRacional(N, Va, n),
+        n: () => this.calcularTempoDescontoRacional(N, Va, i),
+        D: () => {
+          const resultado = this.calcularDescontoRacional(N, i, n);
+          return {
+            desconto: resultado.desconto,
+            valorNominal: N,
+            valorAtual: resultado.valorAtual,
+            taxa: i,
+            tempo: n,
+            tipo: 'Desconto Racional',
+            formula: 'Dr = N x i x n / (1 + i x n)'
+          };
+        }
+      },
+      comercial: {
+        N: () => this.calcularValorNominalComercial(Va, i, n),
+        Va: () => {
+          const resultado = this.calcularDescontoComercial(N, i, n);
+          return {
+            valorAtual: resultado.valorAtual,
+            valorNominal: N,
+            desconto: resultado.desconto,
+            taxa: i,
+            tempo: n,
+            tipo: 'Valor Atual (Desconto Comercial)',
+            formula: 'Va = N - Dc'
+          };
+        },
+        i: () => this.calcularTaxaDescontoComercial(N, Va, n),
+        n: () => this.calcularTempoDescontoComercial(N, Va, i),
+        D: () => {
+          const resultado = this.calcularDescontoComercial(N, i, n);
+          return {
+            desconto: resultado.desconto,
+            valorNominal: N,
+            valorAtual: resultado.valorAtual,
+            taxa: i,
+            tempo: n,
+            tipo: 'Desconto Comercial',
+            formula: 'Dc = N x i x n'
+          };
+        }
+      }
+    };
+
+    if (operacoes[tipoDesconto] && operacoes[tipoDesconto][variavelFaltante]) return operacoes[tipoDesconto][variavelFaltante]();
+    else throw new Error('Variável ou tipo de desconto inválido');
+  }
+
   // ==================== FUNÇÕES DE DESCONTO ====================
 
   /**
    * Calcula desconto racional (por dentro)
-   * Desconto Racional = Valor Nominal × Taxa × Tempo / (1 + Taxa × Tempo)
+   * Desconto Racional = Valor Nominal x Taxa x Tempo / (1 + Taxa x Tempo)
    * @param {number} valorNominal - Valor nominal do título
    * @param {number} taxa - Taxa de desconto (percentual)
    * @param {number} tempo - Tempo até o vencimento
@@ -156,7 +232,7 @@ class CalculosFinanceiros {
     // Cálculo do desconto racional (por dentro)
     const denominador = 1 + (taxaDecimal * tempo);
     const desconto = (valorNominal * taxaDecimal * tempo) / denominador;
-    const valorAtual = ValorNominal - desconto;
+    const valorAtual = valorNominal - desconto;
 
     return {
       desconto: desconto,
@@ -170,7 +246,7 @@ class CalculosFinanceiros {
 
   /**
    * Calcula desconto comercial (por fora)
-   * Desconto Comercial = Valor Nominal × Taxa × Tempo
+   * Desconto Comercial = Valor Nominal x Taxa x Tempo
    * @param {number} valorNominal - Valor nominal do título
    * @param {number} taxa - Taxa de desconto (percentual)
    * @param {number} tempo - Tempo até o vencimento
@@ -187,12 +263,12 @@ class CalculosFinanceiros {
     const taxaDecimal = taxa / 100;
 
     // Cálculo do desconto comercial (por fora)
-    const desconto = valorNominal * TaxaDecimal * tempo;
+    const desconto = valorNominal * taxaDecimal * tempo;
     const valorAtual = valorNominal - desconto;
 
     // Validação para evitar valor atual negativo
     if (valorAtual < 0) {
-      throw new Error('Taxa e tempo muito altos resultam em desconto maio que o valor nominal');
+      throw new Error('Taxa e tempo muito altos resultam em desconto maior que o valor nominal');
     }
 
     return {
@@ -256,7 +332,7 @@ class CalculosFinanceiros {
     // Validação para evitar divisão por zero ou valor negativo
     const denominador = 1 - (taxaDecimal * tempo);
     if (denominador <= 0) {
-      throw new Error ('Taxa e tempo muito altos para calcular valor nominal');
+      throw new Error('Taxa e tempo muito altos para calcular valor nominal');
     }
 
     // Fórmula: N = Va / (1 - i x n)
@@ -270,7 +346,7 @@ class CalculosFinanceiros {
       taxa: taxa,
       tempo: tempo,
       tipo: 'Valor Nominal (Desconto Comercial)',
-      formula: 'N = Va / (1 - i × n)'
+      formula: 'N = Va / (1 - i x n)'
     };
   }
 
@@ -291,7 +367,7 @@ class CalculosFinanceiros {
 
     // Fórmula: i = (N - Va) / (Va x n)
     const taxa = ((valorNominal - valorAtual) / (valorAtual * tempo)) * 100;
-    const desconto = valorNominal - valorAtual
+    const desconto = valorNominal - valorAtual;
 
     return {
       taxa: taxa,
@@ -300,7 +376,7 @@ class CalculosFinanceiros {
       desconto: desconto,
       tempo: tempo,
       tipo: 'Taxa de Desconto Racional',
-      formula: 'i = (N - Va) / (Va × t)'
+      formula: 'i = (N - Va) / (Va x t)'
     };
   }
 
@@ -320,7 +396,7 @@ class CalculosFinanceiros {
     if (tempo <= 0) throw new Error('Tempo deve ser positivo');
 
     // Fórmula: i = (N - Va) / (N x n)
-    const taxa = ((valorNominal - valorAtual) / (valorNominal * tempo)) * 100
+    const taxa = ((valorNominal - valorAtual) / (valorNominal * tempo)) * 100;
     const desconto = valorNominal - valorAtual;
 
     return {
@@ -330,7 +406,7 @@ class CalculosFinanceiros {
       desconto: desconto,
       tempo: tempo,
       tipo: 'Taxa de Desconto Comercial',
-      formula: 'i = (N - Va) / (N × n)'
+      formula: 'i = (N - Va) / (N x n)'
     };
   }
 
@@ -362,7 +438,7 @@ class CalculosFinanceiros {
       desconto: desconto,
       taxa: taxa,
       tipo: 'Tempo para Desconto Racional',
-      formula: 'n = (N - Va) / (Va × i)'
+      formula: 'n = (N - Va) / (Va x i)'
     };
   }
 
@@ -383,7 +459,7 @@ class CalculosFinanceiros {
     const taxaDecimal = taxa / 100;
 
     // Fórmula: n = (N - Va) / (N x i)
-    const tempo = (valorNominal - valorAtual) / (valorNominal * taxaDecimal)
+    const tempo = (valorNominal - valorAtual) / (valorNominal * taxaDecimal);
     const desconto = valorNominal - valorAtual;
 
     return {
@@ -393,7 +469,7 @@ class CalculosFinanceiros {
       desconto: desconto,
       taxa: taxa,
       tipo: 'Tempo para Desconto Comercial',
-      formula: 't = (N - Va) / (N × n)'
+      formula: 'n = (N - Va) / (N x i)'
     };
   }
 
