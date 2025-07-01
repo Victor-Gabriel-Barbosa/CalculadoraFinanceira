@@ -13,7 +13,8 @@ class CalculadoraFinanceira {
       pv: document.getElementById('pvValue'),
       fv: document.getElementById('fvValue'),
       i: document.getElementById('iValue'),
-      n: document.getElementById('nValue')
+      n: document.getElementById('nValue'),
+      d: document.getElementById('dValue')
     };
     
     // Elemento do seletor de taxa
@@ -398,7 +399,13 @@ class CalculadoraFinanceira {
   // Salva o HTML dos botões originais
   salvarBotoesOriginais() {
     const primeiraLinha = document.querySelector('.keypad-row:first-child');
-    if (primeiraLinha && !this.botoesOriginais) this.botoesOriginais = primeiraLinha.innerHTML;
+    const segundaLinha = document.querySelector('.keypad-row:nth-child(2)');
+    if (primeiraLinha && segundaLinha && !this.botoesOriginais) {
+      this.botoesOriginais = {
+        primeira: primeiraLinha.innerHTML,
+        segunda: segundaLinha.innerHTML
+      };
+    }
   }
 
   /**
@@ -406,14 +413,23 @@ class CalculadoraFinanceira {
    */
   criarBotoesDesconto() {
     const primeiraLinha = document.querySelector('.keypad-row:first-child');
-    if (!primeiraLinha) return;
+    const segundaLinha = document.querySelector('.keypad-row:nth-child(2)');
+    if (!primeiraLinha || !segundaLinha) return;
 
     primeiraLinha.innerHTML = `
       <button class="btn financial-btn" data-function="N">N</button>
       <button class="btn financial-btn" data-function="Va">Va</button>
       <button class="btn financial-btn" data-function="i">i</button>
       <button class="btn financial-btn" data-function="n">n</button>
+      <button class="btn financial-btn" data-function="D">D</button>
+    `;
+
+    segundaLinha.innerHTML = `
       <button class="btn operation-btn" data-function="cpt">CPT</button>
+      <button class="btn operation-btn" data-function="ce">CE</button>
+      <button class="btn operation-btn" data-function="sinal">+/-</button>
+      <button class="btn operation-btn" data-function="porcento">%</button>
+      <button class="btn operation-btn" data-function="limpa">←</button>
     `;
 
     // Atualiza event listeners para os novos botões
@@ -425,8 +441,10 @@ class CalculadoraFinanceira {
    */
   restaurarBotoesOriginais() {
     const primeiraLinha = document.querySelector('.keypad-row:first-child');
-    if (primeiraLinha && this.botoesOriginais) {
-      primeiraLinha.innerHTML = this.botoesOriginais;
+    const segundaLinha = document.querySelector('.keypad-row:nth-child(2)');
+    if (primeiraLinha && segundaLinha && this.botoesOriginais) {
+      primeiraLinha.innerHTML = this.botoesOriginais.primeira;
+      segundaLinha.innerHTML = this.botoesOriginais.segunda;
       
       // Reativa os event listeners originais
       this.reativarEventListenersOriginais();
@@ -608,8 +626,8 @@ class CalculadoraFinanceira {
       N: 'pvValue',    // Usa o espaço do PV para mostrar N
       Va: 'fvValue',   // Usa o espaço do FV para mostrar Va
       i: 'iValue',     // Mantém o i
-      n: 'nValue'      // Mantém o n
-      // D não é mostrado no status, apenas calculado
+      n: 'nValue',     // Mantém o n
+      D: 'dValue'      // Novo elemento para mostrar o desconto
     };
 
     Object.keys(mapeamento).forEach(chave => {
@@ -625,18 +643,30 @@ class CalculadoraFinanceira {
   atualizarLabelsParaDesconto() {
     const labelPV = document.querySelector('.status-item:first-child .label');
     const labelFV = document.querySelector('.status-item:nth-child(2) .label');
+    const statusDisplay = document.querySelector('.status-display');
     
     if (labelPV) labelPV.textContent = 'N:';
     if (labelFV) labelFV.textContent = 'Va:';
+    
+    // Mostra o campo do desconto
+    if (statusDisplay) {
+      statusDisplay.classList.add('modo-desconto');
+    }
   }
 
   // Restaura os labels originais do status
   restaurarLabelsStatus() {
     const labelPV = document.querySelector('.status-item:first-child .label');
     const labelFV = document.querySelector('.status-item:nth-child(2) .label');
+    const statusDisplay = document.querySelector('.status-display');
     
     if (labelPV) labelPV.textContent = 'PV:';
     if (labelFV) labelFV.textContent = 'FV:';
+    
+    // Oculta o campo do desconto
+    if (statusDisplay) {
+      statusDisplay.classList.remove('modo-desconto');
+    }
   }
 
   // Limpa os valores financeiros e restaura labels
@@ -931,6 +961,10 @@ class CalculadoraFinanceira {
         const valor = this.valoresFinanceiros[chave];
         this.valoresStatus[chave].textContent = valor !== null ? this.formatarNumero(valor) : '-';
       });
+      // Limpa o campo de desconto quando não está em modo desconto
+      if (this.valoresStatus.d) {
+        this.valoresStatus.d.textContent = '-';
+      }
     }
     
     // Mostra os seletores para campos que têm valores definidos

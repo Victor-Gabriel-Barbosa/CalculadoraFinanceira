@@ -220,6 +220,19 @@ body {
   font-size: 10px;
 }
 
+/* Controle de visibilidade do campo desconto */
+.status-item.desconto-field {
+  display: none;
+}
+
+.status-display.modo-desconto {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.status-display.modo-desconto .status-item.desconto-field {
+  display: block;
+}
+
 /* Seletor de taxa */
 .rate-selector {
   background: #1a1a1a;
@@ -632,6 +645,11 @@ body {
   }
 
   .status-display {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  .status-display.modo-desconto {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
   }
