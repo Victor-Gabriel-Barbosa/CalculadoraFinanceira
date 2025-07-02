@@ -1,6 +1,6 @@
 /**
  * CALCULADORA FINANCEIRA
- * Sistema completo para cálculos financeiros baseado em juros compostos
+ * Sistema completo para cálculos financeiros baseados em juros simples e compostos
  * Suporta cálculo de Valor Presente (PV), Valor Futuro (FV), Taxa de Juros (i) e Número de Períodos (n)
  */
 class CalculadoraFinanceira {  
@@ -56,7 +56,7 @@ class CalculadoraFinanceira {
     };
     
     // Estado atual do modo (para controlar os botões)
-    this.modoAtual = 'composto';
+    this.modoAtual = 'composto'; // Será atualizado na inicialização
     this.botoesOriginais = null;  // Para guardar os botões originais
     
     // Período atual da taxa (day, month, year)
@@ -152,6 +152,10 @@ class CalculadoraFinanceira {
     document.addEventListener('paste', (evento) => {
       this.manipularColar(evento);
     });
+
+    // Inicializa o modo baseado no valor do seletor HTML
+    this.modoAtual = this.seletorModo.value;
+    this.alterarModoCalculadora();
   }
 
   // Manipula a entrada de números
@@ -254,7 +258,7 @@ class CalculadoraFinanceira {
       this.displayPrincipal.classList.add('calculating');
       this.displayOp.textContent = `Calculando ${variavelFaltante.toUpperCase()}...`;
 
-      const resultado = this.calculosFinanceiros.resolverEqFinanceira(variavelFaltante, this.valoresFinanceiros);
+      const resultado = this.calculosFinanceiros.resolverEqFinanceira(variavelFaltante, this.valoresFinanceiros, this.modoAtual);
 
       if (resultado === null || isNaN(resultado) || !isFinite(resultado)) {
         this.mostrarErro('Não foi possível calcular com estes valores');
@@ -300,13 +304,6 @@ class CalculadoraFinanceira {
     this.atualizarDisplayStatus();
     this.limparErro();
     this.limparOp();
-  }
-
-  // Inicializa o seletor de modo com o valor atual
-  inicializarSeletorModo() {
-    const modoAtual = this.calculosFinanceiros.getModoCapitalizacao();
-    this.seletorModo.value = 'composto'; // Define valor padrão
-    this.modoAtual = 'composto'; // Inicializa o modo atual
   }
 
   // Altera o modo da calculadora através do seletor

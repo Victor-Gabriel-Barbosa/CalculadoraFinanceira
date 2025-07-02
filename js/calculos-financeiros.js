@@ -1,6 +1,6 @@
 /**
  * CÁLCULOS FINANCEIROS
- * Classe responsável por todos os cálculos financeiros baseados em juros compostos
+ * Classe responsável por todos os cálculos financeiros baseados em juros simples e compostos
  * Suporta cálculo de Valor Presente (PV), Valor Futuro (FV), Taxa de Juros (i) e Número de Períodos (n)
  */
 class CalculosFinanceiros {
@@ -38,24 +38,33 @@ class CalculosFinanceiros {
    * Resolve a equação financeira para encontrar a variável faltante
    * @param {string} variavelFaltante - variável a ser calculada ('pv', 'fv', 'i', 'n')
    * @param {Object} valores - objeto com os valores conhecidos
+   * @param {string} modoCalculo - modo de cálculo ('simples' ou 'composto')
    * @returns {number} valor calculado
    */
-  resolverEqFinanceira(variavelFaltante, valores) {
+  resolverEqFinanceira(variavelFaltante, valores, modoCalculo = 'simples') {
     const { pv, fv, i, n } = valores;
 
     // Sempre converte taxa de juros de percentual para decimal
     const taxa = i !== null ? i / 100 : null;
 
-    const operacoes = {
-      pv: () => this.calcularVP(fv, taxa, n),
-      fv: () => this.calcularVF(pv, taxa, n),
+    // Seleciona os métodos baseado no modo de cálculo
+    const operacoes = modoCalculo === 'simples' ? {
+      pv: () => this.calcularPVSimples(fv, taxa, n),
+      fv: () => this.calcularFVSimples(pv, taxa, n),
+      i: () => this.calcularTaxaJurosSimples(pv, fv, n),
+      n: () => this.calcularNSimples(pv, fv, taxa),
+    } : {
+      pv: () => this.calcularPVComposto(fv, taxa, n),
+      fv: () => this.calcularFVComposto(pv, taxa, n),
       i: () => this.calcularTaxaJuros(pv, fv, n),
-      n: () => this.calcularN(pv, fv, taxa),
+      n: () => this.calcularNComposto(pv, fv, taxa),
     };
 
     if (operacoes[variavelFaltante]) return operacoes[variavelFaltante]();
     else throw new Error('Variável desconhecida');
   }
+
+  // ==================== MÉTODOS DE JUROS COMPOSTOS ====================
 
   /**
    * Calcula Valor Presente (PV)
@@ -65,7 +74,7 @@ class CalculosFinanceiros {
    * @param {number} n - Número de períodos
    * @returns {number} Valor Presente
    */
-  calcularVP(fv, i, n) {
+  calcularPVComposto(fv, i, n) {
     // Caso especial: taxa zero
     if (i === 0) return -(fv || 0);
 
@@ -81,7 +90,7 @@ class CalculosFinanceiros {
    * @param {number} n - Número de períodos
    * @returns {number} Valor Futuro
    */
-  calcularVF(pv, i, n) {
+  calcularFVComposto(pv, i, n) {
     // Caso especial: taxa zero
     if (i === 0) return -(pv || 0);
 
@@ -117,7 +126,7 @@ class CalculosFinanceiros {
    * @param {number} i - Taxa de juros (decimal)
    * @returns {number} Número de períodos
    */
-  calcularN(pv, fv, i) {
+  calcularNComposto(pv, fv, i) {
     // Validações básicas
     if (i === 0) throw new Error('Taxa de juros não pode ser zero');
     if (pv === 0 || fv === 0) throw new Error('PV e FV não podem ser zero');
@@ -129,6 +138,91 @@ class CalculosFinanceiros {
     
     if (denominador === 0) throw new Error('Taxa de juros inválida para cálculo de n');
     if (numerador <= 0) throw new Error('Não é possível calcular n com estes valores');
+    
+    return numerador / denominador;
+  }
+
+  // ==================== MÉTODOS DE JUROS SIMPLES ====================
+
+  /**
+   * Calcula Valor Presente (PV) para juros simples
+   * PV = FV / (1 + i * n)
+   * @param {number} fv - Valor Futuro
+   * @param {number} i - Taxa de juros (decimal)
+   * @param {number} n - Número de períodos
+   * @returns {number} Valor Presente
+   */
+  calcularPVSimples(fv, i, n) {
+    // Caso especial: taxa zero
+    if (i === 0) return -(fv || 0);
+
+    const fator = 1 + (i * n);
+    return -(fv || 0) / fator;
+  }
+
+  /**
+   * Calcula Valor Futuro (FV) para juros simples
+   * FV = PV * (1 + i * n)
+   * @param {number} pv - Valor Presente
+   * @param {number} i - Taxa de juros (decimal)
+   * @param {number} n - Número de períodos
+   * @returns {number} Valor Futuro
+   */
+  calcularFVSimples(pv, i, n) {
+    // Caso especial: taxa zero
+    if (i === 0) return -(pv || 0);
+
+    const fator = 1 + (i * n);
+    return -(pv || 0) * fator;
+  }
+
+  /**
+   * Calcula Taxa de Juros (i) para juros simples
+   * i = (FV - PV) / (PV * n)
+   * @param {number} pv - Valor Presente
+   * @param {number} fv - Valor Futuro
+   * @param {number} n - Número de períodos
+   * @returns {number} Taxa de juros (percentual)
+   */
+  calcularTaxaJurosSimples(pv, fv, n) {
+    // Validações básicas
+    if (n === 0) throw new Error('Número de períodos não pode ser zero');
+    if (pv === 0) throw new Error('PV não pode ser zero');
+    if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
+
+    // Cálculo para juros simples: i = (FV - PV) / (PV * n)
+    const numerador = Math.abs(fv) - Math.abs(pv);
+    const denominador = Math.abs(pv) * n;
+    
+    if (denominador === 0) throw new Error('Não é possível calcular a taxa com estes valores');
+    
+    const taxa = numerador / denominador;
+    
+    if (isNaN(taxa) || !isFinite(taxa)) throw new Error('Não é possível calcular a taxa com estes valores');
+    
+    return taxa * 100; // Retorna como percentual
+  }
+
+  /**
+   * Calcula Número de Períodos (n) para juros simples
+   * n = (FV - PV) / (PV * i)
+   * @param {number} pv - Valor Presente
+   * @param {number} fv - Valor Futuro
+   * @param {number} i - Taxa de juros (decimal)
+   * @returns {number} Número de períodos
+   */
+  calcularNSimples(pv, fv, i) {
+    // Validações básicas
+    if (i === 0) throw new Error('Taxa de juros não pode ser zero');
+    if (pv === 0) throw new Error('PV não pode ser zero');
+    if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
+
+    // Cálculo para juros simples: n = (FV - PV) / (PV * i)
+    const numerador = Math.abs(fv) - Math.abs(pv);
+    const denominador = Math.abs(pv) * i;
+    
+    if (denominador === 0) throw new Error('Não é possível calcular n com estes valores');
+    if (numerador <= 0) throw new Error('FV deve ser maior que PV para juros simples');
     
     return numerador / denominador;
   }
@@ -267,9 +361,7 @@ class CalculosFinanceiros {
     const valorAtual = valorNominal - desconto;
 
     // Validação para evitar valor atual negativo
-    if (valorAtual < 0) {
-      throw new Error('Taxa e tempo muito altos resultam em desconto maior que o valor nominal');
-    }
+    if (valorAtual < 0) throw new Error('Taxa e tempo muito altos resultam em desconto maior que o valor nominal');
 
     return {
       desconto: desconto,
@@ -320,7 +412,6 @@ class CalculosFinanceiros {
    * @param {number} tempo - Tempo até o vencimento
    * @returns {Object} Valor nominal e informações do desconto
    */
-
   calcularValorNominalComercial(valorAtual, taxa, tempo) {
     // Validações
     if (valorAtual <= 0) throw new Error('Valor atual deve ser positivo');
@@ -387,7 +478,6 @@ class CalculosFinanceiros {
    * @param {number} tempo - Tempo até o vencimento
    * @returns {Object} Taxa de desconto e informações
    */
-
   calcularTaxaDescontoComercial(valorNominal, valorAtual, tempo) {
     // Validações
     if (valorNominal <= 0) throw new Error('Valor nominal deve ser positivo');
@@ -417,7 +507,6 @@ class CalculosFinanceiros {
    * @param {number} taxa - Taxa de desconto (percentual)
    * @returns {Object} Tempo e informações do desconto
    */
-
   calcularTempoDescontoRacional(valorNominal, valorAtual, taxa) {
     // Validações
     if (valorNominal <= 0) throw new Error('Valor nominal deve ser positivo');
@@ -473,7 +562,7 @@ class CalculosFinanceiros {
     };
   }
 
-  // ==================== FUNÇÕES ORIGINAIS ====================
+  // ==================== FUNÇÕES GERAIS ====================
   
   /**
    * Detecta o tipo de taxa baseado na magnitude do valor
