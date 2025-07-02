@@ -313,7 +313,6 @@ class CalculosFinanceiros {
    * @param {number} tempo - Tempo até o vencimento
    * @returns {Object} Objeto com desconto, valor atual e informações
    */
-
   calcularDescontoRacional(valorNominal, taxa, tempo) {
     // Validações
     if (valorNominal <= 0) throw new Error('Valor nominal deve ser positivo');
@@ -346,7 +345,6 @@ class CalculosFinanceiros {
    * @param {number} tempo - Tempo até o vencimento
    * @returns {Object} Objeto com desconto, valor atual e informações
    */
-
   calcularDescontoComercial(valorNominal, taxa, tempo) {
     // Validações
     if (valorNominal <= 0) throw new Error('Valor nominal deve ser positivo');
@@ -381,7 +379,6 @@ class CalculosFinanceiros {
    * @param {number} tempo - Tempo até o vencimento
    * @returns {Object} Valor nominal e informações do desconto
    */
-
   calcularValorNominalRacional(valorAtual, taxa, tempo) {
     // Validações
     if (valorAtual <= 0) throw new Error('Valor atual deve ser positivo');
@@ -448,7 +445,6 @@ class CalculosFinanceiros {
    * @param {number} tempo - Tempo até o vencimento
    * @returns {Object} Taxa de desconto e informações
    */
-
   calcularTaxaDescontoRacional(valorNominal, valorAtual, tempo) {
     // Validações
     if (valorNominal <= 0) throw new Error('Valor nominal deve ser positivo');

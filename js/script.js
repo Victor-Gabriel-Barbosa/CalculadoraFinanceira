@@ -436,9 +436,7 @@ class CalculadoraFinanceira {
     }
   }
 
-  /**
-   * Cria os botões específicos para modos de desconto
-   */
+  // Cria os botões específicos para modos de desconto
   criarBotoesDesconto() {
     const primeiraLinha = document.querySelector('.keypad-row:first-child');
     const segundaLinha = document.querySelector('.keypad-row:nth-child(2)');
@@ -464,9 +462,7 @@ class CalculadoraFinanceira {
     this.atualizarEventListenersDesconto();
   }
 
-  /**
-   * Restaura os botões originais
-   */
+  // Restaura os botões originais
   restaurarBotoesOriginais() {
     const primeiraLinha = document.querySelector('.keypad-row:first-child');
     const segundaLinha = document.querySelector('.keypad-row:nth-child(2)');
@@ -479,9 +475,7 @@ class CalculadoraFinanceira {
     }
   }
 
-  /**
-   * Atualiza os event listeners para os botões de desconto
-   */
+  // Atualiza os event listeners para os botões de desconto
   atualizarEventListenersDesconto() {
     // Remove listeners antigos e adiciona novos para botões financeiros
     document.querySelectorAll('.financial-btn').forEach(btn => {
@@ -561,9 +555,7 @@ class CalculadoraFinanceira {
 
     // Destaca o botão atual
     const btn = document.querySelector(`[data-function="${variavel}"]`);
-    if (btn) {
-      btn.classList.add('active-variable');
-    }
+    if (btn) btn.classList.add('active-variable');
 
     this.valoresDesconto[variavel] = valor;
     this.ultimaVariavel = variavel;
@@ -691,9 +683,7 @@ class CalculadoraFinanceira {
     if (labelFV) labelFV.textContent = 'Va:';
     
     // Mostra o campo do desconto
-    if (statusDisplay) {
-      statusDisplay.classList.add('modo-desconto');
-    }
+    if (statusDisplay) statusDisplay.classList.add('modo-desconto');
   }
 
   // Restaura os labels originais do status
@@ -995,9 +985,8 @@ class CalculadoraFinanceira {
     // Verifica se está em modo de desconto
     const ehModoDesconto = this.modoAtual === 'desconto-racional' || this.modoAtual === 'desconto-comercial';
     
-    if (ehModoDesconto) {
-      this.atualizarDisplayStatusDesconto();
-    } else {
+    if (ehModoDesconto) this.atualizarDisplayStatusDesconto();
+    else {
       Object.keys(this.valoresFinanceiros).forEach(chave => {
         const valor = this.valoresFinanceiros[chave];
         this.valoresStatus[chave].textContent = valor !== null ? this.formatarNumero(valor) : '-';
@@ -1273,7 +1262,6 @@ class CalculadoraFinanceira {
       this.novaEntrada = false;
       this.atualizarDisplay();
       this.mostrarFeedbackCola();
-      
     } catch (erro) {
       this.mostrarErro('Erro ao processar expressão');
     }
