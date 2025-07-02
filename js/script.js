@@ -83,6 +83,21 @@ class CalculadoraFinanceira {
     this.atualizarDisplayOperacao();
   }
 
+  // Inicializa o seletor de modo
+  inicializarSeletorModo() {
+    // Verifica se o seletor de modo existe
+    if (this.seletorModo) {
+      // Define o modo inicial baseado no valor do seletor HTML
+      this.modoAtual = this.seletorModo.value || 'simples';
+      
+      // Atualiza o sistema de cálculos com o modo inicial
+      this.calculosFinanceiros.setModoCapitalizacao(this.modoAtual);
+      
+      // Atualiza a interface para refletir o modo inicial
+      this.atualizarDisplayOperacao();
+    }
+  }
+
   // Inicializa todos os event listeners dos botões
   inicializarEventos() {
     // Botões numéricos
@@ -293,15 +308,31 @@ class CalculadoraFinanceira {
     this.entradaAtual = '0';
     this.novaEntrada = true;
     this.ultimaVariavel = null;
-    this.valoresFinanceiros = {
-      pv: null,
-      fv: null,
-      i: null,
-      n: null
-    };
+    
+    // Verifica se está em modo de desconto para limpar os valores apropriados
+    const ehModoDesconto = this.modoAtual === 'desconto-racional' || this.modoAtual === 'desconto-comercial';
+    
+    if (ehModoDesconto) {
+      this.valoresDesconto = {
+        N: null,
+        Va: null,
+        i: null,
+        n: null,
+        D: null
+      };
+      this.atualizarDisplayStatusDesconto();
+    } else {
+      this.valoresFinanceiros = {
+        pv: null,
+        fv: null,
+        i: null,
+        n: null
+      };
+      this.atualizarDisplayStatus();
+    }
+    
     this.displayVariavel.textContent = '-';
     this.atualizarDisplay();
-    this.atualizarDisplayStatus();
     this.limparErro();
     this.limparOp();
   }
@@ -418,7 +449,7 @@ class CalculadoraFinanceira {
       <button class="btn financial-btn" data-function="Va">Va</button>
       <button class="btn financial-btn" data-function="i">i</button>
       <button class="btn financial-btn" data-function="n">n</button>
-      <button class="btn financial-btn" data-function="D">D</button>
+      <button class="btn operation-btn" data-function="ac">AC</button>
     `;
 
     segundaLinha.innerHTML = `
@@ -474,6 +505,17 @@ class CalculadoraFinanceira {
         this.calcularDescontoFaltante();
       });
     }
+
+    // Atualiza listener do AC (botão de limpar tudo)
+    const btnAc = document.querySelector('[data-function="ac"]');
+    if (btnAc) {
+      const novoBtnAc = btnAc.cloneNode(true);
+      btnAc.parentNode.replaceChild(novoBtnAc, btnAc);
+      
+      novoBtnAc.addEventListener('click', () => {
+        this.limparTudo();
+      });
+    }
   }
 
   // Reativa os event listeners originais
@@ -488,16 +530,15 @@ class CalculadoraFinanceira {
       });
     });
 
-    // Botão CPT original
-    const btnCpt = document.querySelector('[data-function="cpt"]');
-    if (btnCpt) {
-      const novoBtnCpt = btnCpt.cloneNode(true);
-      btnCpt.parentNode.replaceChild(novoBtnCpt, btnCpt);
+    // Reativa todos os botões de operação
+    document.querySelectorAll('.operation-btn').forEach(btn => {
+      const novoBotao = btn.cloneNode(true);
+      btn.parentNode.replaceChild(novoBotao, btn);
       
-      novoBtnCpt.addEventListener('click', () => {
-        this.calcularValorFaltante();
+      novoBotao.addEventListener('click', () => {
+        this.executarOp(novoBotao.dataset.function);
       });
-    }
+    });
   }
 
   /**
@@ -544,21 +585,22 @@ class CalculadoraFinanceira {
 
   // Calcula a variável de desconto faltante usando CPT
   calcularDescontoFaltante() {
-    // Conta quantas variáveis estão definidas
-    const valoresDefinidos = Object.values(this.valoresDesconto).filter(v => v !== null);
+    // Conta quantas variáveis estão definidas (excluindo D que será sempre calculado automaticamente)
+    const valoresParaCalculo = { N: this.valoresDesconto.N, Va: this.valoresDesconto.Va, i: this.valoresDesconto.i, n: this.valoresDesconto.n };
+    const valoresDefinidos = Object.values(valoresParaCalculo).filter(v => v !== null);
 
     if (valoresDefinidos.length < 3) {
       this.mostrarErro('É necessário definir pelo menos 3 valores para calcular');
       return;
     }
 
-    if (valoresDefinidos.length === 5) {
+    if (valoresDefinidos.length === 4) {
       this.mostrarErro('Todos os valores já estão definidos');
       return;
     }
 
-    // Identifica qual variável está faltando
-    const variavelFaltante = Object.keys(this.valoresDesconto).find(chave => this.valoresDesconto[chave] === null);
+    // Identifica qual variável está faltando (excluindo D)
+    const variavelFaltante = Object.keys(valoresParaCalculo).find(chave => valoresParaCalculo[chave] === null);
 
     if (!variavelFaltante) {
       this.mostrarErro('Nenhuma variável faltante encontrada');
@@ -582,13 +624,17 @@ class CalculadoraFinanceira {
         N: 'valorNominal',
         Va: 'valorAtual', 
         i: 'taxa',
-        n: 'tempo',
-        D: 'desconto'
+        n: 'tempo'
       };
       
       valorCalculado = resultado[mapeamentoResultado[variavelFaltante]];
 
+      // Atualiza a variável calculada
       this.valoresDesconto[variavelFaltante] = valorCalculado;
+      
+      // Sempre calcula e atualiza o desconto (D) automaticamente
+      this.valoresDesconto.D = resultado.desconto;
+      
       this.entradaAtual = valorCalculado.toString();
       
       // Mapeia os nomes para exibição
@@ -596,8 +642,7 @@ class CalculadoraFinanceira {
         N: 'Valor Nominal',
         Va: 'Valor Atual',
         i: 'Taxa',
-        n: 'Tempo', 
-        D: 'Desconto'
+        n: 'Tempo'
       };
       
       this.displayVariavel.textContent = `${nomesExibicao[variavelFaltante]} = ${this.formatarNumero(valorCalculado)}`;
@@ -661,9 +706,7 @@ class CalculadoraFinanceira {
     if (labelFV) labelFV.textContent = 'FV:';
     
     // Oculta o campo do desconto
-    if (statusDisplay) {
-      statusDisplay.classList.remove('modo-desconto');
-    }
+    if (statusDisplay) statusDisplay.classList.remove('modo-desconto');
   }
 
   // Limpa os valores financeiros e restaura labels
@@ -915,6 +958,7 @@ class CalculadoraFinanceira {
       operacaoTexto = `${this.formatarNumero(this.operando)} ${simbolosOp[this.operacaoAtual] || this.operacaoAtual}`;
     }
     
+    this.displayOp.innerHTML = `<span style="color: #3498db; font-weight: bold;">${modoTexto}</span><span>${operacaoTexto}</span>`;
   }
 
   // Atualiza o display de operação
@@ -959,9 +1003,7 @@ class CalculadoraFinanceira {
         this.valoresStatus[chave].textContent = valor !== null ? this.formatarNumero(valor) : '-';
       });
       // Limpa o campo de desconto quando não está em modo desconto
-      if (this.valoresStatus.d) {
-        this.valoresStatus.d.textContent = '-';
-      }
+      if (this.valoresStatus.d) this.valoresStatus.d.textContent = '-';
     }
     
     // Mostra os seletores para campos que têm valores definidos
