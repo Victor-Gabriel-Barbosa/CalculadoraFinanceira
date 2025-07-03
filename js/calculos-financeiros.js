@@ -3,7 +3,7 @@
  * Classe responsável por todos os cálculos financeiros baseados em juros simples e compostos
  * Suporta cálculo de Valor Presente (PV), Valor Futuro (FV), Taxa de Juros (i) e Número de Períodos (n)
  */
-class CalculosFinanceiros {
+export class CalculosFinanceiros {
   constructor() {
     // Sistema de conversão de taxas
     this.modoCapitalizacao = 'simples'; // 'simples' ou 'composta'
@@ -36,28 +36,30 @@ class CalculosFinanceiros {
 
   /**
    * Resolve a equação financeira para encontrar a variável faltante
-   * @param {string} variavelFaltante - variável a ser calculada ('pv', 'fv', 'i', 'n')
+   * @param {string} variavelFaltante - variável a ser calculada ('pv', 'fv', 'j', 'i', 'n')
    * @param {Object} valores - objeto com os valores conhecidos
    * @param {string} modoCalculo - modo de cálculo ('simples' ou 'composto')
    * @returns {number} valor calculado
    */
   resolverEqFinanceira(variavelFaltante, valores, modoCalculo = 'simples') {
-    const { pv, fv, i, n } = valores;
+    const { pv, fv, j, i, n } = valores;
 
     // Sempre converte taxa de juros de percentual para decimal
     const taxa = i !== null ? i / 100 : null;
 
     // Seleciona os métodos baseado no modo de cálculo
     const operacoes = modoCalculo === 'simples' ? {
-      pv: () => this.calcularPVSimples(fv, taxa, n),
-      fv: () => this.calcularFVSimples(pv, taxa, n),
-      i: () => this.calcularTaxaJurosSimples(pv, fv, n),
-      n: () => this.calcularNSimples(pv, fv, taxa),
+      pv: () => this.calcularPVSimples(fv, j, taxa, n),
+      fv: () => this.calcularFVSimples(pv, j, taxa, n),
+      j: () => this.calcularJurosSimples(pv, fv, taxa, n),
+      i: () => this.calcularTaxaJurosSimples(pv, fv, j, n),
+      n: () => this.calcularNSimples(pv, fv, j, taxa),
     } : {
-      pv: () => this.calcularPVComposto(fv, taxa, n),
-      fv: () => this.calcularFVComposto(pv, taxa, n),
-      i: () => this.calcularTaxaJuros(pv, fv, n),
-      n: () => this.calcularNComposto(pv, fv, taxa),
+      pv: () => this.calcularPVComposto(fv, j, taxa, n),
+      fv: () => this.calcularFVComposto(pv, j, taxa, n),
+      j: () => this.calcularJurosComposto(pv, fv, taxa, n),
+      i: () => this.calcularTaxaJurosComposto(pv, fv, j, n),
+      n: () => this.calcularNComposto(pv, fv, j, taxa),
     };
 
     if (operacoes[variavelFaltante]) return operacoes[variavelFaltante]();
@@ -68,13 +70,17 @@ class CalculosFinanceiros {
 
   /**
    * Calcula Valor Presente (PV)
-   * PV = -FV / (1 + i)^n
+   * PV = -FV / (1 + i)^n  OU  PV = FV - J (se J for conhecido)
    * @param {number} fv - Valor Futuro
+   * @param {number} j - Juros (opcional)
    * @param {number} i - Taxa de juros (decimal)
    * @param {number} n - Número de períodos
    * @returns {number} Valor Presente
    */
-  calcularPVComposto(fv, i, n) {
+  calcularPVComposto(fv, j, i, n) {
+    // Se J (juros) for conhecido, PV = FV - J
+    if (j !== null && j !== undefined) return Math.abs(fv) - Math.abs(j);
+    
     // Caso especial: taxa zero
     if (i === 0) return -(fv || 0);
 
@@ -84,13 +90,19 @@ class CalculosFinanceiros {
 
   /**
    * Calcula Valor Futuro (FV)
-   * FV = -PV * (1 + i)^n
+   * FV = -PV * (1 + i)^n  OU  FV = PV + J (se J for conhecido)
    * @param {number} pv - Valor Presente
+   * @param {number} j - Juros (opcional)
    * @param {number} i - Taxa de juros (decimal)
    * @param {number} n - Número de períodos
    * @returns {number} Valor Futuro
    */
-  calcularFVComposto(pv, i, n) {
+  calcularFVComposto(pv, j, i, n) {
+    // Se J (juros) for conhecido, FV = PV + J
+    if (j !== null && j !== undefined) {
+      return Math.abs(pv) + Math.abs(j);
+    }
+    
     // Caso especial: taxa zero
     if (i === 0) return -(pv || 0);
 
@@ -99,19 +111,57 @@ class CalculosFinanceiros {
   }
 
   /**
+   * Calcula Juros (J) para juros compostos
+   * J = FV - PV  OU  J = PV * [(1 + i)^n - 1]
+   * @param {number} pv - Valor Presente
+   * @param {number} fv - Valor Futuro
+   * @param {number} i - Taxa de juros (decimal)
+   * @param {number} n - Número de períodos
+   * @returns {number} Juros
+   */
+  calcularJurosComposto(pv, fv, i, n) {
+    // Se PV e FV são conhecidos, J = |FV| - |PV|
+    if (pv !== null && fv !== null) return Math.abs(fv) - Math.abs(pv);
+    
+    // Se PV, i e n são conhecidos, J = |PV| * [(1 + i)^n - 1]
+    if (pv !== null && i !== null && n !== null) {
+      if (i === 0) return 0;
+      const fator = Math.pow(1 + i, n) - 1;
+      return Math.abs(pv) * fator;
+    }
+    
+    // Se FV, i e n são conhecidos, J = |FV| - |FV| / (1 + i)^n
+    if (fv !== null && i !== null && n !== null) {
+      if (i === 0) return 0;
+      const fator = Math.pow(1 + i, n);
+      const pv_calculado = Math.abs(fv) / fator;
+      return Math.abs(fv) - pv_calculado;
+    }
+    
+    throw new Error('Dados insuficientes para calcular os juros');
+  }
+
+  /**
    * Calcula Taxa de Juros (i) usando método direto
    * @param {number} pv - Valor Presente
    * @param {number} fv - Valor Futuro
+   * @param {number} j - Juros (opcional)
    * @param {number} n - Número de períodos
    * @returns {number} Taxa de juros (percentual)
    */
-  calcularTaxaJuros(pv, fv, n) {
+  calcularTaxaJurosComposto(pv, fv, j, n) {
+    // Se J for conhecido e PV ou FV não, calcula o valor faltante primeiro
+    if (j !== null && j !== undefined) {
+      if (pv === null && fv !== null) pv = Math.abs(fv) - Math.abs(j);
+      else if (fv === null && pv !== null) fv = Math.abs(pv) + Math.abs(j);
+    }
+    
     // Validações básicas
     if (n === 0) throw new Error('Número de períodos não pode ser zero');
     if (pv === 0 || fv === 0) throw new Error('PV e FV não podem ser zero');
     if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
 
-    // Cálculo direto para juros compostos simples: i = (FV/PV)^(1/n) - 1
+    // Cálculo direto para juros compostos: i = (FV/PV)^(1/n) - 1
     const taxa = Math.pow(Math.abs(fv / pv), 1 / n) - 1;
     
     if (isNaN(taxa) || !isFinite(taxa)) throw new Error('Não é possível calcular a taxa com estes valores');
@@ -123,10 +173,17 @@ class CalculosFinanceiros {
    * Calcula Número de Períodos (n)
    * @param {number} pv - Valor Presente
    * @param {number} fv - Valor Futuro
+   * @param {number} j - Juros (opcional)
    * @param {number} i - Taxa de juros (decimal)
    * @returns {number} Número de períodos
    */
-  calcularNComposto(pv, fv, i) {
+  calcularNComposto(pv, fv, j, i) {
+    // Se J for conhecido e PV ou FV não, calcula o valor faltante primeiro
+    if (j !== null && j !== undefined) {
+      if (pv === null && fv !== null) pv = Math.abs(fv) - Math.abs(j);
+      else if (fv === null && pv !== null) fv = Math.abs(pv) + Math.abs(j);
+    }
+    
     // Validações básicas
     if (i === 0) throw new Error('Taxa de juros não pode ser zero');
     if (pv === 0 || fv === 0) throw new Error('PV e FV não podem ser zero');
@@ -146,13 +203,19 @@ class CalculosFinanceiros {
 
   /**
    * Calcula Valor Presente (PV) para juros simples
-   * PV = FV / (1 + i * n)
+   * PV = FV / (1 + i * n)  OU  PV = FV - J (se J for conhecido)
    * @param {number} fv - Valor Futuro
+   * @param {number} j - Juros (opcional)
    * @param {number} i - Taxa de juros (decimal)
    * @param {number} n - Número de períodos
    * @returns {number} Valor Presente
    */
-  calcularPVSimples(fv, i, n) {
+  calcularPVSimples(fv, j, i, n) {
+    // Se J (juros) for conhecido, PV = FV - J
+    if (j !== null && j !== undefined) {
+      return Math.abs(fv) - Math.abs(j);
+    }
+    
     // Caso especial: taxa zero
     if (i === 0) return -(fv || 0);
 
@@ -162,13 +225,17 @@ class CalculosFinanceiros {
 
   /**
    * Calcula Valor Futuro (FV) para juros simples
-   * FV = PV * (1 + i * n)
+   * FV = PV * (1 + i * n)  OU  FV = PV + J (se J for conhecido)
    * @param {number} pv - Valor Presente
+   * @param {number} j - Juros (opcional)
    * @param {number} i - Taxa de juros (decimal)
    * @param {number} n - Número de períodos
    * @returns {number} Valor Futuro
    */
-  calcularFVSimples(pv, i, n) {
+  calcularFVSimples(pv, j, i, n) {
+    // Se J (juros) for conhecido, FV = PV + J
+    if (j !== null && j !== undefined) return Math.abs(pv) + Math.abs(j);
+    
     // Caso especial: taxa zero
     if (i === 0) return -(pv || 0);
 
@@ -177,26 +244,78 @@ class CalculosFinanceiros {
   }
 
   /**
-   * Calcula Taxa de Juros (i) para juros simples
-   * i = (FV - PV) / (PV * n)
+   * Calcula Juros (J) para juros simples
+   * J = FV - PV  OU  J = PV * i * n
    * @param {number} pv - Valor Presente
    * @param {number} fv - Valor Futuro
+   * @param {number} i - Taxa de juros (decimal)
+   * @param {number} n - Número de períodos
+   * @returns {number} Juros
+   */
+  calcularJurosSimples(pv, fv, i, n) {
+    // Se PV e FV são conhecidos, J = |FV| - |PV|
+    if (pv !== null && fv !== null) return Math.abs(fv) - Math.abs(pv);
+    
+    // Se PV, i e n são conhecidos, J = |PV| * i * n
+    if (pv !== null && i !== null && n !== null) return Math.abs(pv) * i * n;
+    
+    // Se FV, i e n são conhecidos, J = |FV| - |FV| / (1 + i * n)
+    if (fv !== null && i !== null && n !== null) {
+      if (i === 0) return 0;
+      const fator = 1 + (i * n);
+      const pv_calculado = Math.abs(fv) / fator;
+      return Math.abs(fv) - pv_calculado;
+    }
+    
+    throw new Error('Dados insuficientes para calcular os juros');
+  }
+
+  /**
+   * Calcula Taxa de Juros (i) para juros simples
+   * i = (FV - PV) / (PV * n)  OU  i = J / (PV * n)
+   * @param {number} pv - Valor Presente
+   * @param {number} fv - Valor Futuro
+   * @param {number} j - Juros (opcional)
    * @param {number} n - Número de períodos
    * @returns {number} Taxa de juros (percentual)
    */
-  calcularTaxaJurosSimples(pv, fv, n) {
-    // Validações básicas
+  calcularTaxaJurosSimples(pv, fv, j, n) {
+    // Se J for conhecido, use J diretamente
+    let juros = j;
+    
+    // Se J não for conhecido mas PV e FV são, calcula J
+    if (juros === null && pv !== null && fv !== null) {
+      juros = Math.abs(fv) - Math.abs(pv);
+    }
+    
+    // Se ainda não temos os juros ou se não temos PV, usar método original
+    if (juros === null || pv === null) {
+      // Validações básicas para método original
+      if (n === 0) throw new Error('Número de períodos não pode ser zero');
+      if (pv === 0) throw new Error('PV não pode ser zero');
+      if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
+
+      // Cálculo para juros simples: i = (FV - PV) / (PV * n)
+      const numerador = Math.abs(fv) - Math.abs(pv);
+      const denominador = Math.abs(pv) * n;
+      
+      if (denominador === 0) throw new Error('Não é possível calcular a taxa com estes valores');
+      
+      const taxa = numerador / denominador;
+      
+      if (isNaN(taxa) || !isFinite(taxa)) throw new Error('Não é possível calcular a taxa com estes valores');
+      
+      return taxa * 100; // Retorna como percentual
+    }
+    
+    // Usa a fórmula: i = J / (PV * n)
     if (n === 0) throw new Error('Número de períodos não pode ser zero');
     if (pv === 0) throw new Error('PV não pode ser zero');
-    if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
-
-    // Cálculo para juros simples: i = (FV - PV) / (PV * n)
-    const numerador = Math.abs(fv) - Math.abs(pv);
-    const denominador = Math.abs(pv) * n;
     
+    const denominador = Math.abs(pv) * n;
     if (denominador === 0) throw new Error('Não é possível calcular a taxa com estes valores');
     
-    const taxa = numerador / denominador;
+    const taxa = Math.abs(juros) / denominador;
     
     if (isNaN(taxa) || !isFinite(taxa)) throw new Error('Não é possível calcular a taxa com estes valores');
     
@@ -205,26 +324,46 @@ class CalculosFinanceiros {
 
   /**
    * Calcula Número de Períodos (n) para juros simples
-   * n = (FV - PV) / (PV * i)
+   * n = (FV - PV) / (PV * i)  OU  n = J / (PV * i)
    * @param {number} pv - Valor Presente
    * @param {number} fv - Valor Futuro
+   * @param {number} j - Juros (opcional)
    * @param {number} i - Taxa de juros (decimal)
    * @returns {number} Número de períodos
    */
-  calcularNSimples(pv, fv, i) {
-    // Validações básicas
+  calcularNSimples(pv, fv, j, i) {
+    // Se J for conhecido, use J diretamente
+    let juros = j;
+    
+    // Se J não for conhecido mas PV e FV são, calcula J
+    if (juros === null && pv !== null && fv !== null) juros = Math.abs(fv) - Math.abs(pv);
+    
+    // Se ainda não temos os juros ou se não temos PV, usar método original
+    if (juros === null || pv === null) {
+      // Validações básicas para método original
+      if (i === 0) throw new Error('Taxa de juros não pode ser zero');
+      if (pv === 0) throw new Error('PV não pode ser zero');
+      if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
+
+      // Cálculo para juros simples: n = (FV - PV) / (PV * i)
+      const numerador = Math.abs(fv) - Math.abs(pv);
+      const denominador = Math.abs(pv) * i;
+      
+      if (denominador === 0) throw new Error('Não é possível calcular n com estes valores');
+      if (numerador <= 0) throw new Error('FV deve ser maior que PV para juros simples');
+      
+      return numerador / denominador;
+    }
+    
+    // Usa a fórmula: n = J / (PV * i)
     if (i === 0) throw new Error('Taxa de juros não pode ser zero');
     if (pv === 0) throw new Error('PV não pode ser zero');
-    if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
-
-    // Cálculo para juros simples: n = (FV - PV) / (PV * i)
-    const numerador = Math.abs(fv) - Math.abs(pv);
+    
     const denominador = Math.abs(pv) * i;
-    
     if (denominador === 0) throw new Error('Não é possível calcular n com estes valores');
-    if (numerador <= 0) throw new Error('FV deve ser maior que PV para juros simples');
+    if (juros <= 0) throw new Error('Juros devem ser positivos');
     
-    return numerador / denominador;
+    return Math.abs(juros) / denominador;
   }
 
   /**
@@ -419,9 +558,7 @@ class CalculosFinanceiros {
 
     // Validação para evitar divisão por zero ou valor negativo
     const denominador = 1 - (taxaDecimal * tempo);
-    if (denominador <= 0) {
-      throw new Error('Taxa e tempo muito altos para calcular valor nominal');
-    }
+    if (denominador <= 0) throw new Error('Taxa e tempo muito altos para calcular valor nominal');
 
     // Fórmula: N = Va / (1 - i x n)
     const valorNominal = valorAtual / denominador;
@@ -631,22 +768,18 @@ class CalculosFinanceiros {
     let descricao;
     let tipoOrigem = this.detectarTipoTaxa(taxaAtual);
 
-    switch (tipoConversao) {
-      case 'taxa-dia':
-        resultado = this.converterTaxa('dia', taxaAtual, tipoOrigem);
-        descricao = 'Taxa diária';
-        break;
-      case 'taxa-mes':
-        resultado = this.converterTaxa('mes', taxaAtual, tipoOrigem);
-        descricao = 'Taxa mensal';
-        break;
-      case 'taxa-ano':
-        resultado = this.converterTaxa('ano', taxaAtual, tipoOrigem);
-        descricao = 'Taxa anual';
-        break;
-      default:
-        throw new Error('Tipo de conversão inválido');
-    }
+    // Configuração para conversões
+    const configuracoes = {
+      'taxa-dia': { tipo: 'dia', descricao: 'Taxa diária' },
+      'taxa-mes': { tipo: 'mes', descricao: 'Taxa mensal' },
+      'taxa-ano': { tipo: 'ano', descricao: 'Taxa anual' }
+    };
+
+    const config = configuracoes[tipoConversao];
+    if (!config) throw new Error('Tipo de conversão inválido');
+
+    resultado = this.converterTaxa(config.tipo, taxaAtual, tipoOrigem);
+    descricao = config.descricao;
 
     return {
       resultado: resultado,

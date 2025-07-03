@@ -75,6 +75,15 @@
             <option value="year">Anos</option>
           </select>
         </div>
+        <div class="status-item juros-field">
+          <span class="label">J:</span>
+          <span class="value" id="jValue">-</span>
+          <select class="value-selector" id="jSelector" style="display: none;">
+            <option value="real">Real (R$)</option>
+            <option value="dollar">Dólar (US$)</option>
+            <option value="euro">Euro (€)</option>
+          </select>
+        </div>
         <div class="status-item desconto-field">
           <span class="label">D:</span>
           <span class="value" id="dValue">-</span>
@@ -87,18 +96,18 @@
         <div class="keypad-row">
           <button class="btn financial-btn" data-function="pv">PV</button>
           <button class="btn financial-btn" data-function="fv">FV</button>
+          <button class="btn financial-btn" data-function="j">J</button>
           <button class="btn financial-btn" data-function="i">i</button>
           <button class="btn financial-btn" data-function="n">n</button>
-          <button class="btn operation-btn" data-function="cpt">CPT</button>
         </div>
 
         <!-- Segunda linha - Operações especiais -->
         <div class="keypad-row">
+          <button class="btn operation-btn" data-function="cpt">CPT</button>
           <button class="btn operation-btn" data-function="ac">AC</button>
           <button class="btn operation-btn" data-function="ce">CE</button>
           <button class="btn operation-btn" data-function="sinal">+/-</button>
           <button class="btn operation-btn" data-function="porcento">%</button>
-          <button class="btn operation-btn" data-function="limpa">←</button>
         </div>
 
         <!-- Terceira linha - Números -->
@@ -107,7 +116,7 @@
           <button class="btn number-btn" data-number="8">8</button>
           <button class="btn number-btn" data-number="9">9</button>
           <button class="btn operation-btn" data-function="divide">÷</button>
-          <button class="btn operation-btn" data-function="raiz">√</button>
+          <button class="btn operation-btn" data-function="limpa">←</button>
         </div>
 
         <!-- Quarta linha - Números -->
@@ -116,7 +125,7 @@
           <button class="btn number-btn" data-number="5">5</button>
           <button class="btn number-btn" data-number="6">6</button>
           <button class="btn operation-btn" data-function="multiplica">x</button>
-          <button class="btn operation-btn" data-function="log">log</button>
+          <button class="btn operation-btn" data-function="raiz">√</button>
         </div>
 
         <!-- Quinta linha - Números -->
@@ -139,8 +148,7 @@
     </div>
   </div>
 
-  <script src="js/calculos-financeiros.js"></script>
-  <script src="js/script.js"></script>
+  <script type="module" src="js/script.js"></script>
 </body>
 
 </html>

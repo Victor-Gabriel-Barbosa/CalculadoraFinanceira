@@ -1,3 +1,5 @@
+import { CalculosFinanceiros } from './calculos-financeiros.js';
+
 /**
  * CALCULADORA FINANCEIRA
  * Sistema completo para cálculos financeiros baseados em juros simples e compostos
@@ -12,6 +14,7 @@ class CalculadoraFinanceira {
     this.valoresStatus = {
       pv: document.getElementById('pvValue'),
       fv: document.getElementById('fvValue'),
+      j: document.getElementById('jValue'),
       i: document.getElementById('iValue'),
       n: document.getElementById('nValue'),
       d: document.getElementById('dValue')
@@ -23,6 +26,7 @@ class CalculadoraFinanceira {
     // Elementos dos outros seletores
     this.seletorPV = document.getElementById('pvSelector');
     this.seletorFV = document.getElementById('fvSelector');
+    this.seletorJ = document.getElementById('jSelector');
     this.seletorPeriodo = document.getElementById('periodSelector');
     
     // Seletor de modo
@@ -42,6 +46,7 @@ class CalculadoraFinanceira {
     this.valoresFinanceiros = {
       pv: null,   // Valor Presente
       fv: null,   // Valor Futuro
+      j: null,    // Juros
       i: null,    // Taxa de juros (por período)
       n: null     // Número de períodos
     };
@@ -65,6 +70,7 @@ class CalculadoraFinanceira {
     // Tipos de conversão para valores e períodos
     this.tipoMoedaPV = 'real';
     this.tipoMoedaFV = 'real';
+    this.tipoMoedaJ = 'real';
     this.tipoPeriodo = 'month';
 
     // Sistema de cálculos financeiros
@@ -144,6 +150,12 @@ class CalculadoraFinanceira {
     this.seletorFV.addEventListener('change', (evento) => {
       console.log('Seletor FV mudou para:', evento.target.value);
       this.alterarMoedaFV();
+    });
+    
+    // Seletor de moeda J
+    this.seletorJ.addEventListener('change', (evento) => {
+      console.log('Seletor J mudou para:', evento.target.value);
+      this.alterarMoedaJ();
     });
     
     // Seletor de período
@@ -233,7 +245,6 @@ class CalculadoraFinanceira {
       porcento: () => this.converterParaPorcentagem(),
       raiz: () => this.raizQuadrada(),
       potencia: () => this.potencia(),
-      log: () => this.logaritmo(),
       igual: () => this.igual(),
       soma: () => this.operacaoBasica('soma'),
       subtrai: () => this.operacaoBasica('subtrai'),
@@ -256,7 +267,7 @@ class CalculadoraFinanceira {
       return;
     }
 
-    if (valoresDefinidos.length === 4) {
+    if (valoresDefinidos.length === 5) {
       this.mostrarErro('Todas as variáveis já estão definidas');
       return;
     }
@@ -325,6 +336,7 @@ class CalculadoraFinanceira {
       this.valoresFinanceiros = {
         pv: null,
         fv: null,
+        j: null,
         i: null,
         n: null
       };
@@ -703,7 +715,8 @@ class CalculadoraFinanceira {
   limparValoresFinanceiros() {
     this.valoresFinanceiros = {
       pv: null,
-      fv: null, 
+      fv: null,
+      j: null,
       i: null,
       n: null
     };
@@ -868,23 +881,6 @@ class CalculadoraFinanceira {
     }
   }
 
-  // Calcula o logaritmo do valor atual
-  logaritmo() {
-    const valor = parseFloat(this.entradaAtual);
-    if (!isNaN(valor) && valor > 0) {
-      const resultado = Math.log10(valor);
-      this.displayOp.textContent = `log(${this.formatarNumero(valor)}) = ${this.formatarNumero(resultado)}`;
-      this.entradaAtual = resultado.toString();
-      this.atualizarDisplay();
-      this.novaEntrada = true;
-      
-      // Limpa o display de operação após 2 segundos
-      setTimeout(() => {
-        this.displayOp.textContent = '';
-      }, 2000);
-    } else this.mostrarErro('Logaritmo só é definido para números positivos');
-  }
-
   // Limpa a entrada atual
   limparEntrada() {
     this.entradaAtual = '0';
@@ -1009,6 +1005,10 @@ class CalculadoraFinanceira {
     if (this.valoresFinanceiros.fv !== null) this.mostrarSeletorFV();
     else this.seletorFV.style.display = 'none';
     
+    // J - mostra seletor se há valor definido
+    if (this.valoresFinanceiros.j !== null) this.mostrarSeletorJ();
+    else this.seletorJ.style.display = 'none';
+    
     // i - mostra seletor se há valor definido
     if (this.valoresFinanceiros.i !== null) this.mostrarSeletorTaxa();
     else this.seletorTaxa.style.display = 'none';
@@ -1039,6 +1039,13 @@ class CalculadoraFinanceira {
     if (!this.seletorFV.value || this.seletorFV.value === '') this.seletorFV.value = this.tipoMoedaFV;
   }
 
+  // Mostra o seletor de moeda J
+  mostrarSeletorJ() {
+    this.seletorJ.style.display = 'block';
+    // Só define o valor se ainda não estiver definido
+    if (!this.seletorJ.value || this.seletorJ.value === '') this.seletorJ.value = this.tipoMoedaJ;
+  }
+
   // Mostra o seletor de período
   mostrarSeletorPeriodo() {
     this.seletorPeriodo.style.display = 'block';
@@ -1051,6 +1058,7 @@ class CalculadoraFinanceira {
     this.seletorTaxa.style.display = 'none';
     this.seletorPV.style.display = 'none';
     this.seletorFV.style.display = 'none';
+    this.seletorJ.style.display = 'none';
     this.seletorPeriodo.style.display = 'none';
   }
 
@@ -1116,6 +1124,26 @@ class CalculadoraFinanceira {
       
       // Atualiza o display da variável
       this.displayVariavel.textContent = `FV(${this.calculosFinanceiros.obterSimboloMoeda(novaMoeda)}): ${this.formatarNumero(valorConvertido)}`;
+    }
+  }
+
+  // Altera a moeda do J
+  alterarMoedaJ() {
+    const novaMoeda = this.seletorJ.value;
+    const valorAtualJ = this.valoresFinanceiros.j;
+    
+    // Atualiza a propriedade interna primeiro
+    const moedaAnterior = this.tipoMoedaJ;
+    this.tipoMoedaJ = novaMoeda;
+    
+    if (valorAtualJ !== null) {
+      // Converte o valor para a nova moeda
+      const valorConvertido = this.calculosFinanceiros.converterMoeda(valorAtualJ, moedaAnterior, novaMoeda);
+      this.valoresFinanceiros.j = valorConvertido;
+      this.atualizarDisplayStatus();
+      
+      // Atualiza o display da variável
+      this.displayVariavel.textContent = `J(${this.calculosFinanceiros.obterSimboloMoeda(novaMoeda)}): ${this.formatarNumero(valorConvertido)}`;
     }
   }
 

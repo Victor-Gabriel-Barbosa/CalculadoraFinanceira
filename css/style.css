@@ -196,7 +196,7 @@ body {
   padding: 10px;
   margin-bottom: 15px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
 }
 
@@ -220,13 +220,17 @@ body {
   font-size: 10px;
 }
 
-/* Controle de visibilidade do campo desconto */
+/* Controle de visibilidade dos campos especiais */
+.status-item.juros-field {
+  display: block;
+}
+
 .status-item.desconto-field {
   display: none;
 }
 
 .status-display.modo-desconto {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
 }
 
 .status-display.modo-desconto .status-item.desconto-field {
