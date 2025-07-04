@@ -12,7 +12,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 16px;
 }
 
 /* Container da calculadora */
@@ -230,11 +230,15 @@ body {
 }
 
 .status-display.modo-desconto {
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
 }
 
 .status-display.modo-desconto .status-item.desconto-field {
   display: block;
+}
+
+.status-display.modo-desconto .status-item.juros-field {
+  display: none;
 }
 
 /* Seletor de taxa */
@@ -244,7 +248,6 @@ body {
   border-radius: 3px;
   color: #3498db;
   font-family: 'Courier New', monospace;
-  font-size: 16px;
   padding: 2px;
   outline: none;
   cursor: pointer;
@@ -269,7 +272,6 @@ body {
   border-radius: 3px;
   color: #27ae60;
   font-family: 'Courier New', monospace;
-  font-size: 16px;
   padding: 2px;
   outline: none;
   cursor: pointer;
@@ -294,7 +296,6 @@ body {
   border-radius: 3px;
   color: #e67e22;
   font-family: 'Courier New', monospace;
-  font-size: 16px;
   padding: 2px;
   outline: none;
   cursor: pointer;
@@ -339,9 +340,9 @@ body {
 .btn {
   border: none;
   border-radius: 12px;
-  padding: 15px 8px;
+  padding: 10px 6px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 1000;
   cursor: pointer;
   transition: all 0.15s ease;
   position: relative;
@@ -656,6 +657,10 @@ body {
   .status-display.modo-desconto {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
+  }
+
+  .status-display.modo-desconto .status-item.juros-field {
+    display: none;
   }
 
   .calculator-header h2 {

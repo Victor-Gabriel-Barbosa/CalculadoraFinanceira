@@ -659,7 +659,7 @@ class CalculadoraFinanceira {
     if (labelPV) labelPV.textContent = 'N:';
     if (labelFV) labelFV.textContent = 'Va:';
     
-    // Mostra o campo do desconto
+    // Mostra o campo do desconto e oculta o campo de juros
     if (statusDisplay) statusDisplay.classList.add('modo-desconto');
   }
 
@@ -672,7 +672,7 @@ class CalculadoraFinanceira {
     if (labelPV) labelPV.textContent = 'PV:';
     if (labelFV) labelFV.textContent = 'FV:';
     
-    // Oculta o campo do desconto
+    // Oculta o campo do desconto e mostra o campo de juros
     if (statusDisplay) statusDisplay.classList.remove('modo-desconto');
   }
 
