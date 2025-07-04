@@ -127,46 +127,28 @@ class CalculadoraFinanceira {
     });    
     
     // Seletor de taxa
-    this.seletorTaxa.addEventListener('change', (evento) => {
-      console.log('Seletor taxa mudou para:', evento.target.value);
-      this.alterarPeriodoTaxa();
-    });
+    this.seletorTaxa.addEventListener('change', () => this.alterarPeriodoTaxa());
     
     // Seletor de moeda PV
-    this.seletorPV.addEventListener('change', (evento) => {
-      console.log('Seletor PV mudou para:', evento.target.value);
-      this.alterarMoedaPV();
-    });
+    this.seletorPV.addEventListener('change', () => this.alterarMoedaPV());
     
     // Seletor de moeda FV
-    this.seletorFV.addEventListener('change', (evento) => {
-      console.log('Seletor FV mudou para:', evento.target.value);
-      this.alterarMoedaFV();
-    });
+    this.seletorFV.addEventListener('change', () => this.alterarMoedaFV());
     
     // Seletor de moeda J
-    this.seletorJ.addEventListener('change', (evento) => {
-      console.log('Seletor J mudou para:', evento.target.value);
-      this.alterarMoedaJ();
-    });
+    this.seletorJ.addEventListener('change', () => this.alterarMoedaJ());
     
     // Seletor de período
-    this.seletorPeriodo.addEventListener('change', (evento) => {
-      console.log('Seletor período mudou para:', evento.target.value);
-      this.alterarTipoPeriodo();
-    });
+    this.seletorPeriodo.addEventListener('change', () => this.alterarTipoPeriodo());
     
     // Seletor de modo
-    this.seletorModo.addEventListener('change', (evento) => {
-      console.log('Seletor modo mudou para:', evento.target.value);
-      this.alterarModoCalculadora();
-    });
+    this.seletorModo.addEventListener('change', () => this.alterarModoCalculadora());
     
     // Suporte a teclado
-    document.addEventListener('keydown', (evento) => this.manipularTeclado(evento));
+    document.addEventListener('keydown', (e) => this.manipularTeclado(e));
 
     // Suporte a colar (paste)
-    document.addEventListener('paste', (evento) => this.manipularColar(evento));
+    document.addEventListener('paste', (e) => this.manipularColar(e));
 
     // Inicializa o modo baseado no valor do seletor HTML
     this.modoAtual = this.seletorModo.value;
@@ -745,7 +727,6 @@ class CalculadoraFinanceira {
 
       const resultado = operacoes[this.operacaoAtual]?.();
       if (resultado !== undefined) {
-        // Mostra o resultado da operação no display de operação
         const simbolosOp = {
           soma: '+',
           subtrai: '-', 
@@ -753,6 +734,7 @@ class CalculadoraFinanceira {
           divide: '÷'
         };
         
+        // Atualiza o display de operação com o resultado
         this.displayOp.textContent = `${this.formatarNumero(this.operando)} ${simbolosOp[this.operacaoAtual]} ${this.formatarNumero(atual)} =`;
         
         this.entradaAtual = resultado.toString();
@@ -1165,12 +1147,12 @@ class CalculadoraFinanceira {
     this.displayPrincipal.classList.remove('error');
   }
 
-  // Manipula o evento de colar (paste)
-  manipularColar(evento) {
-    evento.preventDefault();
+  // Manipula o e de colar (paste)
+  manipularColar(e) {
+    e.preventDefault();
     
     // Obtém o texto colado
-    const textoColado = (evento.clipboardData || window.clipboardData).getData('text');
+    const textoColado = (e.clipboardData || window.clipboardData).getData('text');
     
     // Limpa espaços em branco
     const texto = textoColado.trim();
@@ -1263,8 +1245,8 @@ class CalculadoraFinanceira {
   }
 
   // Manipula eventos de teclado para entrada de números e operações
-  manipularTeclado(evento) {
-    const tecla = evento.key;
+  manipularTeclado(e) {
+    const tecla = e.key;
 
     // Lista de teclas que devem ser ignoradas pela calculadora
     const teclasIgnoradas = [
@@ -1278,12 +1260,12 @@ class CalculadoraFinanceira {
     if (teclasIgnoradas.includes(tecla)) return;
 
     // Se há modificadores (Ctrl, Alt, etc.) pressionados, também ignora
-    if (evento.ctrlKey || evento.altKey || evento.metaKey) return;
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
 
     // Números
     if (/[0-9]/.test(tecla)) {
       this.inserirNumero(tecla);
-      evento.preventDefault();
+      e.preventDefault();
       return;
     }
 
@@ -1303,7 +1285,7 @@ class CalculadoraFinanceira {
 
     if (acoesPorTecla[tecla]) {
       acoesPorTecla[tecla]();
-      evento.preventDefault();
+      e.preventDefault();
     }
   }
 }
