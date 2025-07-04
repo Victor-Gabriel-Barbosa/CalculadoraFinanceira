@@ -99,9 +99,7 @@ export class CalculosFinanceiros {
    */
   calcularFVComposto(pv, j, i, n) {
     // Se J (juros) for conhecido, FV = PV + J
-    if (j !== null && j !== undefined) {
-      return Math.abs(pv) + Math.abs(j);
-    }
+    if (j !== null && j !== undefined) return Math.abs(pv) + Math.abs(j);
     
     // Caso especial: taxa zero
     if (i === 0) return -(pv || 0);
@@ -212,9 +210,7 @@ export class CalculosFinanceiros {
    */
   calcularPVSimples(fv, j, i, n) {
     // Se J (juros) for conhecido, PV = FV - J
-    if (j !== null && j !== undefined) {
-      return Math.abs(fv) - Math.abs(j);
-    }
+    if (j !== null && j !== undefined) return Math.abs(fv) - Math.abs(j);
     
     // Caso especial: taxa zero
     if (i === 0) return -(fv || 0);
@@ -284,9 +280,7 @@ export class CalculosFinanceiros {
     let juros = j;
     
     // Se J não for conhecido mas PV e FV são, calcula J
-    if (juros === null && pv !== null && fv !== null) {
-      juros = Math.abs(fv) - Math.abs(pv);
-    }
+    if (juros === null && pv !== null && fv !== null) juros = Math.abs(fv) - Math.abs(pv);
     
     // Se ainda não temos os juros ou se não temos PV, usar método original
     if (juros === null || pv === null) {
