@@ -115,23 +115,17 @@ class CalculadoraFinanceira {
 
     // Botões financeiros
     document.querySelectorAll('.financial-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.definirVariavelFinanceira(btn.dataset.function);
-      });
+      btn.addEventListener('click', () => this.definirVariavelFinanceira(btn.dataset.function));
     });
 
     // Botões de operação
     document.querySelectorAll('.operation-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.executarOp(btn.dataset.function);
-      });
+      btn.addEventListener('click', () => this.executarOp(btn.dataset.function));
     });
 
     // Botões de conversão de taxas
     document.querySelectorAll('.conversion-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.converterTaxa(btn.dataset.function);
-      });
+      btn.addEventListener('click', () => this.converterTaxa(btn.dataset.function));
     });    
     
     // Seletor de taxa
@@ -171,14 +165,10 @@ class CalculadoraFinanceira {
     });
     
     // Suporte a teclado
-    document.addEventListener('keydown', (evento) => {
-      this.manipularTeclado(evento);
-    });
+    document.addEventListener('keydown', (evento) => this.manipularTeclado(evento));
 
     // Suporte a colar (paste)
-    document.addEventListener('paste', (evento) => {
-      this.manipularColar(evento);
-    });
+    document.addEventListener('paste', (evento) => this.manipularColar(evento));
 
     // Inicializa o modo baseado no valor do seletor HTML
     this.modoAtual = this.seletorModo.value;
@@ -211,9 +201,7 @@ class CalculadoraFinanceira {
     }
 
     // Remove destaque de outros botões
-    document.querySelectorAll('.financial-btn').forEach(btn => {
-      btn.classList.remove('active');
-    });
+    document.querySelectorAll('.financial-btn').forEach(btn => btn.classList.remove('active'));
 
     // Destaca o botão atual
     const btn = document.querySelector(`[data-function="${variavel}"]`);
@@ -395,7 +383,6 @@ class CalculadoraFinanceira {
 
   // Alterna entre modo de capitalização simples e composta
   alternarModoCapitalizacao() {
-    const modoAnterior = this.calculosFinanceiros.getModoCapitalizacao();
     const novoModo = this.calculosFinanceiros.alternarModoCapitalizacao();
     
     // Atualiza o display de operação
@@ -404,9 +391,7 @@ class CalculadoraFinanceira {
     // Mostra feedback temporário
     const modoTexto = novoModo.toUpperCase();
     this.displayOp.innerHTML = `<span style="color: #3498db; font-weight: bold;">${modoTexto}</span><span style="color: #e74c3c;"> ALTERADO</span>`;
-    setTimeout(() => {
-      this.atualizarDisplayOperacao();
-    }, 2000);
+    setTimeout(() => this.atualizarDisplayOperacao(), 2000);
   }
 
   // ==================== GESTÃO DE MODOS E BOTÕES ====================
@@ -496,9 +481,7 @@ class CalculadoraFinanceira {
       btn.parentNode.replaceChild(novoBotao, btn);
       
       // Adiciona o novo listener
-      novoBotao.addEventListener('click', () => {
-        this.definirVariavelDesconto(novoBotao.dataset.function);
-      });
+      novoBotao.addEventListener('click', () => this.definirVariavelDesconto(novoBotao.dataset.function));
     });
 
     // Atualiza listener do CPT
@@ -507,9 +490,7 @@ class CalculadoraFinanceira {
       const novoBtnCpt = btnCpt.cloneNode(true);
       btnCpt.parentNode.replaceChild(novoBtnCpt, btnCpt);
       
-      novoBtnCpt.addEventListener('click', () => {
-        this.calcularDescontoFaltante();
-      });
+      novoBtnCpt.addEventListener('click', () => this.calcularDescontoFaltante());
     }
 
     // Atualiza listener do AC (botão de limpar tudo)
@@ -518,9 +499,7 @@ class CalculadoraFinanceira {
       const novoBtnAc = btnAc.cloneNode(true);
       btnAc.parentNode.replaceChild(novoBtnAc, btnAc);
       
-      novoBtnAc.addEventListener('click', () => {
-        this.limparTudo();
-      });
+      novoBtnAc.addEventListener('click', () => this.limparTudo());
     }
   }
 
@@ -531,9 +510,7 @@ class CalculadoraFinanceira {
       const novoBotao = btn.cloneNode(true);
       btn.parentNode.replaceChild(novoBotao, btn);
       
-      novoBotao.addEventListener('click', () => {
-        this.definirVariavelFinanceira(novoBotao.dataset.function);
-      });
+      novoBotao.addEventListener('click', () => this.definirVariavelFinanceira(novoBotao.dataset.function));
     });
 
     // Reativa todos os botões de operação
@@ -541,9 +518,7 @@ class CalculadoraFinanceira {
       const novoBotao = btn.cloneNode(true);
       btn.parentNode.replaceChild(novoBotao, btn);
       
-      novoBotao.addEventListener('click', () => {
-        this.executarOp(novoBotao.dataset.function);
-      });
+      novoBotao.addEventListener('click', () => this.executarOp(novoBotao.dataset.function));
     });
   }
 
@@ -659,9 +634,7 @@ class CalculadoraFinanceira {
       this.mostrarErro(erro.message);
     } finally {
       // Remove destaque de todos os botões
-      document.querySelectorAll('.financial-btn').forEach(btn => {
-        btn.classList.remove('active-variable');
-      });
+      document.querySelectorAll('.financial-btn').forEach(btn => btn.classList.remove('active-variable'));
     }
   }
 
@@ -795,9 +768,7 @@ class CalculadoraFinanceira {
         this.novaEntrada = true;
         
         // Limpa a operação após exibir o resultado
-        setTimeout(() => {
-          this.limparOp();
-        }, 2000);
+        setTimeout(() => this.limparOp(), 2000);
       }
     }
   }
@@ -840,9 +811,7 @@ class CalculadoraFinanceira {
       this.atualizarDisplay();
       
       // Limpa o display de operação após 2 segundos
-      setTimeout(() => {
-        this.displayOp.textContent = '';
-      }, 2000);
+      setTimeout(() => this.displayOp.textContent = '', 2000);
     }
   }
 
@@ -857,9 +826,7 @@ class CalculadoraFinanceira {
       this.novaEntrada = true;
       
       // Limpa o display de operação após 2 segundos
-      setTimeout(() => {
-        this.displayOp.textContent = '';
-      }, 2000);
+      setTimeout(() => this.displayOp.textContent = '', 2000);
     } else this.mostrarErro('Não é possível calcular raiz de número negativo');
 
   }
@@ -875,9 +842,7 @@ class CalculadoraFinanceira {
       this.novaEntrada = true;
       
       // Limpa o display de operação após 2 segundos
-      setTimeout(() => {
-        this.displayOp.textContent = '';
-      }, 2000);
+      setTimeout(() => this.displayOp.textContent = '', 2000);
     }
   }
 
@@ -902,9 +867,7 @@ class CalculadoraFinanceira {
     }
 
     // Remove destaque de outros botões de conversão
-    document.querySelectorAll('.conversion-btn').forEach(btn => {
-      btn.classList.remove('active');
-    });
+    document.querySelectorAll('.conversion-btn').forEach(btn => btn.classList.remove('active'));
 
     // Destaca o botão atual
     const btn = document.querySelector(`[data-function="${tipoConversao}"]`);
@@ -1190,9 +1153,7 @@ class CalculadoraFinanceira {
 
     this.displayPrincipal.classList.add('error');
 
-    setTimeout(() => {
-      this.limparErro();
-    }, 3000);
+    setTimeout(() => this.limparErro(), 3000);
   }
 
   // Limpa a mensagem de erro atual
@@ -1298,9 +1259,7 @@ class CalculadoraFinanceira {
   // Mostra feedback visual quando algo é colado
   mostrarFeedbackCola() {
     this.displayPrincipal.classList.add('pasted');
-    setTimeout(() => {
-      this.displayPrincipal.classList.remove('pasted');
-    }, 300);
+    setTimeout(() => this.displayPrincipal.classList.remove('pasted'), 300);
   }
 
   // Manipula eventos de teclado para entrada de números e operações
@@ -1351,7 +1310,7 @@ class CalculadoraFinanceira {
 
 // Inicializa calculadora quando DOM estiver carregado
 document.addEventListener('DOMContentLoaded', () => {
-  const calculadora = new CalculadoraFinanceira();
+  new CalculadoraFinanceira();
   
   // Foca na calculadora para permitir eventos de cola
   const elementoCalculadora = document.getElementById('calculator');

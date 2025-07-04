@@ -703,9 +703,7 @@ export class CalculosFinanceiros {
    * @returns {string} Tipo detectado ('dia', 'mes', 'ano')
    */
   detectarTipoTaxa(taxa) {
-    if (taxa <= 1) return 'dia';
-    else if (taxa <= 15) return 'mes';
-    else return 'ano';
+    return taxa <= 1 ? 'dia' : taxa <= 15 ? 'mes' : 'ano';
   }
 
   /**
@@ -719,39 +717,24 @@ export class CalculosFinanceiros {
     // Se já é o tipo desejado, retorna a taxa
     if (tipoOrigem === tipoDestino) return taxa;
 
-    // Primeiro converte para taxa anual
-    let taxaAnual;
-    switch (tipoOrigem) {
-      case 'dia':
-        taxaAnual = this.modoCapitalizacao === 'simples' 
-          ? taxa * 360 
-          : (Math.pow(1 + taxa / 100, 360) - 1) * 100;
-        break;
-      case 'mes':
-        taxaAnual = this.modoCapitalizacao === 'simples' 
-          ? taxa * 12 
-          : (Math.pow(1 + taxa / 100, 12) - 1) * 100;
-        break;
-      case 'ano':
-        taxaAnual = taxa;
-        break;
-    }
+    // Mapeamento de períodos para fatores de conversão
+    const fatoresConversao = {
+      'dia': 360,
+      'mes': 12,
+      'ano': 1
+    };
 
-    // Depois converte da taxa anual para o tipo desejado
-    switch (tipoDestino) {
-      case 'dia':
-        return this.modoCapitalizacao === 'simples' 
-          ? taxaAnual / 360 
-          : (Math.pow(1 + taxaAnual / 100, 1/360) - 1) * 100;
-      case 'mes':
-        return this.modoCapitalizacao === 'simples' 
-          ? taxaAnual / 12 
-          : (Math.pow(1 + taxaAnual / 100, 1/12) - 1) * 100;
-      case 'ano':
-        return taxaAnual;
-      default:
-        return taxa;
-    }
+    // Converte para taxa anual primeiro
+    const fatorOrigem = fatoresConversao[tipoOrigem];
+    const taxaAnual = this.modoCapitalizacao === 'simples' 
+      ? taxa * fatorOrigem
+      : (Math.pow(1 + taxa / 100, fatorOrigem) - 1) * 100;
+
+    // Converte da taxa anual para o tipo desejado
+    const fatorDestino = fatoresConversao[tipoDestino];
+    return this.modoCapitalizacao === 'simples' 
+      ? taxaAnual / fatorDestino
+      : (Math.pow(1 + taxaAnual / 100, 1 / fatorDestino) - 1) * 100;
   }
 
   /**
