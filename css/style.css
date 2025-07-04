@@ -830,3 +830,51 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.3),
     inset 0 -1px 0 rgba(0, 0, 0, 0.4) !important;
 }
+
+/* Container para valor e botão de remoção */
+.value-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+/* Botão de remoção de valor individual */
+.clear-value-btn {
+  display: none !important;
+  background: #e74c3c;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 8px;
+  font-weight: bold;
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  line-height: 1;
+  padding: 0;
+  margin-left: 2px;
+}
+
+.clear-value-btn:hover {
+  opacity: 1;
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
+.clear-value-btn:active {
+  transform: scale(0.95);
+}
+
+/* Mostrar botão de remoção quando valor está definido */
+.status-item.has-value .clear-value-btn {
+  display: inline-block !important;
+}
+
+/* Ajustar espaçamento do valor quando botão está visível */
+.status-item.has-value .value {
+  margin-right: 2px;
+}

@@ -21,6 +21,16 @@ class CalculadoraFinanceira {
       d: document.getElementById('dValue')
     };
     
+    // Botões de remoção individual
+    this.botoesRemocao = {
+      pv: document.getElementById('clearPV'),
+      fv: document.getElementById('clearFV'),
+      j: document.getElementById('clearJ'),
+      i: document.getElementById('clearI'),
+      n: document.getElementById('clearN'),
+      d: document.getElementById('clearD')
+    };
+    
     // Elemento do seletor de taxa
     this.seletorTaxa = document.getElementById('rateSelector');
     
@@ -144,6 +154,11 @@ class CalculadoraFinanceira {
     
     // Seletor de modo
     this.seletorModo.addEventListener('change', () => this.alterarModoCalculadora());
+    
+    // Botões de remoção individual
+    Object.keys(this.botoesRemocao).forEach(variavel => {
+      if (this.botoesRemocao[variavel]) this.botoesRemocao[variavel].addEventListener('click', () => this.removerValorIndividual(variavel));
+    });
     
     // Suporte a teclado
     document.addEventListener('keydown', (e) => this.manipularTeclado(e));
@@ -594,11 +609,33 @@ class CalculadoraFinanceira {
       D: 'dValue'      // Novo elemento para mostrar o desconto
     };
 
+    // Mapeia para os botões de remoção
+    const mapeamentoBotoes = {
+      N: 'pv',
+      Va: 'fv', 
+      i: 'i',
+      n: 'n',
+      D: 'd'
+    };
+
     Object.keys(mapeamento).forEach(chave => {
       const elemento = document.getElementById(mapeamento[chave]);
       if (elemento) {
         const valor = this.valoresDesconto[chave];
         elemento.textContent = valor !== null ? this.formatarNumero(valor) : '-';
+        
+        // Atualiza visibilidade do botão de remoção e classe do status-item
+        const statusItem = elemento.closest('.status-item');
+        const chaveBotao = mapeamentoBotoes[chave];
+        const botaoRemocao = this.botoesRemocao[chaveBotao];
+        
+        if (valor !== null) {
+          statusItem.classList.add('has-value');
+          if (botaoRemocao) botaoRemocao.style.display = 'inline-block';
+        } else {
+          statusItem.classList.remove('has-value');
+          if (botaoRemocao) botaoRemocao.style.display = 'none';
+        }
       }
     });
   }
@@ -897,6 +934,18 @@ class CalculadoraFinanceira {
       Object.keys(this.valoresFinanceiros).forEach(chave => {
         const valor = this.valoresFinanceiros[chave];
         this.valoresStatus[chave].textContent = valor !== null ? this.formatarNumero(valor) : '-';
+        
+        // Atualiza visibilidade do botão de remoção e classe do status-item
+        const statusItem = this.valoresStatus[chave].closest('.status-item');
+        const botaoRemocao = this.botoesRemocao[chave];
+        
+        if (valor !== null) {
+          statusItem.classList.add('has-value');
+          if (botaoRemocao) botaoRemocao.style.display = 'inline-block';
+        } else {
+          statusItem.classList.remove('has-value');
+          if (botaoRemocao) botaoRemocao.style.display = 'none';
+        }
       });
       // Limpa o campo de desconto quando não está em modo desconto
       if (this.valoresStatus.d) this.valoresStatus.d.textContent = '-';
@@ -1261,6 +1310,50 @@ class CalculadoraFinanceira {
       acoesPorTecla[tecla]();
       e.preventDefault();
     }
+  }
+
+  // Remove um valor individual específico
+  removerValorIndividual(variavel) {
+    this.limparErro();
+    
+    // Verifica se está em modo de desconto
+    const ehModoDesconto = this.modoAtual === 'desconto-racional' || this.modoAtual === 'desconto-comercial';
+    
+    if (ehModoDesconto) {
+      // Para modo desconto, mapeia as variáveis
+      const mapeamentoDesconto = {
+        'pv': 'N',   // Valor Nominal
+        'fv': 'Va',  // Valor Atual
+        'i': 'i',    // Taxa
+        'n': 'n',    // Tempo
+        'd': 'D'     // Desconto
+      };
+      
+      const variavelDesconto = mapeamentoDesconto[variavel];
+      if (variavelDesconto && this.valoresDesconto[variavelDesconto] !== null) {
+        this.valoresDesconto[variavelDesconto] = null;
+        this.displayOp.textContent = `${variavelDesconto} removido`;
+        this.atualizarDisplayStatusDesconto();
+      }
+    } else {
+      // Para modo juros simples/compostos
+      if (this.valoresFinanceiros[variavel] !== null) {
+        this.valoresFinanceiros[variavel] = null;
+        this.displayOp.textContent = `${variavel.toUpperCase()} removido`;
+        this.atualizarDisplayStatus();
+      }
+    }
+    
+    // Limpa a mensagem após 2 segundos
+    setTimeout(() => this.displayOp.textContent = '', 2000);
+    
+    // Se foi a última variável definida, limpa o display de variável
+    if (this.ultimaVariavel === variavel) {
+      this.displayVariavel.textContent = '-';
+      this.ultimaVariavel = null;
+    }
+    
+    this.atualizarDisplay();
   }
 }
 

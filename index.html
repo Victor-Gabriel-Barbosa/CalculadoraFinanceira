@@ -44,7 +44,10 @@
       <div class="status-display">
         <div class="status-item">
           <span class="label">PV:</span>
-          <span class="value" id="pvValue">-</span>
+          <div class="value-container">
+            <span class="value" id="pvValue">-</span>
+            <button class="clear-value-btn" id="clearPV" style="display: none;" title="Remover valor PV">×</button>
+          </div>
           <select class="value-selector" id="pvSelector" style="display: none;">
             <option value="real">Real (R$)</option>
             <option value="dollar">Dólar (US$)</option>
@@ -53,7 +56,10 @@
         </div>
         <div class="status-item">
           <span class="label">FV:</span>
-          <span class="value" id="fvValue">-</span>
+          <div class="value-container">
+            <span class="value" id="fvValue">-</span>
+            <button class="clear-value-btn" id="clearFV" style="display: none;" title="Remover valor FV">×</button>
+          </div>
           <select class="value-selector" id="fvSelector" style="display: none;">
             <option value="real">Real (R$)</option>
             <option value="dollar">Dólar (US$)</option>
@@ -62,7 +68,10 @@
         </div>
         <div class="status-item">
           <span class="label">i:</span>
-          <span class="value" id="iValue">-</span>
+          <div class="value-container">
+            <span class="value" id="iValue">-</span>
+            <button class="clear-value-btn" id="clearI" style="display: none;" title="Remover valor i">×</button>
+          </div>
           <select class="rate-selector" id="rateSelector" style="display: none;">
             <option value="day">Dia</option>
             <option value="month" selected>Mês</option>
@@ -71,7 +80,10 @@
         </div>
         <div class="status-item">
           <span class="label">n:</span>
-          <span class="value" id="nValue">-</span>
+          <div class="value-container">
+            <span class="value" id="nValue">-</span>
+            <button class="clear-value-btn" id="clearN" style="display: none;" title="Remover valor n">×</button>
+          </div>
           <select class="period-selector" id="periodSelector" style="display: none;">
             <option value="day">Dias</option>
             <option value="month" selected>Meses</option>
@@ -80,7 +92,10 @@
         </div>
         <div class="status-item juros-field">
           <span class="label">J:</span>
-          <span class="value" id="jValue">-</span>
+          <div class="value-container">
+            <span class="value" id="jValue">-</span>
+            <button class="clear-value-btn" id="clearJ" style="display: none;" title="Remover valor J">×</button>
+          </div>
           <select class="value-selector" id="jSelector" style="display: none;">
             <option value="real">Real (R$)</option>
             <option value="dollar">Dólar (US$)</option>
@@ -89,7 +104,10 @@
         </div>
         <div class="status-item desconto-field">
           <span class="label">D:</span>
-          <span class="value" id="dValue">-</span>
+          <div class="value-container">
+            <span class="value" id="dValue">-</span>
+            <button class="clear-value-btn" id="clearD" style="display: none;" title="Remover valor D">×</button>
+          </div>
         </div>
       </div>
 
