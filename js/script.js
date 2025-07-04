@@ -11,6 +11,7 @@ class CalculadoraFinanceira {
     this.displayPrincipal = document.getElementById('mainDisplay');
     this.displayVariavel = document.getElementById('variableDisplay');
     this.displayOp = document.getElementById('operationDisplay');
+    this.displayModo = document.getElementById('modeDisplay');
     this.valoresStatus = {
       pv: document.getElementById('pvValue'),
       fv: document.getElementById('fvValue'),
@@ -269,7 +270,6 @@ class CalculadoraFinanceira {
 
       // Limpa o display de operação após 3 segundos
       setTimeout(() => this.displayOp.textContent = '', 3000);
-
     } catch (erro) {
       this.mostrarErro('Erro no cálculo: ' + erro.message);
       this.displayOp.textContent = '';
@@ -327,45 +327,16 @@ class CalculadoraFinanceira {
     // Troca os botões se necessário
     this.atualizarBotoesPorModo(modoAnterior, novoModo);
 
-    // Atualiza o display de operação
+    // Atualiza o display de operação diretamente sem transição
     this.atualizarDisplayOperacao();
-
-    // Define o texto de feedback baseado no modo selecionado
-    const textosModo = {
-      'simples': 'JUROS SIMPLES',
-      'composto': 'JUROS COMPOSTOS',
-      'desconto-racional': 'DESCONTO RACIONAL',
-      'desconto-comercial': 'DESCONTO COMERCIAL'
-    };
-
-    const modoTexto = textosModo[novoModo] || 'JUROS SIMPLES';
-
-    // Mostra feedback temporário com cores diferentes para cada modo
-    const coresModo = {
-      'simples': '#3498db',
-      'composto': '#2ecc71',
-      'desconto-racional': '#f39c12',
-      'desconto-comercial': '#e74c3c'
-    };
-
-    const cor = coresModo[novoModo] || '#3498db';
-
-    this.displayOp.innerHTML = `<span style="color: ${cor}; font-weight: bold;">${modoTexto}</span>`;
-
-    setTimeout(() => this.atualizarDisplayOperacao(), 2000);
   }
 
   // Alterna entre modo de capitalização simples e composta
   alternarModoCapitalizacao() {
     const novoModo = this.calculosFinanceiros.alternarModoCapitalizacao();
     
-    // Atualiza o display de operação
+    // Atualiza o display de operação diretamente sem transição
     this.atualizarDisplayOperacao();
-    
-    // Mostra feedback temporário
-    const modoTexto = novoModo.toUpperCase();
-    this.displayOp.innerHTML = `<span style="color: #3498db; font-weight: bold;">${modoTexto}</span><span style="color: #e74c3c;"> ALTERADO</span>`;
-    setTimeout(() => this.atualizarDisplayOperacao(), 2000);
   }
 
   // ==================== GESTÃO DE MODOS E BOTÕES ====================
@@ -392,7 +363,7 @@ class CalculadoraFinanceira {
       this.restaurarLabelsStatus();
     }
     // Se mudou entre modos de desconto atualiza os event listeners
-    else if (ehModoDesconto(modoAnterior) && ehModoDesconto(novoModo))this.atualizarEventListenersDesconto();
+    else if (ehModoDesconto(modoAnterior) && ehModoDesconto(novoModo)) this.atualizarEventListenersDesconto();
   }
 
   // Salva o HTML dos botões originais
@@ -871,6 +842,10 @@ class CalculadoraFinanceira {
     const modoTexto = this.calculosFinanceiros.getModoCapitalizacao().toUpperCase();
     let operacaoTexto = '';
     
+    // Atualiza o display do modo
+    this.displayModo.textContent = modoTexto;
+    
+    // Atualiza o display das operações
     if (this.operando !== undefined && this.operacaoAtual) {
       const simbolosOp = {
         'soma': '+',
@@ -881,15 +856,14 @@ class CalculadoraFinanceira {
       operacaoTexto = `${this.formatarNumero(this.operando)} ${simbolosOp[this.operacaoAtual] || this.operacaoAtual}`;
     }
     
-    this.displayOp.innerHTML = `<span style="color: #3498db; font-weight: bold;">${modoTexto}</span><span>${operacaoTexto}</span>`;
+    this.displayOp.textContent = operacaoTexto;
   }
 
   // Atualiza o display de operação
   atualizarDisplayOp(simbolo) {
     if (this.operando !== undefined) {
-      const modoTexto = this.calculosFinanceiros.getModoCapitalizacao().toUpperCase();
       const operacaoTexto = `${this.formatarNumero(this.operando)} ${simbolo}`;
-      this.displayOp.innerHTML = `<span style="color: #3498db; font-weight: bold;">${modoTexto}</span><span>${operacaoTexto}</span>`;
+      this.displayOp.textContent = operacaoTexto;
     }
   }
 
