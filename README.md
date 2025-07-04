@@ -354,12 +354,15 @@ CPT → D: R$ 600,00
 
 Este projeto está licenciado sob a **Licença MIT** - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
-## 👨‍💻 Autor
+## 👨‍💻 Autores
 
 ### Victor Gabriel Barbosa
 
 - GitHub: [@victor-gabriel-barbosa](https://github.com/victor-gabriel-barbosa)
-- LinkedIn: [Victor Gabriel Barbosa](https://linkedin.com/in/victor-gabriel-barbosa)
+
+### Guilherme Epifânio da Silva
+
+- GitHub: [@guilherme-epifânio-da-silva](https://github.com/Guiscoob7)
 
 ---
 
