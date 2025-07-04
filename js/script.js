@@ -108,9 +108,7 @@ class CalculadoraFinanceira {
   inicializarEventos() {
     // Botões numéricos
     document.querySelectorAll('.number-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.inserirNumero(btn.dataset.number);
-      });
+      btn.addEventListener('click', () => this.inserirNumero(btn.dataset.number));
     });
 
     // Botões financeiros
@@ -288,17 +286,13 @@ class CalculadoraFinanceira {
       this.novaEntrada = true;
 
       // Limpa o display de operação após 3 segundos
-      setTimeout(() => {
-        this.displayOp.textContent = '';
-      }, 3000);
+      setTimeout(() => this.displayOp.textContent = '', 3000);
 
     } catch (erro) {
       this.mostrarErro('Erro no cálculo: ' + erro.message);
       this.displayOp.textContent = '';
     } finally {
-      setTimeout(() => {
-        this.displayPrincipal.classList.remove('calculating');
-      }, 500);
+      setTimeout(() => this.displayPrincipal.classList.remove('calculating'), 500);
     }
   }
 
@@ -376,9 +370,7 @@ class CalculadoraFinanceira {
 
     this.displayOp.innerHTML = `<span style="color: ${cor}; font-weight: bold;">${modoTexto}</span>`;
 
-    setTimeout(() => {
-      this.atualizarDisplayOperacao();
-    }, 2000);
+    setTimeout(() => this.atualizarDisplayOperacao(), 2000);
   }
 
   // Alterna entre modo de capitalização simples e composta
