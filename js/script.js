@@ -1138,12 +1138,17 @@ class CalculadoraFinanceira {
   // Gerenciamento de erros
   mostrarErro(mensagem) {
     this.limparErro();
-    this.mensagemErro = document.createElement('div');
-    this.mensagemErro.className = 'error-message';
-    this.mensagemErro.textContent = mensagem;
-    document.querySelector('.calculator').appendChild(this.mensagemErro);
-
+    
+    // Salva o conteúdo atual do variable-display para restaurar depois
+    this.variableDisplayAnterior = this.displayVariavel.textContent;
+    
+    // Exibe a mensagem de erro no variable-display
+    this.displayVariavel.textContent = `❌ ${mensagem}`;
+    this.displayVariavel.classList.add('error');
     this.displayPrincipal.classList.add('error');
+
+    // Marca que há uma mensagem de erro ativa
+    this.mensagemErro = true;
 
     setTimeout(() => this.limparErro(), 3000);
   }
@@ -1151,8 +1156,11 @@ class CalculadoraFinanceira {
   // Limpa a mensagem de erro atual
   limparErro() {
     if (this.mensagemErro) {
-      this.mensagemErro.remove();
+      // Restaura o conteúdo anterior do variable-display
+      this.displayVariavel.textContent = this.variableDisplayAnterior || '-';
+      this.displayVariavel.classList.remove('error');
       this.mensagemErro = null;
+      this.variableDisplayAnterior = null;
     }    
     this.displayPrincipal.classList.remove('error');
   }
