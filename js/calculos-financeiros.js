@@ -792,8 +792,10 @@ export class CalculosFinanceiros {
     const diasOrigem = diasPorPeriodo[periodoOrigem];
     const diasDestino = diasPorPeriodo[periodoDestino];
 
-    // Converte taxa para equivalente no novo período (juros compostos)
-    const taxaConvertida = Math.pow(1 + taxaDecimal, diasDestino / diasOrigem) - 1;
+    // Verifica o modo de capitalização para usar a fórmula correta
+    let taxaConvertida;
+    if (this.modoCapitalizacao === 'simples') taxaConvertida = taxaDecimal * diasDestino / diasOrigem;
+    else taxaConvertida = Math.pow(1 + taxaDecimal, diasDestino / diasOrigem) - 1;
 
     return taxaConvertida * 100; // Retorna em porcentagem
   }
