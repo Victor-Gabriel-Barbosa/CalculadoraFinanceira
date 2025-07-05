@@ -373,21 +373,74 @@ export class CalculosFinanceiros {
     // Define as operações baseadas no tipo de desconto
     const operacoes = {
       racional: {
-        N: () => this.calcularValorNominalRacional(Va, i, n),
-        Va: () => {
-          const resultado = this.calcularDescontoRacional(N, i, n);
-          return {
-            valorAtual: resultado.valorAtual,
-            valorNominal: N,
-            desconto: resultado.desconto,
-            taxa: i,
-            tempo: n,
-            tipo: 'Valor Atual (Desconto Racional)',
-            formula: 'Va = N - Dr'
-          };
+        N: () => {
+          if (D !== null && Va !== null) {
+            // Se D e Va são conhecidos: N = Va + D
+            return {
+              valorNominal: Va + D,
+              valorAtual: Va,
+              desconto: D,
+              tipo: 'Valor Nominal (a partir de Desconto e Va)',
+              formula: 'N = Va + D'
+            };
+          } else {
+            return this.calcularValorNominalRacional(Va, i, n);
+          }
         },
-        i: () => this.calcularTaxaDescontoRacional(N, Va, n),
-        n: () => this.calcularTempoDescontoRacional(N, Va, i),
+        Va: () => {
+          if (D !== null && N !== null) {
+            // Se D e N são conhecidos: Va = N - D
+            return {
+              valorAtual: N - D,
+              valorNominal: N,
+              desconto: D,
+              tipo: 'Valor Atual (a partir de Desconto e N)',
+              formula: 'Va = N - D'
+            };
+          } else {
+            const resultado = this.calcularDescontoRacional(N, i, n);
+            return {
+              valorAtual: resultado.valorAtual,
+              valorNominal: N,
+              desconto: resultado.desconto,
+              taxa: i,
+              tempo: n,
+              tipo: 'Valor Atual (Desconto Racional)',
+              formula: 'Va = N - Dr'
+            };
+          }
+        },
+        i: () => {
+          if (D !== null && N !== null && n !== null) {
+            // Fórmula racional: i = D / (n * (N - D))
+            const taxa = D / (n * (N - D)) * 100;
+            return {
+              taxa: taxa,
+              valorNominal: N,
+              valorAtual: N - D,
+              desconto: D,
+              tempo: n,
+              tipo: 'Taxa (a partir de Desconto Racional)',
+              formula: 'i = D / (n x (N - D))'
+            };
+          } else return this.calcularTaxaDescontoRacional(N, Va, n);
+        },
+        n: () => {
+          if (D !== null && N !== null && i !== null) {
+            // n = D / (i * (N - D))
+            const taxaDecimal = i / 100;
+            const tempo = D / (taxaDecimal * (N - D));
+            return {
+              tempo: tempo,
+              valorNominal: N,
+              valorAtual: N - D,
+              desconto: D,
+              taxa: i,
+              tipo: 'Tempo (a partir de Desconto Racional)',
+              formula: 'n = D / (i x (N - D))'
+            };
+          } else return this.calcularTempoDescontoRacional(N, Va, i);
+        },
         D: () => {
           const resultado = this.calcularDescontoRacional(N, i, n);
           return {
@@ -402,21 +455,76 @@ export class CalculosFinanceiros {
         }
       },
       comercial: {
-        N: () => this.calcularValorNominalComercial(Va, i, n),
-        Va: () => {
-          const resultado = this.calcularDescontoComercial(N, i, n);
-          return {
-            valorAtual: resultado.valorAtual,
-            valorNominal: N,
-            desconto: resultado.desconto,
-            taxa: i,
-            tempo: n,
-            tipo: 'Valor Atual (Desconto Comercial)',
-            formula: 'Va = N - Dc'
-          };
+        N: () => {
+          if (D !== null && Va !== null) {
+            // Se D e Va são conhecidos: N = Va + D
+            return {
+              valorNominal: Va + D,
+              valorAtual: Va,
+              desconto: D,
+              tipo: 'Valor Nominal (a partir de Desconto e Va)',
+              formula: 'N = Va + D'
+            };
+          } else {
+            return this.calcularValorNominalComercial(Va, i, n);
+          }
         },
-        i: () => this.calcularTaxaDescontoComercial(N, Va, n),
-        n: () => this.calcularTempoDescontoComercial(N, Va, i),
+        Va: () => {
+          if (D !== null && N !== null) {
+            // Se D e N são conhecidos: Va = N - D
+            return {
+              valorAtual: N - D,
+              valorNominal: N,
+              desconto: D,
+              tipo: 'Valor Atual (a partir de Desconto e N)',
+              formula: 'Va = N - D'
+            };
+          } else {
+            const resultado = this.calcularDescontoComercial(N, i, n);
+            return {
+              valorAtual: resultado.valorAtual,
+              valorNominal: N,
+              desconto: resultado.desconto,
+              taxa: i,
+              tempo: n,
+              tipo: 'Valor Atual (Desconto Comercial)',
+              formula: 'Va = N - Dc'
+            };
+          }
+        },
+        i: () => {
+          if (D !== null && N !== null && n !== null) {
+            // Fórmula comercial: i = D / (N * n)
+            const taxa = (D / (N * n)) * 100;
+            return {
+              taxa: taxa,
+              valorNominal: N,
+              valorAtual: N - D,
+              desconto: D,
+              tempo: n,
+              tipo: 'Taxa (a partir de Desconto Comercial)',
+              formula: 'i = D / (N x n)'
+            };
+          } else return this.calcularTaxaDescontoComercial(N, Va, n);
+        },
+        n: () => {
+          if (D !== null && N !== null && i !== null) {
+            // Fórmula comercial: n = D / (N * i)
+            const taxaDecimal = i / 100;
+            const tempo = D / (N * taxaDecimal);
+            return {
+              tempo: tempo,
+              valorNominal: N,
+              valorAtual: N - D,
+              desconto: D,
+              taxa: i,
+              tipo: 'Tempo (a partir de Desconto Comercial)',
+              formula: 'n = D / (N x i)'
+            };
+          } else {
+            return this.calcularTempoDescontoComercial(N, Va, i);
+          }
+        },
         D: () => {
           const resultado = this.calcularDescontoComercial(N, i, n);
           return {
@@ -712,11 +820,7 @@ export class CalculosFinanceiros {
     if (tipoOrigem === tipoDestino) return taxa;
 
     // Mapeamento de períodos para fatores de conversão
-    const fatoresConversao = {
-      'dia': 360,
-      'mes': 12,
-      'ano': 1
-    };
+    const fatoresConversao = { 'dia': 360, 'mes': 12, 'ano': 1 };
 
     // Converte para taxa anual primeiro
     const fatorOrigem = fatoresConversao[tipoOrigem];
@@ -800,11 +904,7 @@ export class CalculosFinanceiros {
    * @returns {string} Nome do período em português
    */
   obterNomePeriodo(periodo) {
-    const nomes = {
-      day: 'Dia',
-      month: 'Mês',
-      year: 'Ano'
-    };
+    const nomes = { day: 'Dia', month: 'Mês', year: 'Ano' };
     return nomes[periodo] || 'Mês';
   }
 
@@ -836,11 +936,7 @@ export class CalculosFinanceiros {
    * @returns {string} Símbolo da moeda
    */
   obterSimboloMoeda(moeda) {
-    const simbolos = {
-      real: 'R$',
-      dollar: 'US$',
-      euro: '€'
-    };
+    const simbolos = { real: 'R$', dollar: 'US$', euro: '€' };
     return simbolos[moeda] || 'R$';
   }
 

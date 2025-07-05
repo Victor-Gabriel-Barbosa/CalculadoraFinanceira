@@ -38,6 +38,7 @@ class CalculadoraFinanceira {
     this.seletorPV = document.getElementById('pvSelector');
     this.seletorFV = document.getElementById('fvSelector');
     this.seletorJ = document.getElementById('jSelector');
+    this.seletorD = document.getElementById('dSelector');
     this.seletorPeriodo = document.getElementById('periodSelector');
     
     // Seletor de modo
@@ -82,6 +83,7 @@ class CalculadoraFinanceira {
     this.tipoMoedaPV = 'real';
     this.tipoMoedaFV = 'real';
     this.tipoMoedaJ = 'real';
+    this.tipoMoedaD = 'real';
     this.tipoPeriodo = 'month';
 
     // Sistema de cálculos financeiros
@@ -148,6 +150,9 @@ class CalculadoraFinanceira {
     
     // Seletor de moeda J
     this.seletorJ.addEventListener('change', () => this.alterarMoedaJ());
+    
+    // Seletor de moeda D
+    this.seletorD.addEventListener('change', () => this.alterarMoedaD());
     
     // Seletor de período
     this.seletorPeriodo.addEventListener('change', () => this.alterarTipoPeriodo());
@@ -402,16 +407,16 @@ class CalculadoraFinanceira {
     primeiraLinha.innerHTML = `
       <button class="btn financial-btn" data-function="N">N</button>
       <button class="btn financial-btn" data-function="Va">Va</button>
+      <button class="btn financial-btn" data-function="D">D</button>
       <button class="btn financial-btn" data-function="i">i</button>
       <button class="btn financial-btn" data-function="n">n</button>
-      <button class="btn operation-btn" data-function="ac">AC</button>
     `;
 
     segundaLinha.innerHTML = `
       <button class="btn operation-btn" data-function="cpt">CPT</button>
+      <button class="btn operation-btn" data-function="ac">AC</button>
       <button class="btn operation-btn" data-function="ce">CE</button>
       <button class="btn operation-btn" data-function="sinal">+/-</button>
-      <button class="btn operation-btn" data-function="porcento">%</button>
       <button class="btn operation-btn" data-function="limpa">←</button>
     `;
 
@@ -524,22 +529,21 @@ class CalculadoraFinanceira {
 
   // Calcula a variável de desconto faltante usando CPT
   calcularDescontoFaltante() {
-    // Conta quantas variáveis estão definidas (excluindo D que será sempre calculado automaticamente)
-    const valoresParaCalculo = { N: this.valoresDesconto.N, Va: this.valoresDesconto.Va, i: this.valoresDesconto.i, n: this.valoresDesconto.n };
-    const valoresDefinidos = Object.values(valoresParaCalculo).filter(v => v !== null);
+    // Conta quantas variáveis estão definidas (incluindo D agora)
+    const valoresDefinidos = Object.values(this.valoresDesconto).filter(v => v !== null);
 
     if (valoresDefinidos.length < 3) {
       this.mostrarErro('É necessário definir pelo menos 3 valores para calcular');
       return;
     }
 
-    if (valoresDefinidos.length === 4) {
+    if (valoresDefinidos.length === 5) {
       this.mostrarErro('Todos os valores já estão definidos');
       return;
     }
 
-    // Identifica qual variável está faltando (excluindo D)
-    const variavelFaltante = Object.keys(valoresParaCalculo).find(chave => valoresParaCalculo[chave] === null);
+    // Identifica qual variável está faltando
+    const variavelFaltante = Object.keys(this.valoresDesconto).find(chave => this.valoresDesconto[chave] === null);
 
     if (!variavelFaltante) {
       this.mostrarErro('Nenhuma variável faltante encontrada');
@@ -563,7 +567,8 @@ class CalculadoraFinanceira {
         N: 'valorNominal',
         Va: 'valorAtual', 
         i: 'taxa',
-        n: 'tempo'
+        n: 'tempo',
+        D: 'desconto'
       };
       
       valorCalculado = resultado[mapeamentoResultado[variavelFaltante]];
@@ -571,8 +576,10 @@ class CalculadoraFinanceira {
       // Atualiza a variável calculada
       this.valoresDesconto[variavelFaltante] = valorCalculado;
       
-      // Sempre calcula e atualiza o desconto (D) automaticamente
-      this.valoresDesconto.D = resultado.desconto;
+      // Se D não foi a variável calculada, também atualiza o desconto automaticamente
+      if (variavelFaltante !== 'D') {
+        this.valoresDesconto.D = resultado.desconto;
+      }
       
       this.entradaAtual = valorCalculado.toString();
       
@@ -581,7 +588,8 @@ class CalculadoraFinanceira {
         N: 'Valor Nominal',
         Va: 'Valor Atual',
         i: 'Taxa',
-        n: 'Tempo'
+        n: 'Tempo',
+        D: 'Desconto'
       };
       
       this.displayVariavel.textContent = `${nomesExibicao[variavelFaltante]} = ${this.formatarNumero(valorCalculado)}`;
@@ -632,6 +640,9 @@ class CalculadoraFinanceira {
         if (valor !== null) {
           statusItem.classList.add('has-value');
           if (botaoRemocao) botaoRemocao.style.display = 'inline-block';
+          
+          // Mostra seletor específico se necessário
+          if (chave === 'D') this.mostrarSeletorD();
         } else {
           statusItem.classList.remove('has-value');
           if (botaoRemocao) botaoRemocao.style.display = 'none';
@@ -957,25 +968,45 @@ class CalculadoraFinanceira {
 
   // Atualiza a visibilidade dos seletores baseado nos valores definidos
   atualizarVisibilidadeSeletores() {
-    // PV - mostra seletor se há valor definido
-    if (this.valoresFinanceiros.pv !== null) this.mostrarSeletorPV();
-    else this.seletorPV.style.display = 'none';
+    const ehModoDesconto = this.modoAtual === 'desconto-racional' || this.modoAtual === 'desconto-comercial';
     
-    // FV - mostra seletor se há valor definido
-    if (this.valoresFinanceiros.fv !== null) this.mostrarSeletorFV();
-    else this.seletorFV.style.display = 'none';
-    
-    // J - mostra seletor se há valor definido
-    if (this.valoresFinanceiros.j !== null) this.mostrarSeletorJ();
-    else this.seletorJ.style.display = 'none';
-    
-    // i - mostra seletor se há valor definido
-    if (this.valoresFinanceiros.i !== null) this.mostrarSeletorTaxa();
-    else this.seletorTaxa.style.display = 'none';
-    
-    // n - mostra seletor se há valor definido
-    if (this.valoresFinanceiros.n !== null) this.mostrarSeletorPeriodo();
-    else this.seletorPeriodo.style.display = 'none';
+    if (ehModoDesconto) {
+      // Modo desconto - verifica valores de desconto
+      
+      // D - mostra seletor se há valor definido
+      if (this.valoresDesconto.D !== null) this.mostrarSeletorD();
+      else this.seletorD.style.display = 'none';
+      
+      // i - mostra seletor se há valor definido
+      if (this.valoresDesconto.i !== null) this.mostrarSeletorTaxa();
+      else this.seletorTaxa.style.display = 'none';
+      
+      // n - mostra seletor se há valor definido
+      if (this.valoresDesconto.n !== null) this.mostrarSeletorPeriodo();
+      else this.seletorPeriodo.style.display = 'none';
+    } else {
+      // Modo normal - verifica valores financeiros
+      
+      // PV - mostra seletor se há valor definido
+      if (this.valoresFinanceiros.pv !== null) this.mostrarSeletorPV();
+      else this.seletorPV.style.display = 'none';
+      
+      // FV - mostra seletor se há valor definido
+      if (this.valoresFinanceiros.fv !== null) this.mostrarSeletorFV();
+      else this.seletorFV.style.display = 'none';
+      
+      // J - mostra seletor se há valor definido
+      if (this.valoresFinanceiros.j !== null) this.mostrarSeletorJ();
+      else this.seletorJ.style.display = 'none';
+      
+      // i - mostra seletor se há valor definido
+      if (this.valoresFinanceiros.i !== null) this.mostrarSeletorTaxa();
+      else this.seletorTaxa.style.display = 'none';
+      
+      // n - mostra seletor se há valor definido
+      if (this.valoresFinanceiros.n !== null) this.mostrarSeletorPeriodo();
+      else this.seletorPeriodo.style.display = 'none';
+    }
   }
 
   // Mostra o seletor de taxa quando o usuário clica em 'i'
@@ -1006,6 +1037,13 @@ class CalculadoraFinanceira {
     if (!this.seletorJ.value || this.seletorJ.value === '') this.seletorJ.value = this.tipoMoedaJ;
   }
 
+  // Mostra o seletor de moeda D
+  mostrarSeletorD() {
+    this.seletorD.style.display = 'block';
+    // Só define o valor se ainda não estiver definido
+    if (!this.seletorD.value || this.seletorD.value === '') this.seletorD.value = this.tipoMoedaD;
+  }
+
   // Mostra o seletor de período
   mostrarSeletorPeriodo() {
     this.seletorPeriodo.style.display = 'block';
@@ -1019,6 +1057,7 @@ class CalculadoraFinanceira {
     this.seletorPV.style.display = 'none';
     this.seletorFV.style.display = 'none';
     this.seletorJ.style.display = 'none';
+    this.seletorD.style.display = 'none';
     this.seletorPeriodo.style.display = 'none';
   }
 
@@ -1104,6 +1143,26 @@ class CalculadoraFinanceira {
       
       // Atualiza o display da variável
       this.displayVariavel.textContent = `J(${this.calculosFinanceiros.obterSimboloMoeda(novaMoeda)}): ${this.formatarNumero(valorConvertido)}`;
+    }
+  }
+
+  // Altera a moeda do D
+  alterarMoedaD() {
+    const novaMoeda = this.seletorD.value;
+    const valorAtualD = this.valoresDesconto.D;
+    
+    // Atualiza a propriedade interna primeiro
+    const moedaAnterior = this.tipoMoedaD;
+    this.tipoMoedaD = novaMoeda;
+    
+    if (valorAtualD !== null) {
+      // Converte o valor para a nova moeda
+      const valorConvertido = this.calculosFinanceiros.converterMoeda(valorAtualD, moedaAnterior, novaMoeda);
+      this.valoresDesconto.D = valorConvertido;
+      this.atualizarDisplayStatusDesconto();
+      
+      // Atualiza o display da variável
+      this.displayVariavel.textContent = `Desconto(${this.calculosFinanceiros.obterSimboloMoeda(novaMoeda)}): ${this.formatarNumero(valorConvertido)}`;
     }
   }
 
