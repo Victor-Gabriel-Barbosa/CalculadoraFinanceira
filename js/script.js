@@ -407,9 +407,9 @@ class CalculadoraFinanceira {
     primeiraLinha.innerHTML = `
       <button class="btn financial-btn" data-function="N">N</button>
       <button class="btn financial-btn" data-function="Va">Va</button>
-      <button class="btn financial-btn" data-function="D">D</button>
       <button class="btn financial-btn" data-function="i">i</button>
       <button class="btn financial-btn" data-function="n">n</button>
+      <button class="btn financial-btn" data-function="D">D</button>
     `;
 
     segundaLinha.innerHTML = `
@@ -417,7 +417,7 @@ class CalculadoraFinanceira {
       <button class="btn operation-btn" data-function="ac">AC</button>
       <button class="btn operation-btn" data-function="ce">CE</button>
       <button class="btn operation-btn" data-function="sinal">+/-</button>
-      <button class="btn operation-btn" data-function="limpa">←</button>
+      <button class="btn operation-btn" data-function="porcento">%</button>
     `;
 
     // Atualiza event listeners para os novos botões
@@ -466,6 +466,18 @@ class CalculadoraFinanceira {
       
       novoBtnAc.addEventListener('click', () => this.limparTudo());
     }
+
+    // Atualiza listeners para os outros botões de operação (CE, +/-, %)
+    const outrosBotoesOperacao = ['ce', 'sinal', 'porcento'];
+    outrosBotoesOperacao.forEach(funcao => {
+      const btn = document.querySelector(`[data-function="${funcao}"]`);
+      if (btn) {
+        const novoBotao = btn.cloneNode(true);
+        btn.parentNode.replaceChild(novoBotao, btn);
+        
+        novoBotao.addEventListener('click', () => this.executarOp(novoBotao.dataset.function));
+      }
+    });
   }
 
   // Reativa os event listeners originais
