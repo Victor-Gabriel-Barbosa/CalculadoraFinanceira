@@ -35,44 +35,30 @@ class TaxaCalculator {
         const controlKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
         
         // Permitir teclas de controle e combinações com Ctrl
-        if (controlKeys.includes(e.key) || 
-            (e.ctrlKey && ['a', 'c', 'v', 'x', 'z', 'y'].includes(e.key.toLowerCase()))) {
-          return;
-        }
-
+        if (controlKeys.includes(e.key) || (e.ctrlKey && ['a', 'c', 'v', 'x', 'z', 'y'].includes(e.key.toLowerCase()))) return;
+        
         // Para o campo n (período), apenas números
         if (input === this.nTaxaInput) {
           if (!/^[0-9]$/.test(e.key)) e.preventDefault();
         } else {
-          // Para ic e i, permitir números e um ponto decimal
-          if (!/^[0-9.]$/.test(e.key)) {
-            e.preventDefault();
-          } else if (e.key === '.' && input.value.includes('.')) {
-            // Prevenir múltiplos pontos decimais
-            e.preventDefault();
-          }
+          if (!/^[0-9.]$/.test(e.key)) e.preventDefault(); // Para ic e i, permitir números e um ponto decimal
+          else if (e.key === '.' && input.value.includes('.')) e.preventDefault(); // Prevenir múltiplos pontos decimais
         }
       });
 
       // Auto-calcular quando o valor mudar
-      input.addEventListener('input', () => {
-        setTimeout(() => this.autoCalculate(), 100);
-      });
+      input.addEventListener('input', () => setTimeout(() => this.autoCalculate(), 100));
 
       // Enter key para calcular
       input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          this.calculate();
-        }
+        if (e.key === 'Enter') this.calculate();
       });
     });
   }
 
   autoCalculate() {
     const filledInputs = this.getFilledInputs();
-    if (filledInputs.length >= 2) {
-      this.calculate();
-    }
+    if (filledInputs.length >= 2) this.calculate();
   }
 
   getFilledInputs() {
@@ -113,9 +99,7 @@ class TaxaCalculator {
         // Calcular i a partir de ic e n
         // Fórmula: i = ic / (1 - ic × n)
         const denominator = 1 - (ic * n);
-        if (ic === 0 || denominator <= 0) {
-          throw new Error('Valores inválidos para o cálculo - denominador zero ou negativo');
-        }
+        if (ic === 0 || denominator <= 0) throw new Error('Valores inválidos para o cálculo - denominador zero ou negativo');
         result.i = ic / denominator;
         result.ic = ic;
         result.n = n;
@@ -123,30 +107,23 @@ class TaxaCalculator {
         // Calcular ic a partir de i e n
         // Fórmula: ic = i / (1 + i × n)
         const denominator = 1 + (i * n);
-        if (denominator === 0) {
-          throw new Error('Valores inválidos para o cálculo');
-        }
+        if (denominator === 0) throw new Error('Valores inválidos para o cálculo');
         result.ic = i / denominator;
         result.i = i;
         result.n = n;
       } else if (filledInputs.includes('ic') && filledInputs.includes('i') && !filledInputs.includes('n')) {
         // Calcular n a partir de ic e i
         // Fórmula: n = (i - ic) / (ic × i)
-        if (ic === 0 || i === 0) {
-          throw new Error('Valores inválidos para o cálculo - taxas não podem ser zero');
-        }
+        if (ic === 0 || i === 0) throw new Error('Valores inválidos para o cálculo - taxas não podem ser zero');
         result.n = (i - ic) / (ic * i);
         result.ic = ic;
         result.i = i;
       }
 
       // Validar se os resultados fazem sentido
-      if (result.ic < 0 || result.i < 0 || result.n < 0) {
-        throw new Error('Resultado negativo - verifique os valores de entrada');
-      }
+      if (result.ic < 0 || result.i < 0 || result.n < 0) throw new Error('Resultado negativo - verifique os valores de entrada');
 
       this.displayResults(result);
-
     } catch (error) {
       this.showError(error.message || 'Erro no cálculo. Verifique os valores inseridos.');
     }
