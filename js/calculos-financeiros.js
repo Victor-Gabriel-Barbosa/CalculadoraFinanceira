@@ -70,7 +70,7 @@ export class CalculosFinanceiros {
 
   /**
    * Calcula Valor Presente (PV)
-   * PV = -FV / (1 + i)^n  OU  PV = FV - J (se J for conhecido)
+   * PV = FV / (1 + i)^n  OU  PV = FV - J (se J for conhecido)
    * @param {number} fv - Valor Futuro
    * @param {number} j - Juros (opcional)
    * @param {number} i - Taxa de juros (decimal)
@@ -82,15 +82,15 @@ export class CalculosFinanceiros {
     if (j !== null && j !== undefined) return Math.abs(fv) - Math.abs(j);
     
     // Caso especial: taxa zero
-    if (i === 0) return -(fv || 0);
+    if (i === 0) return Math.abs(fv || 0);
 
     const fator = Math.pow(1 + i, n);
-    return -(fv || 0) / fator;
+    return Math.abs(fv || 0) / fator;
   }
 
   /**
    * Calcula Valor Futuro (FV)
-   * FV = -PV * (1 + i)^n  OU  FV = PV + J (se J for conhecido)
+   * FV = PV * (1 + i)^n  OU  FV = PV + J (se J for conhecido)
    * @param {number} pv - Valor Presente
    * @param {number} j - Juros (opcional)
    * @param {number} i - Taxa de juros (decimal)
@@ -102,10 +102,10 @@ export class CalculosFinanceiros {
     if (j !== null && j !== undefined) return Math.abs(pv) + Math.abs(j);
     
     // Caso especial: taxa zero
-    if (i === 0) return -(pv || 0);
+    if (i === 0) return Math.abs(pv || 0);
 
     const fator = Math.pow(1 + i, n);
-    return -(pv || 0) * fator;
+    return Math.abs(pv || 0) * fator;
   }
 
   /**
@@ -157,10 +157,15 @@ export class CalculosFinanceiros {
     // Validações básicas
     if (n === 0) throw new Error('Número de períodos não pode ser zero');
     if (pv === 0 || fv === 0) throw new Error('PV e FV não podem ser zero');
-    if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
+    
+    // Garante que estamos trabalhando com valores positivos
+    const pvAbs = Math.abs(pv);
+    const fvAbs = Math.abs(fv);
+    
+    if (fvAbs <= pvAbs) throw new Error('FV deve ser maior que PV para haver juros positivos');
 
     // Cálculo direto para juros compostos: i = (FV/PV)^(1/n) - 1
-    const taxa = Math.pow(Math.abs(fv / pv), 1 / n) - 1;
+    const taxa = Math.pow(fvAbs / pvAbs, 1 / n) - 1;
     
     if (isNaN(taxa) || !isFinite(taxa)) throw new Error('Não é possível calcular a taxa com estes valores');
     
@@ -185,10 +190,15 @@ export class CalculosFinanceiros {
     // Validações básicas
     if (i === 0) throw new Error('Taxa de juros não pode ser zero');
     if (pv === 0 || fv === 0) throw new Error('PV e FV não podem ser zero');
-    if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
+    
+    // Garante que estamos trabalhando com valores positivos
+    const pvAbs = Math.abs(pv);
+    const fvAbs = Math.abs(fv);
+    
+    if (fvAbs <= pvAbs) throw new Error('FV deve ser maior que PV para haver juros positivos');
 
     // Cálculo direto: n = ln(FV/PV) / ln(1 + i)
-    const numerador = Math.log(Math.abs(fv / pv));
+    const numerador = Math.log(fvAbs / pvAbs);
     const denominador = Math.log(1 + i);
     
     if (denominador === 0) throw new Error('Taxa de juros inválida para cálculo de n');
@@ -213,10 +223,10 @@ export class CalculosFinanceiros {
     if (j !== null && j !== undefined) return Math.abs(fv) - Math.abs(j);
     
     // Caso especial: taxa zero
-    if (i === 0) return -(fv || 0);
+    if (i === 0) return Math.abs(fv || 0);
 
     const fator = 1 + (i * n);
-    return -(fv || 0) / fator;
+    return Math.abs(fv || 0) / fator;
   }
 
   /**
@@ -233,10 +243,10 @@ export class CalculosFinanceiros {
     if (j !== null && j !== undefined) return Math.abs(pv) + Math.abs(j);
     
     // Caso especial: taxa zero
-    if (i === 0) return -(pv || 0);
+    if (i === 0) return Math.abs(pv || 0);
 
     const fator = 1 + (i * n);
-    return -(pv || 0) * fator;
+    return Math.abs(pv || 0) * fator;
   }
 
   /**
@@ -287,11 +297,16 @@ export class CalculosFinanceiros {
       // Validações básicas para método original
       if (n === 0) throw new Error('Número de períodos não pode ser zero');
       if (pv === 0) throw new Error('PV não pode ser zero');
-      if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
+      
+      // Garante que estamos trabalhando com valores positivos
+      const pvAbs = Math.abs(pv);
+      const fvAbs = Math.abs(fv);
+      
+      if (fvAbs <= pvAbs) throw new Error('FV deve ser maior que PV para haver juros positivos');
 
       // Cálculo para juros simples: i = (FV - PV) / (PV * n)
-      const numerador = Math.abs(fv) - Math.abs(pv);
-      const denominador = Math.abs(pv) * n;
+      const numerador = fvAbs - pvAbs;
+      const denominador = pvAbs * n;
       
       if (denominador === 0) throw new Error('Não é possível calcular a taxa com estes valores');
       
@@ -337,11 +352,16 @@ export class CalculosFinanceiros {
       // Validações básicas para método original
       if (i === 0) throw new Error('Taxa de juros não pode ser zero');
       if (pv === 0) throw new Error('PV não pode ser zero');
-      if ((pv > 0 && fv > 0) || (pv < 0 && fv < 0)) throw new Error('PV e FV devem ter sinais opostos');
+      
+      // Garante que estamos trabalhando com valores positivos
+      const pvAbs = Math.abs(pv);
+      const fvAbs = Math.abs(fv);
+      
+      if (fvAbs <= pvAbs) throw new Error('FV deve ser maior que PV para haver juros positivos');
 
       // Cálculo para juros simples: n = (FV - PV) / (PV * i)
-      const numerador = Math.abs(fv) - Math.abs(pv);
-      const denominador = Math.abs(pv) * i;
+      const numerador = fvAbs - pvAbs;
+      const denominador = pvAbs * i;
       
       if (denominador === 0) throw new Error('Não é possível calcular n com estes valores');
       if (numerador <= 0) throw new Error('FV deve ser maior que PV para juros simples');
