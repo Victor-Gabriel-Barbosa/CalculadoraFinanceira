@@ -1342,6 +1342,15 @@ class CalculadoraFinanceira {
   manipularTeclado(e) {
     const tecla = e.key;
 
+    // Verificar se o foco está na seção da taxa calculator
+    const elementoAtivo = document.activeElement;
+    const taxaCalculatorContainer = document.querySelector('.taxa-calculator-container');
+    
+    // Se o elemento ativo está dentro da taxa calculator, não interceptar
+    if (taxaCalculatorContainer && taxaCalculatorContainer.contains(elementoAtivo)) {
+      return;
+    }
+
     // Lista de teclas que devem ser ignoradas pela calculadora
     const teclasIgnoradas = [
       'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',

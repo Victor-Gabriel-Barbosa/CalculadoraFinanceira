@@ -1,0 +1,284 @@
+/* Taxa Calculator Styles */
+.taxa-calculator-container {
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+}
+
+.taxa-calculator {
+  background: linear-gradient(145deg, #434343, #2a2a2a, #1a1a1a);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 10px 20px rgba(0, 0, 0, 0.2),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.3);
+  width: 500px;
+  max-width: 95vw;
+  position: relative;
+}
+
+/* Efeito de luz ambiente para taxa calculator */
+.taxa-calculator::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    rgba(46, 204, 113, 0.1), 
+    rgba(155, 89, 182, 0.1), 
+    rgba(46, 204, 113, 0.1));
+  border-radius: 22px;
+  z-index: -1;
+  filter: blur(8px);
+}
+
+.taxa-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.taxa-header h3 {
+  color: #ecf0f1;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  margin-bottom: 8px;
+}
+
+.taxa-header p {
+  color: #bdc3c7;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.taxa-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+@media (max-width: 600px) {
+  .taxa-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.taxa-input-section h4,
+.taxa-output-section h4 {
+  color: #3498db;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.taxa-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.taxa-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.taxa-input-group label {
+  color: #ecf0f1;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.taxa-input-group input,
+.taxa-unit-select {
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  padding: 8px 12px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.taxa-input-group input:focus,
+.taxa-unit-select:focus {
+  border-color: #2ecc71;
+  box-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
+}
+
+.taxa-input-group input::placeholder {
+  color: #666;
+  font-style: italic;
+}
+
+.taxa-unit {
+  color: #f39c12;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 8px;
+  align-self: center;
+}
+
+.taxa-unit-select {
+  margin-top: 5px;
+  color: #f39c12;
+  font-size: 12px;
+}
+
+.taxa-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.taxa-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.taxa-calculate {
+  background: linear-gradient(145deg, #2ecc71, #27ae60);
+  color: white;
+  box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+}
+
+.taxa-calculate:hover {
+  background: linear-gradient(145deg, #27ae60, #229954);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(46, 204, 113, 0.4);
+}
+
+.taxa-clear {
+  background: linear-gradient(145deg, #e74c3c, #c0392b);
+  color: white;
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.taxa-clear:hover {
+  background: linear-gradient(145deg, #c0392b, #a93226);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(231, 76, 60, 0.4);
+}
+
+.taxa-results {
+  background: linear-gradient(145deg, #0a0a0a, #1a1a1a, #2a2a2a);
+  border: 2px inset #444;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 
+    inset 0 4px 8px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.taxa-result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #333;
+}
+
+.taxa-result-item:last-child {
+  border-bottom: none;
+}
+
+.taxa-result-label {
+  color: #bdc3c7;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.taxa-result-value {
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 0 3px #00ff00;
+}
+
+.taxa-formula {
+  background: #2c3e50;
+  border-radius: 8px;
+  padding: 15px;
+  border: 1px solid #34495e;
+}
+
+.taxa-formula h5 {
+  color: #e67e22;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.formula-display {
+  color: #ecf0f1;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.formula-display p {
+  margin: 5px 0;
+  padding: 5px 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  border-left: 3px solid #e67e22;
+}
+
+/* Animações */
+@keyframes resultUpdate {
+  0% { 
+    transform: scale(1); 
+    color: #00ff00; 
+  }
+  50% { 
+    transform: scale(1.05); 
+    color: #2ecc71; 
+    text-shadow: 0 0 8px #2ecc71; 
+  }
+  100% { 
+    transform: scale(1); 
+    color: #00ff00; 
+    text-shadow: 0 0 3px #00ff00; 
+  }
+}
+
+.taxa-result-value.updated {
+  animation: resultUpdate 0.5s ease;
+}
+
+/* Estados de erro */
+.taxa-input-group input.error {
+  border-color: #e74c3c;
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
+}
+
+.taxa-result-value.error {
+  color: #e74c3c;
+  text-shadow: 0 0 3px #e74c3c;
+}
