@@ -189,12 +189,12 @@
           <div class="taxa-inputs">
             <div class="taxa-input-group">
               <label for="icInput">ic (Taxa Desconto Comercial):</label>
-              <input type="number" id="icInput" step="0.01" placeholder="Ex: 2.5%">
+              <input type="number" id="icInput" step="0.01" min="0" max="100" placeholder="Ex: 2.5">
               <span class="taxa-unit">%</span>
             </div>
             <div class="taxa-input-group">
               <label for="nTaxaInput">n (Período):</label>
-              <input type="number" id="nTaxaInput" step="1" placeholder="Ex: 12">
+              <input type="number" id="nTaxaInput" step="1" min="1" placeholder="Ex: 12">
               <select id="nTaxaUnit" class="taxa-unit-select" title="Unidade de tempo para o período">
                 <option value="dias">Dias</option>
                 <option value="meses" selected>Meses</option>
@@ -203,7 +203,7 @@
             </div>
             <div class="taxa-input-group">
               <label for="iTaxaInput">i (Taxa Efetiva):</label>
-              <input type="number" id="iTaxaInput" step="0.01" placeholder="Ex: 3.0%">
+              <input type="number" id="iTaxaInput" step="0.01" min="0" max="100" placeholder="Ex: 3.0">
               <span class="taxa-unit">%</span>
             </div>
           </div>
