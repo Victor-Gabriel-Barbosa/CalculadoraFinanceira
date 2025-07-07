@@ -114,7 +114,7 @@ body {
   background: linear-gradient(145deg, #0a0a0a, #1a1a1a, #2a2a2a);
   border: 3px inset #444;
   border-radius: 12px;
-  padding: 15px;
+  padding: 10px;
   margin-bottom: 15px;
   box-shadow: 
     inset 0 4px 8px rgba(0, 0, 0, 0.6),
@@ -140,10 +140,10 @@ body {
 .operation-display {
   color: #f39c12;
   font-family: 'Courier New', monospace;
-  font-size: 14px;
-  min-height: 20px;
-  margin-bottom: 5px;
-  padding: 0 10px;
+  font-size: 12px;
+  min-height: 16px;
+  margin-bottom: 4px;
+  padding: 0 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -169,13 +169,13 @@ body {
   background: #000;
   color: #00ff00;
   font-family: 'Courier New', monospace;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
   text-align: right;
-  padding: 10px;
+  padding: 8px;
   border: 1px solid #333;
   border-radius: 4px;
-  min-height: 40px;
+  min-height: 32px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -235,16 +235,16 @@ body {
   background: #2a2a2a;
   border: 1px solid #555;
   border-radius: 6px;
-  padding: 10px;
+  padding: 12px;
   margin-bottom: 15px;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
 .status-item {
   text-align: center;
-  font-size: 11px;
+  font-size: 14px;
   color: #bdc3c7;
 }
 
@@ -252,14 +252,16 @@ body {
   display: block;
   font-weight: bold;
   color: #ecf0f1;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
+  font-size: 15px;
 }
 
 .status-item .value {
   display: block;
   font-family: 'Courier New', monospace;
   color: #3498db;
-  font-size: 10px;
+  font-size: 13px;
+  font-weight: bold;
 }
 
 /* Controle de visibilidade dos campos especiais */
@@ -272,7 +274,7 @@ body {
 }
 
 .status-display.modo-desconto {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .status-display.modo-desconto .status-item.desconto-field {
@@ -704,13 +706,14 @@ body {
   }
 
   .status-display {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
   }
 
   .status-display.modo-desconto {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
   }
 
   .status-display.modo-desconto .status-item.juros-field {
