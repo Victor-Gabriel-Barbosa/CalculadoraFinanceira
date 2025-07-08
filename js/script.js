@@ -978,46 +978,30 @@ class CalculadoraFinanceira {
     this.atualizarVisibilidadeSeletores();
   }
 
-  // Atualiza a visibilidade dos seletores baseado nos valores definidos
+  // Atualiza a visibilidade dos seletores - mantém todos sempre visíveis
   atualizarVisibilidadeSeletores() {
     const ehModoDesconto = this.modoAtual === 'desconto-racional' || this.modoAtual === 'desconto-comercial';
     
     if (ehModoDesconto) {
-      // Modo desconto - verifica valores de desconto
+      // Modo desconto - mostra todos os seletores relevantes sempre
+      this.mostrarSeletorD();
+      this.mostrarSeletorTaxa();
+      this.mostrarSeletorPeriodo();
       
-      // D - mostra seletor se há valor definido
-      if (this.valoresDesconto.D !== null) this.mostrarSeletorD();
-      else this.seletorD.style.display = 'none';
-      
-      // i - mostra seletor se há valor definido
-      if (this.valoresDesconto.i !== null) this.mostrarSeletorTaxa();
-      else this.seletorTaxa.style.display = 'none';
-      
-      // n - mostra seletor se há valor definido
-      if (this.valoresDesconto.n !== null) this.mostrarSeletorPeriodo();
-      else this.seletorPeriodo.style.display = 'none';
+      // Esconde seletores que não são relevantes no modo desconto
+      this.seletorPV.style.display = 'none';
+      this.seletorFV.style.display = 'none';
+      this.seletorJ.style.display = 'none';
     } else {
-      // Modo normal - verifica valores financeiros
+      // Modo normal - mostra todos os seletores sempre
+      this.mostrarSeletorPV();
+      this.mostrarSeletorFV();
+      this.mostrarSeletorJ();
+      this.mostrarSeletorTaxa();
+      this.mostrarSeletorPeriodo();
       
-      // PV - mostra seletor se há valor definido
-      if (this.valoresFinanceiros.pv !== null) this.mostrarSeletorPV();
-      else this.seletorPV.style.display = 'none';
-      
-      // FV - mostra seletor se há valor definido
-      if (this.valoresFinanceiros.fv !== null) this.mostrarSeletorFV();
-      else this.seletorFV.style.display = 'none';
-      
-      // J - mostra seletor se há valor definido
-      if (this.valoresFinanceiros.j !== null) this.mostrarSeletorJ();
-      else this.seletorJ.style.display = 'none';
-      
-      // i - mostra seletor se há valor definido
-      if (this.valoresFinanceiros.i !== null) this.mostrarSeletorTaxa();
-      else this.seletorTaxa.style.display = 'none';
-      
-      // n - mostra seletor se há valor definido
-      if (this.valoresFinanceiros.n !== null) this.mostrarSeletorPeriodo();
-      else this.seletorPeriodo.style.display = 'none';
+      // Esconde o seletor de desconto no modo normal
+      this.seletorD.style.display = 'none';
     }
   }
 

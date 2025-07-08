@@ -92,7 +92,7 @@ body {
   border-radius: 4px;
   color: #f39c12;
   font-family: 'Courier New', monospace;
-  font-size: 10px;
+  font-size: medium;
   padding: 4px 8px;
   outline: none;
   cursor: pointer;
@@ -260,7 +260,7 @@ body {
   display: block;
   font-family: 'Courier New', monospace;
   color: #3498db;
-  font-size: 13px;
+  font-size: large;
   font-weight: bold;
 }
 
@@ -297,6 +297,10 @@ body {
   cursor: pointer;
   width: 100%;
   margin-top: 2px;
+  display: block; /* Sempre visível */
+  font-size: medium;
+  opacity: 0.8; /* Levemente transparente quando não há valor */
+  transition: opacity 0.3s ease;
 }
 
 .rate-selector:focus {
@@ -321,6 +325,10 @@ body {
   cursor: pointer;
   width: 100%;
   margin-top: 2px;
+  display: block; /* Sempre visível */
+  font-size: medium;
+  opacity: 0.8; /* Levemente transparente quando não há valor */
+  transition: opacity 0.3s ease;
 }
 
 .value-selector:focus {
@@ -331,6 +339,14 @@ body {
 .value-selector option {
   background: #1a1a1a;
   color: #27ae60;
+}
+
+/* Estados dos seletores com valores */
+.status-item.has-value .rate-selector,
+.status-item.has-value .value-selector,
+.status-item.has-value .period-selector {
+  opacity: 1; /* Totalmente opaco quando há valor */
+  border-color: #555; /* Borda mais destacada */
 }
 
 /* Seletor de períodos (n) */
@@ -345,6 +361,10 @@ body {
   cursor: pointer;
   width: 100%;
   margin-top: 2px;
+  display: block; /* Sempre visível */
+  font-size: medium;
+  opacity: 0.8; /* Levemente transparente quando não há valor */
+  transition: opacity 0.3s ease;
 }
 
 .period-selector:focus {
@@ -852,10 +872,10 @@ body {
   border: none;
   border-radius: 50%;
   color: white;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: bold;
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   cursor: pointer;
   opacity: 0.7;
   transition: all 0.2s ease;
@@ -867,7 +887,6 @@ body {
 .clear-value-btn:hover {
   opacity: 1;
   background: #c0392b;
-  transform: scale(1.1);
 }
 
 .clear-value-btn:active {
