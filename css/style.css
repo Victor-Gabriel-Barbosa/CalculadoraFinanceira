@@ -954,10 +954,6 @@ body {
   background: #c0392b;
 }
 
-.clear-value-btn:active {
-  transform: scale(0.95);
-}
-
 /* Mostrar botão de remoção quando valor está definido */
 .status-item.has-value .clear-value-btn {
   display: inline-block !important;

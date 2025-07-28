@@ -899,9 +899,7 @@ class CalculadoraFinanceira {
       this.valoresDesconto[variavelFaltante] = valorCalculado;
       
       // Se D não foi a variável calculada, também atualiza o desconto automaticamente
-      if (variavelFaltante !== 'D') {
-        this.valoresDesconto.D = resultado.desconto;
-      }
+      if (variavelFaltante !== 'D') this.valoresDesconto.D = resultado.desconto;
       
       this.entradaAtual = valorCalculado.toString();
       
@@ -1140,9 +1138,7 @@ class CalculadoraFinanceira {
         // Calcular i a partir de ic e n: i = ic / (1 - ic × n)
         const icDecimal = ic / 100; // Converter % para decimal
         const denominator = 1 - (icDecimal * n);
-        if (icDecimal === 0 || denominator <= 0) {
-          throw new Error('Valores inválidos para o cálculo - denominador zero ou negativo');
-        }
+        if (icDecimal === 0 || denominator <= 0) throw new Error('Valores inválidos para o cálculo - denominador zero ou negativo');
         valorCalculado = (icDecimal / denominator) * 100; // Converter de volta para %
       } else if (variavelFaltante === 'ic') {
         // Calcular ic a partir de i e n: ic = i / (1 + i × n)
@@ -1336,9 +1332,7 @@ class CalculadoraFinanceira {
         const ikDecimal = ik / 100;
         const ieDecimal = ie / 100;
         
-        if (ieDecimal <= 0 || ikDecimal <= 0) {
-          throw new Error('Taxas devem ser positivas');
-        }
+        if (ieDecimal <= 0 || ikDecimal <= 0) throw new Error('Taxas devem ser positivas');
         
         // Método iterativo para encontrar k
         let kTentativa = 1;
@@ -1351,19 +1345,14 @@ class CalculadoraFinanceira {
           erro = ieCalculada - ieDecimal;
           
           // Ajusta k baseado no erro
-          if (erro > 0) {
-            kTentativa += 0.1;
-          } else {
-            kTentativa -= 0.1;
-          }
+          if (erro > 0) kTentativa += 0.1;
+          else kTentativa -= 0.1;
           
           if (kTentativa <= 0) kTentativa = 0.1;
           iteracao++;
         }
         
-        if (iteracao >= maxIteracoes) {
-          throw new Error('Não foi possível convergir para um valor de k válido');
-        }
+        if (iteracao >= maxIteracoes) throw new Error('Não foi possível convergir para um valor de k válido');
         
         valorCalculado = kTentativa;
       } else {
