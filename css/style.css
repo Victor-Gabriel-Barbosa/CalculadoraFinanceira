@@ -285,6 +285,20 @@ body {
   display: none;
 }
 
+/* Modo Taxa de Desconto Comercial */
+.status-display.modo-taxa-desconto {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.status-display.modo-taxa-desconto .status-item.desconto-field,
+.status-display.modo-taxa-desconto .status-item.juros-field {
+  display: none;
+}
+
+.status-display.modo-taxa-desconto .status-item:nth-child(2) {
+  display: none; /* FV */
+}
+
 /* Seletor de taxa */
 .rate-selector {
   background: #1a1a1a;
@@ -901,4 +915,21 @@ body {
 /* Ajustar espaçamento do valor quando botão está visível */
 .status-item.has-value .value {
   margin-right: 2px;
+}
+
+/* Botões vazios no modo taxa de desconto */
+.btn.empty-btn {
+  background: transparent !important;
+  border: 1px dashed rgba(255, 255, 255, 0.1) !important;
+  color: transparent !important;
+  cursor: default !important;
+  box-shadow: none !important;
+  pointer-events: none;
+}
+
+.btn.empty-btn:hover,
+.btn.empty-btn:active {
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
