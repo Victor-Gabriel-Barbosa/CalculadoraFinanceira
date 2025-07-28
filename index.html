@@ -28,6 +28,8 @@
             <option value="desconto-racional">Desconto Racional</option>
             <option value="desconto-comercial">Desconto Comercial</option>
             <option value="taxa-desconto-comercial">Taxa Desconto Comercial</option>
+            <option value="capitalizacao">Taxa Capitalização</option>
+            <option value="taxas-equivalentes">Taxas Equivalentes</option>
           </select>
         </div>
       </div>
@@ -115,6 +117,69 @@
             <option value="dollar">Dólar (US$)</option>
             <option value="euro">Euro (€)</option>
           </select>
+        </div>
+        <!-- Campos para capitalização -->
+        <div class="status-item capitalizacao-field">
+          <span class="label">iₖ (%):</span>
+          <div class="value-container">
+            <span class="value" id="ikValue">-</span>
+            <button class="clear-value-btn" id="clearIk" style="display: none;" title="Remover valor iₖ">x</button>
+          </div>
+        </div>
+        <div class="status-item capitalizacao-field">
+          <span class="label">iₑ (%):</span>
+          <div class="value-container">
+            <span class="value" id="ieValue">-</span>
+            <button class="clear-value-btn" id="clearIe" style="display: none;" title="Remover valor iₑ">x</button>
+          </div>
+        </div>
+        <div class="status-item capitalizacao-field">
+          <span class="label">k:</span>
+          <div class="value-container">
+            <span class="value" id="kValue">-</span>
+            <button class="clear-value-btn" id="clearK" style="display: none;" title="Remover valor k">x</button>
+          </div>
+        </div>
+        <!-- Campos para taxas equivalentes -->
+        <div class="status-item equivalentes-field">
+          <span class="label">i₁ (%):</span>
+          <div class="value-container">
+            <span class="value" id="i1Value">-</span>
+            <button class="clear-value-btn" id="clearI1" style="display: none;" title="Remover valor i₁">x</button>
+          </div>
+          <select class="period-selector" id="i1PeriodSelector" style="display: none;">
+            <option value="day">Diária</option>
+            <option value="month" selected>Mensal</option>
+            <option value="semester">Semestral</option>
+            <option value="year">Anual</option>
+          </select>
+        </div>
+        <div class="status-item equivalentes-field">
+          <span class="label">i₂ (%):</span>
+          <div class="value-container">
+            <span class="value" id="i2Value">-</span>
+            <button class="clear-value-btn" id="clearI2" style="display: none;" title="Remover valor i₂">x</button>
+          </div>
+          <select class="period-selector" id="i2PeriodSelector" style="display: none;">
+            <option value="day">Diária</option>
+            <option value="month">Mensal</option>
+            <option value="semester">Semestral</option>
+            <option value="year" selected>Anual</option>
+          </select>
+        </div>
+        <div class="status-item equivalentes-field">
+          <span class="label">n₁:</span>
+          <div class="value-container">
+            <span class="value" id="n1Value">-</span>
+            <button class="clear-value-btn" id="clearN1" style="display: none;" title="Remover valor n₁">x</button>
+          </div>
+        </div>
+        <div class="status-item equivalentes-field">
+          <span class="label">n₂:</span>
+          <div class="value-container">
+            <span class="value" id="n2Value">-</span>
+            <button class="clear-value-btn" id="clearN2" style="display: none;" title="Remover valor n₂">x</button>
+          </div>
         </div>
       </div>
 

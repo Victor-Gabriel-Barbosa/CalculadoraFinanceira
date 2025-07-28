@@ -252,7 +252,6 @@ body {
   display: block;
   font-weight: bold;
   color: #ecf0f1;
-  margin-bottom: 4px;
   font-size: 15px;
 }
 
@@ -270,6 +269,14 @@ body {
 }
 
 .status-item.desconto-field {
+  display: none;
+}
+
+.status-item.capitalizacao-field {
+  display: none;
+}
+
+.status-item.equivalentes-field {
   display: none;
 }
 
@@ -297,6 +304,50 @@ body {
 
 .status-display.modo-taxa-desconto .status-item:nth-child(2) {
   display: none; /* FV */
+}
+
+/* Modo Capitalização */
+.status-display.modo-capitalizacao {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.status-display.modo-capitalizacao .status-item.capitalizacao-field {
+  display: block;
+}
+
+.status-display.modo-capitalizacao .status-item.juros-field,
+.status-display.modo-capitalizacao .status-item.desconto-field,
+.status-display.modo-capitalizacao .status-item.equivalentes-field {
+  display: none;
+}
+
+.status-display.modo-capitalizacao .status-item:nth-child(1),
+.status-display.modo-capitalizacao .status-item:nth-child(2),
+.status-display.modo-capitalizacao .status-item:nth-child(3),
+.status-display.modo-capitalizacao .status-item:nth-child(4) {
+  display: none; /* PV, FV, i, n */
+}
+
+/* Modo Taxas Equivalentes */
+.status-display.modo-taxas-equivalentes {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.status-display.modo-taxas-equivalentes .status-item.equivalentes-field {
+  display: block;
+}
+
+.status-display.modo-taxas-equivalentes .status-item.juros-field,
+.status-display.modo-taxas-equivalentes .status-item.desconto-field,
+.status-display.modo-taxas-equivalentes .status-item.capitalizacao-field {
+  display: none;
+}
+
+.status-display.modo-taxas-equivalentes .status-item:nth-child(1),
+.status-display.modo-taxas-equivalentes .status-item:nth-child(2),
+.status-display.modo-taxas-equivalentes .status-item:nth-child(3),
+.status-display.modo-taxas-equivalentes .status-item:nth-child(4) {
+  display: none; /* PV, FV, i, n */
 }
 
 /* Seletor de taxa */
