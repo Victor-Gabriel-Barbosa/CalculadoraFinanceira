@@ -927,16 +927,12 @@ class CalculadoraFinanceira {
         // Calcular n a partir de ic e i: n = (i - ic) / (ic × i)
         const icDecimal = ic / 100;
         const iDecimal = i / 100;
-        if (icDecimal === 0 || iDecimal === 0) {
-          throw new Error('Valores inválidos para o cálculo - taxas não podem ser zero');
-        }
+        if (icDecimal === 0 || iDecimal === 0) throw new Error('Valores inválidos para o cálculo - taxas não podem ser zero');
         valorCalculado = (iDecimal - icDecimal) / (icDecimal * iDecimal);
       }
 
       // Validar se os resultados fazem sentido
-      if (valorCalculado < 0) {
-        throw new Error('Resultado negativo - verifique os valores de entrada');
-      }
+      if (valorCalculado < 0) throw new Error('Resultado negativo - verifique os valores de entrada');
 
       // Atualiza a variável calculada
       this.valoresTaxaDesconto[variavelFaltante] = valorCalculado;
@@ -1654,9 +1650,7 @@ class CalculadoraFinanceira {
     const taxaCalculatorContainer = document.querySelector('.taxa-calculator-container');
     
     // Se o elemento ativo está dentro da taxa calculator, não interceptar
-    if (taxaCalculatorContainer && taxaCalculatorContainer.contains(elementoAtivo)) {
-      return;
-    }
+    if (taxaCalculatorContainer && taxaCalculatorContainer.contains(elementoAtivo)) return;
 
     // Lista de teclas que devem ser ignoradas pela calculadora
     const teclasIgnoradas = [
