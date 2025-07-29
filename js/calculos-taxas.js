@@ -86,7 +86,7 @@ class CalculosTaxas {
 
       // Obter valores das entradas
       const ic = this.icInput.value ? parseFloat(this.icInput.value) / 100 : null; // Converter % para decimal
-      const n = this.nTaxaInput.value ? this.convertPeriodToMonths(parseFloat(this.nTaxaInput.value)) : null;
+      const n = this.nTaxaInput.value ? this.convertePeriodoParaMeses(parseFloat(this.nTaxaInput.value)) : null;
       const i = this.iTaxaInput.value ? parseFloat(this.iTaxaInput.value) / 100 : null; // Converter % para decimal
 
       let result = {};
@@ -126,32 +126,24 @@ class CalculosTaxas {
     }
   }
 
-  convertPeriodToMonths(value) {
-    const unit = this.nTaxaUnit.value;
-    switch (unit) {
-      case 'dias':
-        return value / 30; // Aproximação: 30 dias = 1 mês
-      case 'meses':
-        return value;
-      case 'anos':
-        return value * 12;
-      default:
-        return value;
-    }
+  convertePeriodoParaMeses(valor) {
+    const fatoresConversao = {
+      'dias': 1/30,
+      'meses': 1,
+      'anos': 12
+    };
+
+    return valor * (fatoresConversao[this.nTaxaUnit.value] || 1);
   }
 
-  convertMonthsToPeriod(months) {
-    const unit = this.nTaxaUnit.value;
-    switch (unit) {
-      case 'dias':
-        return months * 30;
-      case 'meses':
-        return months;
-      case 'anos':
-        return months / 12;
-      default:
-        return months;
-    }
+  converteMesesParaPeriodo(meses) {
+    const fatoresConversao = {
+      'dias': 30,
+      'meses': 1,
+      'anos': 1/12
+    };
+
+    return meses * (fatoresConversao[this.nTaxaUnit.value] || 1);
   }
 
   displayResults(result) {
@@ -163,7 +155,7 @@ class CalculosTaxas {
 
     // Mostrar n (no período original)
     if (result.n !== undefined) {
-      const nInOriginalUnit = this.convertMonthsToPeriod(result.n);
+      const nInOriginalUnit = this.converteMesesParaPeriodo(result.n);
       this.nTaxaResult.textContent = nInOriginalUnit.toFixed(2) + ' ' + this.nTaxaUnit.value;
       this.nTaxaResult.classList.add('updated');
     }

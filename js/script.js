@@ -421,23 +421,18 @@ class CalculadoraFinanceira {
       'modo-capitalizacao',
       'modo-taxas-equivalentes'
     );
-    
-    // Adiciona a classe apropriada baseada no modo
-    switch (modo) {
-      case 'desconto-racional':
-      case 'desconto-comercial':
-        statusDisplay.classList.add('modo-desconto');
-        break;
-      case 'taxa-desconto-comercial':
-        statusDisplay.classList.add('modo-taxa-desconto');
-        break;
-      case 'capitalizacao':
-        statusDisplay.classList.add('modo-capitalizacao');
-        break;
-      case 'taxas-equivalentes':
-        statusDisplay.classList.add('modo-taxas-equivalentes');
-        break;
-    }
+  
+    // Mapeia modos para suas respectivas classes CSS
+    const mapaClassesModo = {
+      'desconto-racional': 'modo-desconto',
+      'desconto-comercial': 'modo-desconto',
+      'taxa-desconto-comercial': 'modo-taxa-desconto',
+      'capitalizacao': 'modo-capitalizacao',
+      'taxas-equivalentes': 'modo-taxas-equivalentes'
+    };
+
+    // Adiciona a classe correspondente se o modo estiver no mapa
+    if (mapaClassesModo[modo]) statusDisplay.classList.add(mapaClassesModo[modo]);
   }
 
   /**
@@ -631,8 +626,7 @@ class CalculadoraFinanceira {
     const btnCpt = document.querySelector('[data-function="cpt"]');
     if (btnCpt) {
       const novoBtnCpt = btnCpt.cloneNode(true);
-      btnCpt.parentNode.replaceChild(novoBtnCpt, btnCpt);
-      
+      btnCpt.parentNode.replaceChild(novoBtnCpt, btnCpt); 
       novoBtnCpt.addEventListener('click', () => this.calcularDescontoFaltante());
     }
 
@@ -652,7 +646,6 @@ class CalculadoraFinanceira {
       if (btn) {
         const novoBotao = btn.cloneNode(true);
         btn.parentNode.replaceChild(novoBotao, btn);
-        
         novoBotao.addEventListener('click', () => this.executarOp(novoBotao.dataset.function));
       }
     });
@@ -742,7 +735,6 @@ class CalculadoraFinanceira {
     if (btnCpt) {
       const novoBtnCpt = btnCpt.cloneNode(true);
       btnCpt.parentNode.replaceChild(novoBtnCpt, btnCpt);
-      
       novoBtnCpt.addEventListener('click', () => this.calcularTaxasEquivalentesFaltante());
     }
 
@@ -756,7 +748,6 @@ class CalculadoraFinanceira {
     if (btnAc) {
       const novoBtnAc = btnAc.cloneNode(true);
       btnAc.parentNode.replaceChild(novoBtnAc, btnAc);
-      
       novoBtnAc.addEventListener('click', () => this.limparTudo());
     }
 
@@ -766,8 +757,7 @@ class CalculadoraFinanceira {
       const btn = document.querySelector(`[data-function="${funcao}"]`);
       if (btn) {
         const novoBotao = btn.cloneNode(true);
-        btn.parentNode.replaceChild(novoBotao, btn);
-        
+        btn.parentNode.replaceChild(novoBotao, btn); 
         novoBotao.addEventListener('click', () => this.executarOp(novoBotao.dataset.function));
       }
     });
@@ -778,16 +768,14 @@ class CalculadoraFinanceira {
     // Botões financeiros originais
     document.querySelectorAll('.financial-btn').forEach(btn => {
       const novoBotao = btn.cloneNode(true);
-      btn.parentNode.replaceChild(novoBotao, btn);
-      
+      btn.parentNode.replaceChild(novoBotao, btn);  
       novoBotao.addEventListener('click', () => this.definirVariavelFinanceira(novoBotao.dataset.function));
     });
 
     // Reativa todos os botões de operação
     document.querySelectorAll('.operation-btn').forEach(btn => {
       const novoBotao = btn.cloneNode(true);
-      btn.parentNode.replaceChild(novoBotao, btn);
-      
+      btn.parentNode.replaceChild(novoBotao, btn);   
       novoBotao.addEventListener('click', () => this.executarOp(novoBotao.dataset.function));
     });
   }
@@ -900,7 +888,6 @@ class CalculadoraFinanceira {
       this.atualizarDisplayStatusDesconto();
       
       this.novaEntrada = true;
-      
     } catch (erro) {
       this.mostrarErro(erro.message);
     } finally {
@@ -1272,7 +1259,6 @@ class CalculadoraFinanceira {
       this.atualizarDisplay();
       this.atualizarDisplayStatusCapitalizacao();
       this.novaEntrada = true;
-      
     } catch (erro) {
       this.mostrarErro(erro.message);
     } finally {
@@ -1401,10 +1387,8 @@ class CalculadoraFinanceira {
           if (botaoRemocao) botaoRemocao.style.display = 'inline-block';
         } else {
           elemento.textContent = '-';
-          
           const statusItem = elemento.closest('.status-item');
-          const botaoRemocao = this.botoesRemocao[chave];
-          
+          const botaoRemocao = this.botoesRemocao[chave]; 
           statusItem.classList.remove('has-value');
           if (botaoRemocao) botaoRemocao.style.display = 'none';
         }
@@ -1600,19 +1584,17 @@ class CalculadoraFinanceira {
     let modoTexto;
     
     // Determina o texto do modo baseado no modo atual
-    switch (this.modoAtual) {
-      case 'taxa-desconto-comercial':
-        modoTexto = 'TAXA DESCONTO COMERCIAL';
-        break;
-      case 'capitalizacao':
-        modoTexto = 'CAPITALIZAÇÃO';
-        break;
-      case 'taxas-equivalentes':
-        modoTexto = 'TAXAS EQUIVALENTES';
-        break;
-      default:
-        modoTexto = this.calculosFinanceiros.getModoCapitalizacao().toUpperCase();
-    }
+    const modoTextoMap = {
+      'simples': 'JUROS SIMPLES',
+      'composto': 'JUROS COMPOSTOS', 
+      'desconto-racional': 'DESCONTO RACIONAL',
+      'desconto-comercial': 'DESCONTO COMERCIAL',
+      'taxa-desconto-comercial': 'TAXA DESCONTO COMERCIAL',
+      'capitalizacao': 'CAPITALIZAÇÃO',
+      'taxas-equivalentes': 'TAXAS EQUIVALENTES'
+    };
+
+    modoTexto = modoTextoMap[this.modoAtual] || this.modoAtual.toUpperCase();
     
     let operacaoTexto = '';
     
