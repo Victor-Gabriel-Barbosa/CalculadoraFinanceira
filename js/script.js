@@ -1,4 +1,6 @@
 import { CalculosFinanceiros } from './calculos-financeiros.js';
+import { CalculosCapitalizacao } from './calculos-capitalizacao.js';
+import { CalculosTaxasEquivalentes } from './calculos-taxas-equivalentes.js';
 
 /**
  * CALCULADORA FINANCEIRA
@@ -111,6 +113,8 @@ class CalculadoraFinanceira {
 
     // Sistema de cálculos financeiros
     this.calculosFinanceiros = new CalculosFinanceiros();
+    this.calculosCapitalizacao = new CalculosCapitalizacao();
+    this.calculosTaxasEquivalentes = new CalculosTaxasEquivalentes();
 
     // Inicializa eventos
     this.inicializarEventos();
@@ -350,19 +354,10 @@ class CalculadoraFinanceira {
       };
       this.atualizarDisplayStatusTaxaDesconto();
     } else if (ehModoCapitalizacao) {
-      this.valoresCapitalizacao = {
-        ik: null,
-        ie: null,
-        k: null
-      };
+      this.calculosCapitalizacao.limparTodosValores();
       this.atualizarDisplayStatusCapitalizacao();
     } else if (ehModoTaxasEquivalentes) {
-      this.valoresTaxasEquivalentes = {
-        i1: null,
-        i2: null,
-        n1: null,
-        n2: null
-      };
+      this.calculosTaxasEquivalentes.limparTodosValores();
       this.atualizarDisplayStatusTaxasEquivalentes();
     } else {
       this.valoresFinanceiros = {
@@ -391,8 +386,6 @@ class CalculadoraFinanceira {
     // Guarda o modo anterior e atualiza o novo
     const modoAnterior = this.modoAtual;
     this.modoAtual = novoModo;
-
-    console.log(`Mudando modo de "${modoAnterior}" para "${novoModo}"`);
 
     // Atualiza a classe CSS do status-display
     this.atualizarClasseStatusDisplay(novoModo);
@@ -456,8 +449,6 @@ class CalculadoraFinanceira {
     // Se não há modo anterior definido, trata como modo normal
     if (!modoAnterior) modoAnterior = 'simples';
     
-    console.log(`Atualizando botões: ${modoAnterior} -> ${novoModo}`);
-    
     const ehModoDesconto = (modo) => modo === 'desconto-racional' || modo === 'desconto-comercial';
     const ehModoTaxaDesconto = (modo) => modo === 'taxa-desconto-comercial';
     const ehModoCapitalizacao = (modo) => modo === 'capitalizacao';
@@ -465,32 +456,24 @@ class CalculadoraFinanceira {
     const ehModoNormal = (modo) => modo === 'simples' || modo === 'composto';
     
     // Salva os botões originais se ainda não foram salvos e está saindo do modo normal
-    if (ehModoNormal(modoAnterior) && !ehModoNormal(novoModo) && !this.botoesOriginais) {
-      console.log('Salvando botões originais');
-      this.salvarBotoesOriginais();
-    }
+    if (ehModoNormal(modoAnterior) && !ehModoNormal(novoModo) && !this.botoesOriginais) this.salvarBotoesOriginais();
     
     // Determina qual conjunto de botões criar baseado no novo modo
     if (ehModoDesconto(novoModo)) {
-      console.log('Criando botões de desconto');
       this.criarBotoesDesconto();
       this.limparValoresFinanceiros();
       this.atualizarLabelsParaDesconto();
     } else if (ehModoTaxaDesconto(novoModo)) {
-      console.log('Criando botões de taxa de desconto');
       this.criarBotoesTaxaDesconto();
       this.limparValoresFinanceiros();
       this.atualizarLabelsParaTaxaDesconto();
     } else if (ehModoCapitalizacao(novoModo)) {
-      console.log('Criando botões de capitalização');
       this.criarBotoesCapitalizacao();
       this.limparValoresFinanceiros();
     } else if (ehModoTaxasEquivalentes(novoModo)) {
-      console.log('Criando botões de taxas equivalentes');
       this.criarBotoesTaxasEquivalentes();
       this.limparValoresFinanceiros();
     } else if (ehModoNormal(novoModo)) {
-      console.log('Restaurando botões originais');
       // Voltando para modo normal
       this.restaurarBotoesOriginais();
       this.limparValoresDesconto();
@@ -1011,18 +994,8 @@ class CalculadoraFinanceira {
     };
     
     // Limpa também os novos valores específicos dos modos
-    this.valoresCapitalizacao = {
-      ik: null,
-      ie: null,
-      k: null
-    };
-    
-    this.valoresTaxasEquivalentes = {
-      i1: null,
-      i2: null,
-      n1: null,
-      n2: null
-    };
+    this.calculosCapitalizacao.limparTodosValores();
+    this.calculosTaxasEquivalentes.limparTodosValores();
     
     this.atualizarDisplayStatus();
   }
@@ -1261,112 +1234,11 @@ class CalculadoraFinanceira {
     const btn = document.querySelector(`[data-function="${variavel}"]`);
     if (btn) btn.classList.add('active-variable');
 
-    // Inicializa objeto se não existe
-    if (!this.valoresCapitalizacao) this.valoresCapitalizacao = {};
-
-    this.valoresCapitalizacao[variavel] = valor;
-    this.ultimaVariavel = variavel;
-    
-    this.atualizarDisplayStatusCapitalizacao();
-    
-    // Mapeia os nomes para exibição
-    const nomesExibicao = {
-      ik: 'Taxa Nominal',
-      ie: 'Taxa Efetiva',
-      k: 'Períodos de Capitalização'
-    };
-    
-    this.displayVariavel.textContent = `${nomesExibicao[variavel]}: ${this.formatarNumero(valor)}`;
-    this.novaEntrada = true;
-  }
-
-  // Calcula o valor faltante no modo de capitalização
-  calcularCapitalizacaoFaltante() {
-    if (!this.valoresCapitalizacao) {
-      this.mostrarErro('Nenhum valor foi definido');
-      return;
-    }
-
-    // Conta quantas variáveis estão definidas
-    const valoresDefinidos = Object.values(this.valoresCapitalizacao).filter(v => v !== null && v !== undefined);
-
-    if (valoresDefinidos.length < 2) {
-      this.mostrarErro('É necessário definir pelo menos 2 valores para calcular');
-      return;
-    }
-
-    if (valoresDefinidos.length === 3) {
-      this.mostrarErro('Todos os valores já estão definidos');
-      return;
-    }
-
-    // Identifica qual variável está faltando
-    const variaveisNecessarias = ['ik', 'ie', 'k'];
-    const variavelFaltante = variaveisNecessarias.find(chave => 
-      !this.valoresCapitalizacao.hasOwnProperty(chave) || 
-      this.valoresCapitalizacao[chave] === null || 
-      this.valoresCapitalizacao[chave] === undefined
-    );
-
-    if (!variavelFaltante) {
-      this.mostrarErro('Nenhuma variável faltante encontrada');
-      return;
-    }
-
     try {
-      const { ik, ie, k } = this.valoresCapitalizacao;
-      let valorCalculado;
-
-      // Deduz automaticamente qual fórmula usar baseado na variável faltante
-      if (variavelFaltante === 'ie' && ik !== null && k !== null) {
-        // Calcula taxa efetiva a partir da nominal: ie = (1 + ik/k)^k - 1
-        const ikDecimal = ik / 100;
-        valorCalculado = (Math.pow(1 + ikDecimal / k, k) - 1) * 100;
-      } else if (variavelFaltante === 'ik' && ie !== null && k !== null) {
-        // Calcula taxa nominal a partir da efetiva: ik = k * ((1 + ie)^(1/k) - 1)
-        const ieDecimal = ie / 100;
-        valorCalculado = k * (Math.pow(1 + ieDecimal, 1 / k) - 1) * 100;
-      } else if (variavelFaltante === 'k' && ik !== null && ie !== null) {
-        // Calcula k iterativamente: k = ln(1 + ie) / ln(1 + ik/k)
-        // Fórmula aproximada usando método iterativo simples
-        const ikDecimal = ik / 100;
-        const ieDecimal = ie / 100;
-        
-        if (ieDecimal <= 0 || ikDecimal <= 0) throw new Error('Taxas devem ser positivas');
-        
-        // Método iterativo para encontrar k
-        let kTentativa = 1;
-        let erro = 1;
-        const maxIteracoes = 100;
-        let iteracao = 0;
-        
-        while (Math.abs(erro) > 0.0001 && iteracao < maxIteracoes) {
-          const ieCalculada = Math.pow(1 + ikDecimal / kTentativa, kTentativa) - 1;
-          erro = ieCalculada - ieDecimal;
-          
-          // Ajusta k baseado no erro
-          if (erro > 0) kTentativa += 0.1;
-          else kTentativa -= 0.1;
-          
-          if (kTentativa <= 0) kTentativa = 0.1;
-          iteracao++;
-        }
-        
-        if (iteracao >= maxIteracoes) throw new Error('Não foi possível convergir para um valor de k válido');
-        
-        valorCalculado = kTentativa;
-      } else {
-        throw new Error('Combinação de valores inválida para o cálculo');
-      }
-
-      // Validar se os resultados fazem sentido
-      if (valorCalculado < 0 || isNaN(valorCalculado) || !isFinite(valorCalculado)) {
-        throw new Error('Resultado inválido - verifique os valores de entrada');
-      }
-
-      // Atualiza a variável calculada
-      this.valoresCapitalizacao[variavelFaltante] = valorCalculado;
-      this.entradaAtual = valorCalculado.toString();
+      this.calculosCapitalizacao.definirVariavel(variavel, valor);
+      this.ultimaVariavel = variavel;
+      
+      this.atualizarDisplayStatusCapitalizacao();
       
       // Mapeia os nomes para exibição
       const nomesExibicao = {
@@ -1375,7 +1247,28 @@ class CalculadoraFinanceira {
         k: 'Períodos de Capitalização'
       };
       
-      this.displayVariavel.textContent = `${nomesExibicao[variavelFaltante]} = ${this.formatarNumero(valorCalculado)}`;
+      this.displayVariavel.textContent = `${nomesExibicao[variavel]}: ${this.formatarNumero(valor)}`;
+      this.novaEntrada = true;
+    } catch (erro) {
+      this.mostrarErro(erro.message);
+    }
+  }
+
+  // Calcula o valor faltante no modo de capitalização
+  calcularCapitalizacaoFaltante() {
+    try {
+      const resultado = this.calculosCapitalizacao.calcularValorFaltante();
+      
+      this.entradaAtual = resultado.valor.toString();
+      
+      // Mapeia os nomes para exibição
+      const nomesExibicao = {
+        ik: 'Taxa Nominal',
+        ie: 'Taxa Efetiva',
+        k: 'Períodos de Capitalização'
+      };
+      
+      this.displayVariavel.textContent = `${nomesExibicao[resultado.variavel]} = ${this.formatarNumero(resultado.valor)}`;
       this.atualizarDisplay();
       this.atualizarDisplayStatusCapitalizacao();
       this.novaEntrada = true;
@@ -1390,12 +1283,12 @@ class CalculadoraFinanceira {
 
   // Atualiza o display de status com os valores de capitalização
   atualizarDisplayStatusCapitalizacao() {
-    if (!this.valoresCapitalizacao) return;
+    const valores = this.calculosCapitalizacao.obterValores();
 
     ['ik', 'ie', 'k'].forEach(chave => {
       const elemento = this.valoresStatus[chave];
       if (elemento) {
-        const valor = this.valoresCapitalizacao[chave];
+        const valor = valores[chave];
         if (valor !== null && valor !== undefined) {
           elemento.textContent = this.formatarNumero(valor);
           
@@ -1439,95 +1332,33 @@ class CalculadoraFinanceira {
     const btn = document.querySelector(`[data-function="${variavel}"]`);
     if (btn) btn.classList.add('active-variable');
 
-    // Inicializa objeto se não existe
-    if (!this.valoresTaxasEquivalentes) this.valoresTaxasEquivalentes = {};
-
-    this.valoresTaxasEquivalentes[variavel] = valor;
-    this.ultimaVariavel = variavel;
-    
-    this.atualizarDisplayStatusTaxasEquivalentes();
-    
-    // Mapeia os nomes para exibição
-    const nomesExibicao = {
-      i1: 'Taxa 1',
-      i2: 'Taxa 2',
-      n1: 'Períodos 1',
-      n2: 'Períodos 2'
-    };
-    
-    this.displayVariavel.textContent = `${nomesExibicao[variavel]}: ${this.formatarNumero(valor)}`;
-    this.novaEntrada = true;
+    try {
+      this.calculosTaxasEquivalentes.definirVariavel(variavel, valor);
+      this.ultimaVariavel = variavel;
+      
+      this.atualizarDisplayStatusTaxasEquivalentes();
+      
+      // Mapeia os nomes para exibição
+      const nomesExibicao = {
+        i1: 'Taxa 1',
+        i2: 'Taxa 2',
+        n1: 'Períodos 1',
+        n2: 'Períodos 2'
+      };
+      
+      this.displayVariavel.textContent = `${nomesExibicao[variavel]}: ${this.formatarNumero(valor)}`;
+      this.novaEntrada = true;
+    } catch (erro) {
+      this.mostrarErro(erro.message);
+    }
   }
 
   // Calcula o valor faltante no modo de taxas equivalentes
   calcularTaxasEquivalentesFaltante() {
-    if (!this.valoresTaxasEquivalentes) {
-      this.mostrarErro('Nenhum valor foi definido');
-      return;
-    }
-
-    // Conta quantas variáveis estão definidas
-    const valoresDefinidos = Object.values(this.valoresTaxasEquivalentes).filter(v => v !== null && v !== undefined);
-
-    if (valoresDefinidos.length < 3) {
-      this.mostrarErro('É necessário definir pelo menos 3 valores para calcular');
-      return;
-    }
-
-    if (valoresDefinidos.length === 4) {
-      this.mostrarErro('Todos os valores já estão definidos');
-      return;
-    }
-
-    // Identifica qual variável está faltando
-    const variaveisNecessarias = ['i1', 'i2', 'n1', 'n2'];
-    const variavelFaltante = variaveisNecessarias.find(chave => 
-      !this.valoresTaxasEquivalentes.hasOwnProperty(chave) || 
-      this.valoresTaxasEquivalentes[chave] === null || 
-      this.valoresTaxasEquivalentes[chave] === undefined
-    );
-
-    if (!variavelFaltante) {
-      this.mostrarErro('Nenhuma variável faltante encontrada');
-      return;
-    }
-
     try {
-      const { i1, i2, n1, n2 } = this.valoresTaxasEquivalentes;
-      let valorCalculado;
+      const resultado = this.calculosTaxasEquivalentes.calcularVariavelFaltante();
+      const { variavel: variavelFaltante, valor: valorCalculado } = resultado;
 
-      // Fórmula de taxas equivalentes: (1 + i1)^n1 = (1 + i2)^n2
-      if (variavelFaltante === 'i1' && i2 && n1 && n2) {
-        // i1 = (1 + i2)^(n2/n1) - 1
-        const i2Decimal = i2 / 100;
-        valorCalculado = (Math.pow(1 + i2Decimal, n2 / n1) - 1) * 100;
-      } else if (variavelFaltante === 'i2' && i1 && n1 && n2) {
-        // i2 = (1 + i1)^(n1/n2) - 1
-        const i1Decimal = i1 / 100;
-        valorCalculado = (Math.pow(1 + i1Decimal, n1 / n2) - 1) * 100;
-      } else if (variavelFaltante === 'n1' && i1 && i2 && n2) {
-        // n1 = n2 * ln(1 + i1) / ln(1 + i2)
-        const i1Decimal = i1 / 100;
-        const i2Decimal = i2 / 100;
-        if (i1Decimal <= -1 || i2Decimal <= -1) throw new Error('Taxas devem ser maiores que -100%');
-        valorCalculado = n2 * Math.log(1 + i1Decimal) / Math.log(1 + i2Decimal);
-      } else if (variavelFaltante === 'n2' && i1 && i2 && n1) {
-        // n2 = n1 * ln(1 + i2) / ln(1 + i1)
-        const i1Decimal = i1 / 100;
-        const i2Decimal = i2 / 100;
-        if (i1Decimal <= -1 || i2Decimal <= -1) throw new Error('Taxas devem ser maiores que -100%');
-        valorCalculado = n1 * Math.log(1 + i2Decimal) / Math.log(1 + i1Decimal);
-      } else {
-        throw new Error('Combinação de valores inválida para o cálculo');
-      }
-
-      // Validar se os resultados fazem sentido
-      if (isNaN(valorCalculado) || !isFinite(valorCalculado)) {
-        throw new Error('Resultado inválido - verifique os valores de entrada');
-      }
-
-      // Atualiza a variável calculada
-      this.valoresTaxasEquivalentes[variavelFaltante] = valorCalculado;
       this.entradaAtual = valorCalculado.toString();
       
       // Mapeia os nomes para exibição
@@ -1553,12 +1384,12 @@ class CalculadoraFinanceira {
 
   // Atualiza o display de status com os valores de taxas equivalentes
   atualizarDisplayStatusTaxasEquivalentes() {
-    if (!this.valoresTaxasEquivalentes) return;
+    const valores = this.calculosTaxasEquivalentes.obterTodosValores();
 
     ['i1', 'i2', 'n1', 'n2'].forEach(chave => {
       const elemento = this.valoresStatus[chave];
       if (elemento) {
-        const valor = this.valoresTaxasEquivalentes[chave];
+        const valor = valores[chave];
         if (valor !== null && valor !== undefined) {
           elemento.textContent = this.formatarNumero(valor);
           
@@ -1838,15 +1669,11 @@ class CalculadoraFinanceira {
     const ehModoCapitalizacao = this.modoAtual === 'capitalizacao';
     const ehModoTaxasEquivalentes = this.modoAtual === 'taxas-equivalentes';
     
-    if (ehModoDesconto) {
-      this.atualizarDisplayStatusDesconto();
-    } else if (ehModoTaxaDesconto) {
-      this.atualizarDisplayStatusTaxaDesconto();
-    } else if (ehModoCapitalizacao) {
-      this.atualizarDisplayStatusCapitalizacao();
-    } else if (ehModoTaxasEquivalentes) {
-      this.atualizarDisplayStatusTaxasEquivalentes();
-    } else {
+    if (ehModoDesconto) this.atualizarDisplayStatusDesconto();
+    else if (ehModoTaxaDesconto) this.atualizarDisplayStatusTaxaDesconto();
+    else if (ehModoCapitalizacao) this.atualizarDisplayStatusCapitalizacao();
+    else if (ehModoTaxasEquivalentes) this.atualizarDisplayStatusTaxasEquivalentes();
+    else {
       Object.keys(this.valoresFinanceiros).forEach(chave => {
         const valor = this.valoresFinanceiros[chave];
         this.valoresStatus[chave].textContent = valor !== null ? this.formatarNumero(valor) : '-';
@@ -2232,10 +2059,10 @@ class CalculadoraFinanceira {
 
     // Verificar se o foco está na seção da taxa calculator
     const elementoAtivo = document.activeElement;
-    const taxaCalculatorContainer = document.querySelector('.taxa-calculator-container');
+    const calculosTaxasContainer = document.querySelector('.taxa-calculator-container');
     
     // Se o elemento ativo está dentro da taxa calculator, não interceptar
-    if (taxaCalculatorContainer && taxaCalculatorContainer.contains(elementoAtivo)) return;
+    if (calculosTaxasContainer && calculosTaxasContainer.contains(elementoAtivo)) return;
 
     // Lista de teclas que devem ser ignoradas pela calculadora
     const teclasIgnoradas = [
@@ -2320,17 +2147,20 @@ class CalculadoraFinanceira {
       }
     } else if (ehModoCapitalizacao) {
       // Para modo capitalização
-      if (['ik', 'ie', 'k'].includes(variavel) && this.valoresCapitalizacao && this.valoresCapitalizacao[variavel] !== null) {
-        this.valoresCapitalizacao[variavel] = null;
+      if (['ik', 'ie', 'k'].includes(variavel) && this.calculosCapitalizacao.valorDefinido(variavel)) {
+        this.calculosCapitalizacao.removerValor(variavel);
         this.displayOp.textContent = `${variavel} removido`;
         this.atualizarDisplayStatusCapitalizacao();
       }
     } else if (ehModoTaxasEquivalentes) {
       // Para modo taxas equivalentes
-      if (['i1', 'i2', 'n1', 'n2'].includes(variavel) && this.valoresTaxasEquivalentes && this.valoresTaxasEquivalentes[variavel] !== null) {
-        this.valoresTaxasEquivalentes[variavel] = null;
-        this.displayOp.textContent = `${variavel} removido`;
-        this.atualizarDisplayStatusTaxasEquivalentes();
+      if (['i1', 'i2', 'n1', 'n2'].includes(variavel)) {
+        const valor = this.calculosTaxasEquivalentes.obterValor(variavel);
+        if (valor !== null) {
+          this.calculosTaxasEquivalentes.limparValor(variavel);
+          this.displayOp.textContent = `${variavel} removido`;
+          this.atualizarDisplayStatusTaxasEquivalentes();
+        }
       }
     } else {
       // Para modo juros simples/compostos

@@ -1,5 +1,5 @@
 // Taxa Calculator Module
-class TaxaCalculator {
+class CalculosTaxas {
   constructor() {
     this.initializeElements();
     this.bindEvents();
@@ -88,9 +88,6 @@ class TaxaCalculator {
       const ic = this.icInput.value ? parseFloat(this.icInput.value) / 100 : null; // Converter % para decimal
       const n = this.nTaxaInput.value ? this.convertPeriodToMonths(parseFloat(this.nTaxaInput.value)) : null;
       const i = this.iTaxaInput.value ? parseFloat(this.iTaxaInput.value) / 100 : null; // Converter % para decimal
-
-      // Debug dos valores
-      this.debugCalculation(ic, n, i);
 
       let result = {};
 
@@ -217,13 +214,9 @@ class TaxaCalculator {
   }
 
   showError(message) {
-    console.error('Taxa Calculator Error:', message);
-
     // Destacar campos com erro
     [this.icInput, this.nTaxaInput, this.iTaxaInput].forEach(input => {
-      if (input.value) {
-        input.classList.add('error');
-      }
+      if (input.value) input.classList.add('error');
     });
 
     // Mostrar erro nos resultados
@@ -235,30 +228,12 @@ class TaxaCalculator {
     // Mostrar alerta para o usuário
     alert(message);
   }
-
-  debugCalculation(ic, n, i) {
-    console.log('=== DEBUG CÁLCULO ===');
-    console.log('ic (decimal):', ic);
-    console.log('n (meses):', n);
-    console.log('i (decimal):', i);
-    
-    if (ic && n) {
-      const result = ic / (1 - ic * n);
-      console.log('Fórmula: i = ic / (1 - ic × n)');
-      console.log('Cálculo: i =', ic, '/ (1 -', ic, '×', n, ')');
-      console.log('Cálculo: i =', ic, '/ (1 -', (ic * n), ')');
-      console.log('Cálculo: i =', ic, '/', (1 - ic * n));
-      console.log('Resultado i:', result);
-      console.log('Resultado i (%):', (result * 100).toFixed(4) + '%');
-    }
-    console.log('===================');
-  }
 }
 
 // Inicializar quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', () => {
-  new TaxaCalculator();
+  new CalculosTaxas();
 });
 
 // Exportar para uso em outros módulos se necessário
-export { TaxaCalculator };
+export { CalculosTaxas };
