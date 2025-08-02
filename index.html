@@ -120,14 +120,14 @@
         </div>
         <!-- Campos para capitalização -->
         <div class="status-item capitalizacao-field">
-          <span class="label">iₖ (%):</span>
+          <span class="label">i<sub>k</sub> (%):</span>
           <div class="value-container">
             <span class="value" id="ikValue">-</span>
             <button class="clear-value-btn" id="clearIk" style="display: none;" title="Remover valor iₖ">x</button>
           </div>
         </div>
         <div class="status-item capitalizacao-field">
-          <span class="label">iₑ (%):</span>
+          <span class="label">i<sub>e</sub> (%):</span>
           <div class="value-container">
             <span class="value" id="ieValue">-</span>
             <button class="clear-value-btn" id="clearIe" style="display: none;" title="Remover valor iₑ">x</button>
@@ -142,43 +142,31 @@
         </div>
         <!-- Campos para taxas equivalentes -->
         <div class="status-item equivalentes-field">
-          <span class="label">i₁ (%):</span>
+          <span class="label">i<sub>e</sub> (%):</span>
           <div class="value-container">
             <span class="value" id="i1Value">-</span>
-            <button class="clear-value-btn" id="clearI1" style="display: none;" title="Remover valor i₁">x</button>
+            <button class="clear-value-btn" id="clearI1" style="display: none;" title="Remover Taxa Original">x</button>
           </div>
-          <select class="period-selector" id="i1PeriodSelector" style="display: none;">
-            <option value="day">Diária</option>
-            <option value="month" selected>Mensal</option>
-            <option value="semester">Semestral</option>
-            <option value="year">Anual</option>
-          </select>
         </div>
         <div class="status-item equivalentes-field">
-          <span class="label">i₂ (%):</span>
-          <div class="value-container">
-            <span class="value" id="i2Value">-</span>
-            <button class="clear-value-btn" id="clearI2" style="display: none;" title="Remover valor i₂">x</button>
-          </div>
-          <select class="period-selector" id="i2PeriodSelector" style="display: none;">
-            <option value="day">Diária</option>
-            <option value="month">Mensal</option>
-            <option value="semester">Semestral</option>
-            <option value="year" selected>Anual</option>
-          </select>
-        </div>
-        <div class="status-item equivalentes-field">
-          <span class="label">n₁:</span>
+          <span class="label">n:</span>
           <div class="value-container">
             <span class="value" id="n1Value">-</span>
-            <button class="clear-value-btn" id="clearN1" style="display: none;" title="Remover valor n₁">x</button>
+            <button class="clear-value-btn" id="clearN1" style="display: none;" title="Remover Número de Períodos">x</button>
           </div>
         </div>
         <div class="status-item equivalentes-field">
-          <span class="label">n₂:</span>
+          <span class="label">i<sub>eq</sub> (%):</span>
+          <div class="value-container">
+            <span class="value" id="i2Value">-</span>
+            <button class="clear-value-btn" id="clearI2" style="display: none;" title="Resultado calculado">x</button>
+          </div>
+        </div>
+        <div class="status-item equivalentes-field" style="display: none;">
+          <span class="label">-:</span>
           <div class="value-container">
             <span class="value" id="n2Value">-</span>
-            <button class="clear-value-btn" id="clearN2" style="display: none;" title="Remover valor n₂">x</button>
+            <button class="clear-value-btn" id="clearN2" style="display: none;" title="Não utilizado">x</button>
           </div>
         </div>
       </div>

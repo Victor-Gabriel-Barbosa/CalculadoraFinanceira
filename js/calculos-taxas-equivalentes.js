@@ -1,29 +1,29 @@
 /**
  * CÁLCULOS DE TAXAS EQUIVALENTES
  * Classe responsável pelos cálculos de conversão entre taxas equivalentes
- * Suporta conversão entre taxas de juros para diferentes períodos
+ * Converte uma taxa efetiva de um período para outro período equivalente
  */
 export class CalculosTaxasEquivalentes {
   constructor() {
-    // Valores para taxas equivalentes
-    this.valoresTaxasEquivalentes = {
-      i1: null,   // Taxa 1
-      i2: null,   // Taxa 2  
-      n1: null,   // Períodos 1
-      n2: null    // Períodos 2
+    // Valores para conversão de taxas equivalentes
+    this.valores = {
+      taxaOriginal: null,    // Taxa efetiva no período original (%)
+      numeroPeríodos: null   // Número de períodos para conversão
     };
   }
 
   /**
-   * Define uma variável para modo de taxas equivalentes
-   * @param {string} variavel - Variável a ser definida (i1, i2, n1, n2)
+   * Define uma variável para conversão de taxas equivalentes
+   * @param {string} variavel - Variável a ser definida (taxaOriginal, numeroPeríodos)
    * @param {number} valor - Valor a ser atribuído
    */
   definirVariavel(variavel, valor) {
-    if (!['i1', 'i2', 'n1', 'n2'].includes(variavel)) throw new Error(`Variável ${variavel} não é válida para taxas equivalentes`);
+    if (!['taxaOriginal', 'numeroPeríodos'].includes(variavel)) throw new Error(`Variável ${variavel} não é válida. Use: taxaOriginal ou numeroPeríodos`);
     if (isNaN(valor)) throw new Error('Valor deve ser numérico');
+    if (variavel === 'taxaOriginal' && valor <= -100) throw new Error('Taxa original deve ser maior que -100%');
+    if (variavel === 'numeroPeríodos' && valor <= 0) throw new Error('Número de períodos deve ser maior que zero');
 
-    this.valoresTaxasEquivalentes[variavel] = valor;
+    this.valores[variavel] = valor;
   }
 
   /**
@@ -32,7 +32,7 @@ export class CalculosTaxasEquivalentes {
    * @returns {number|null} Valor da variável ou null se não definida
    */
   obterValor(variavel) {
-    return this.valoresTaxasEquivalentes[variavel] || null;
+    return this.valores[variavel] || null;
   }
 
   /**
@@ -40,69 +40,45 @@ export class CalculosTaxasEquivalentes {
    * @returns {object} Objeto com todos os valores
    */
   obterTodosValores() {
-    return { ...this.valoresTaxasEquivalentes };
+    return { ...this.valores };
   }
 
   /**
-   * Calcula o valor faltante no modo de taxas equivalentes
-   * @returns {object} Objeto com a variável calculada e seu valor
+   * Calcula a taxa equivalente para o novo período
+   * @returns {object} Objeto com a taxa equivalente calculada
    */
-  calcularVariavelFaltante() {
-    // Conta quantas variáveis estão definidas
-    const valoresDefinidos = Object.values(this.valoresTaxasEquivalentes).filter(v => v !== null && v !== undefined);
+  calcularTaxaEquivalente() {
+    const { taxaOriginal, numeroPeríodos } = this.valores;
 
-    if (valoresDefinidos.length < 3) throw new Error('É necessário definir pelo menos 3 valores para calcular');
-    if (valoresDefinidos.length === 4) throw new Error('Todos os valores já estão definidos');
+    // Validar se ambos os valores estão definidos
+    if (taxaOriginal === null || taxaOriginal === undefined) throw new Error('Taxa original deve ser definida');
+    if (numeroPeríodos === null || numeroPeríodos === undefined) throw new Error('Número de períodos deve ser definido');
 
-    // Identifica qual variável está faltando
-    const variaveisNecessarias = ['i1', 'i2', 'n1', 'n2'];
-    const variavelFaltante = variaveisNecessarias.find(chave => 
-      !this.valoresTaxasEquivalentes.hasOwnProperty(chave) || 
-      this.valoresTaxasEquivalentes[chave] === null || 
-      this.valoresTaxasEquivalentes[chave] === undefined
-    );
+    // Converter taxa de porcentagem para decimal
+    const taxaDecimal = taxaOriginal / 100;
+    
+    // Validações adicionais
+    if (taxaDecimal <= -1) throw new Error('Taxa original deve ser maior que -100%');
+    if (numeroPeríodos <= 0) throw new Error('Número de períodos deve ser maior que zero');
 
-    if (!variavelFaltante) {
-      throw new Error('Nenhuma variável faltante encontrada');
+    let taxaEquivalente;
+    
+    // Se n = 1, a taxa equivalente é igual à original
+    if (numeroPeríodos === 1) taxaEquivalente = taxaOriginal;
+    else {
+      // Calcular taxa equivalente usando a fórmula de equivalência
+      const fatorConversao = Math.pow(1 + taxaDecimal, 1 / numeroPeríodos);
+      taxaEquivalente = (fatorConversao - 1) * 100;
     }
 
-    const { i1, i2, n1, n2 } = this.valoresTaxasEquivalentes;
-    let valorCalculado;
-
-    // Fórmula de taxas equivalentes: (1 + i1)^n1 = (1 + i2)^n2
-    if (variavelFaltante === 'i1' && i2 && n1 && n2) {
-      // i1 = (1 + i2)^(n2/n1) - 1
-      const i2Decimal = i2 / 100;
-      valorCalculado = (Math.pow(1 + i2Decimal, n2 / n1) - 1) * 100;
-    } else if (variavelFaltante === 'i2' && i1 && n1 && n2) {
-      // i2 = (1 + i1)^(n1/n2) - 1
-      const i1Decimal = i1 / 100;
-      valorCalculado = (Math.pow(1 + i1Decimal, n1 / n2) - 1) * 100;
-    } else if (variavelFaltante === 'n1' && i1 && i2 && n2) {
-      // n1 = n2 * ln(1 + i1) / ln(1 + i2)
-      const i1Decimal = i1 / 100;
-      const i2Decimal = i2 / 100;
-      if (i1Decimal <= -1 || i2Decimal <= -1) throw new Error('Taxas devem ser maiores que -100%');
-      valorCalculado = n2 * Math.log(1 + i1Decimal) / Math.log(1 + i2Decimal);
-    } else if (variavelFaltante === 'n2' && i1 && i2 && n1) {
-      // n2 = n1 * ln(1 + i2) / ln(1 + i1)
-      const i1Decimal = i1 / 100;
-      const i2Decimal = i2 / 100;
-      if (i1Decimal <= -1 || i2Decimal <= -1) {
-        throw new Error('Taxas devem ser maiores que -100%');
-      }
-      valorCalculado = n1 * Math.log(1 + i2Decimal) / Math.log(1 + i1Decimal);
-    } else throw new Error('Combinação de valores inválida para o cálculo');
-
-    // Validar se os resultados fazem sentido
-    if (isNaN(valorCalculado) || !isFinite(valorCalculado)) throw new Error('Resultado inválido - verifique os valores de entrada');
-
-    // Atualiza a variável calculada
-    this.valoresTaxasEquivalentes[variavelFaltante] = valorCalculado;
+    // Validar resultado
+    if (isNaN(taxaEquivalente) || !isFinite(taxaEquivalente)) throw new Error('Resultado inválido - verifique os valores de entrada');
 
     return {
-      variavel: variavelFaltante,
-      valor: valorCalculado
+      taxaOriginal: taxaOriginal,
+      numeroPeríodos: numeroPeríodos,
+      taxaEquivalente: taxaEquivalente,
+      descrição: `ieq: ${taxaEquivalente.toFixed(6)}%`
     };
   }
 
@@ -110,11 +86,9 @@ export class CalculosTaxasEquivalentes {
    * Limpa todos os valores
    */
   limparTodosValores() {
-    this.valoresTaxasEquivalentes = {
-      i1: null,
-      i2: null,
-      n1: null,
-      n2: null
+    this.valores = {
+      taxaOriginal: null,
+      numeroPeríodos: null
     };
   }
 
@@ -123,7 +97,7 @@ export class CalculosTaxasEquivalentes {
    * @param {string} variavel - Variável a ser limpa
    */
   limparValor(variavel) {
-    if (this.valoresTaxasEquivalentes.hasOwnProperty(variavel)) this.valoresTaxasEquivalentes[variavel] = null;
+    if (this.valores.hasOwnProperty(variavel)) this.valores[variavel] = null;
   }
 
   /**
@@ -131,7 +105,7 @@ export class CalculosTaxasEquivalentes {
    * @returns {boolean} True se todas estão definidas
    */
   todasVariaveisDefinidas() {
-    return Object.values(this.valoresTaxasEquivalentes).every(v => v !== null && v !== undefined);
+    return Object.values(this.valores).every(v => v !== null && v !== undefined);
   }
 
   /**
@@ -139,7 +113,7 @@ export class CalculosTaxasEquivalentes {
    * @returns {number} Número de variáveis definidas
    */
   contarVariaveisDefinidas() {
-    return Object.values(this.valoresTaxasEquivalentes).filter(v => v !== null && v !== undefined).length;
+    return Object.values(this.valores).filter(v => v !== null && v !== undefined).length;
   }
 
   /**
@@ -149,23 +123,53 @@ export class CalculosTaxasEquivalentes {
   validarConfiguracao() {
     const definidas = this.contarVariaveisDefinidas();
     
-    if (definidas < 3) {
+    if (definidas < 2) {
       return {
         valida: false,
-        mensagem: 'É necessário definir pelo menos 3 valores para calcular'
-      };
-    }
-    
-    if (definidas === 4) {
-      return {
-        valida: false,
-        mensagem: 'Todos os valores já estão definidos'
+        mensagem: 'É necessário definir a taxa original e o número de períodos'
       };
     }
     
     return {
       valida: true,
       mensagem: 'Configuração válida para cálculo'
+    };
+  }
+
+  /**
+   * Método auxiliar para conversões comuns
+   * @param {number} taxaOriginal - Taxa original em %
+   * @param {string} periodoOriginal - Período original (anual, mensal, diário)
+   * @param {string} periodoDesejado - Período desejado (anual, mensal, diário)
+   * @returns {object} Resultado do cálculo com descrição
+   */
+  converterTaxa(taxaOriginal, periodoOriginal, periodoDesejado) {
+    // Mapeamento de períodos para número de conversões
+    const periodos = {
+      'anual': 1,
+      'mensal': 12,
+      'diário': 365,
+      'semestral': 2,
+      'trimestral': 4,
+      'quinzenal': 24,
+      'semanal': 52
+    };
+
+    if (!periodos[periodoOriginal] || !periodos[periodoDesejado]) throw new Error('Período não suportado. Use: anual, mensal, diário, semestral, trimestral, quinzenal, semanal');
+
+    // Calcular o fator de conversão
+    const fatorrConversao = periodos[periodoDesejado] / periodos[periodoOriginal];
+    
+    this.definirVariavel('taxaOriginal', taxaOriginal);
+    this.definirVariavel('numeroPeríodos', fatorrConversao);
+    
+    const resultado = this.calcularTaxaEquivalente();
+    
+    return {
+      ...resultado,
+      periodoOriginal,
+      periodoDesejado,
+      descrição: `Taxa ${periodoOriginal} de ${taxaOriginal.toFixed(4)}% equivale a ${resultado.taxaEquivalente.toFixed(6)}% ${periodoDesejado}`
     };
   }
 }

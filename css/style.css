@@ -330,7 +330,7 @@ body {
 
 /* Modo Taxas Equivalentes */
 .status-display.modo-taxas-equivalentes {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .status-display.modo-taxas-equivalentes .status-item.equivalentes-field {
@@ -348,6 +348,17 @@ body {
 .status-display.modo-taxas-equivalentes .status-item:nth-child(3),
 .status-display.modo-taxas-equivalentes .status-item:nth-child(4) {
   display: none; /* PV, FV, i, n */
+}
+
+/* Ajustes para labels mais longos em taxas equivalentes */
+.status-display.modo-taxas-equivalentes .status-item .label {
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+/* Esconde o último campo não utilizado */
+.status-display.modo-taxas-equivalentes .status-item.equivalentes-field:nth-last-child(1) {
+  display: none;
 }
 
 /* Seletor de taxa */

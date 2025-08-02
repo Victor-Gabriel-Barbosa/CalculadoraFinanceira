@@ -403,9 +403,7 @@ export class CalculosFinanceiros {
               tipo: 'Valor Nominal (a partir de Desconto e Va)',
               formula: 'N = Va + D'
             };
-          } else {
-            return this.calcularValorNominalRacional(Va, i, n);
-          }
+          } else return this.calcularValorNominalRacional(Va, i, n);
         },
         Va: () => {
           if (D !== null && N !== null) {
