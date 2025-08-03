@@ -57,6 +57,7 @@ class CalculadoraFinanceira {
     this.seletorD = document.getElementById('dSelector');
     this.seletorPeriodo = document.getElementById('periodSelector');
     this.seletorI1Periodo = document.getElementById('i1PeriodSelector');
+    this.seletorI2Periodo = document.getElementById('i2PeriodSelector');
     this.seletorIkPeriodo = document.getElementById('ikPeriodSelector');
     this.seletorIePeriodo = document.getElementById('iePeriodSelector');
     
@@ -199,6 +200,9 @@ class CalculadoraFinanceira {
     // Seletores de período para taxas equivalentes
     if (this.seletorI1Periodo) {
       this.seletorI1Periodo.addEventListener('change', () => this.alterarPeriodoI1());
+    }
+    if (this.seletorI2Periodo) {
+      this.seletorI2Periodo.addEventListener('change', () => this.alterarPeriodoI2());
     }
     
     // Seletor de modo
@@ -484,10 +488,16 @@ class CalculadoraFinanceira {
       if (this.seletorI1Periodo) {
         this.seletorI1Periodo.style.display = 'inline-block';
       }
+      if (this.seletorI2Periodo) {
+        this.seletorI2Periodo.style.display = 'inline-block';
+      }
     } else {
       // Esconde o seletor em outros modos
       if (this.seletorI1Periodo) {
         this.seletorI1Periodo.style.display = 'none';
+      }
+      if (this.seletorI2Periodo) {
+        this.seletorI2Periodo.style.display = 'none';
       }
     }
   }
@@ -1387,9 +1397,12 @@ class CalculadoraFinanceira {
     try {
       this.calculosTaxasEquivalentes.definirVariavel(variavel, valor);
       
-      // Também define o período atual do seletor original
+      // Também define os períodos atuais dos seletores
       if (this.seletorI1Periodo) {
         this.calculosTaxasEquivalentes.definirVariavel('periodoOriginal', this.seletorI1Periodo.value);
+      }
+      if (this.seletorI2Periodo) {
+        this.calculosTaxasEquivalentes.definirVariavel('periodoEquivalente', this.seletorI2Periodo.value);
       }
       
       this.ultimaVariavel = variavel;
@@ -1425,6 +1438,10 @@ class CalculadoraFinanceira {
         elementoResultado.textContent = this.formatarNumero(taxaEquivalente);
         const statusItem = elementoResultado.closest('.status-item');
         statusItem.classList.add('has-value');
+        
+        // Mostra o botão de limpar para o resultado
+        const botaoRemocao = this.botoesRemocao['i2'];
+        if (botaoRemocao) botaoRemocao.style.display = 'inline-block';
       }
       
       this.novaEntrada = true;
@@ -1493,6 +1510,9 @@ class CalculadoraFinanceira {
         elementoResultado.textContent = '-';
         const statusItem = elementoResultado.closest('.status-item');
         statusItem.classList.remove('has-value');
+        // Esconde o botão de limpar quando não há resultado
+        const botaoRemocao = this.botoesRemocao['i2'];
+        if (botaoRemocao) botaoRemocao.style.display = 'none';
       }
     }
 
@@ -2249,11 +2269,21 @@ class CalculadoraFinanceira {
       // Para modo taxas equivalentes - mapeia botões para variáveis
       const mapeamentoTaxasEquivalentes = {
         'i1': 'taxaOriginal',    // Botão i1 remove taxa original
-        'n1': 'numeroPeríodos'   // Botão n1 remove número de períodos
+        'n1': 'numeroPeríodos',  // Botão n1 remove número de períodos
+        'i2': 'resultado'        // Botão i2 limpa o resultado
       };
       
       const variavelTaxaEquivalente = mapeamentoTaxasEquivalentes[variavel];
-      if (variavelTaxaEquivalente) {
+      if (variavelTaxaEquivalente === 'resultado') {
+        // Limpa apenas o resultado visual, não afeta os cálculos
+        const elementoResultado = document.getElementById('i2Value');
+        if (elementoResultado) {
+          elementoResultado.textContent = '-';
+          const statusItem = elementoResultado.closest('.status-item');
+          statusItem.classList.remove('has-value');
+        }
+        this.displayOp.textContent = 'Resultado limpo';
+      } else if (variavelTaxaEquivalente) {
         const valor = this.calculosTaxasEquivalentes.obterValor(variavelTaxaEquivalente);
         if (valor !== null) {
           this.calculosTaxasEquivalentes.limparValor(variavelTaxaEquivalente);
@@ -2340,7 +2370,28 @@ class CalculadoraFinanceira {
       this.calculosTaxasEquivalentes.definirVariavel('periodoOriginal', novoPeriodo);
       
       // Se há valores definidos, recalcula automaticamente
-      if (this.calculosTaxasEquivalentes.contarVariaveisDefinidas() >= 2) this.calcularTaxasEquivalentesFaltante();
+      if (this.calculosTaxasEquivalentes.contarVariaveisDefinidas() >= 2) {
+        this.calcularTaxasEquivalentesFaltante();
+      }
+    } catch (erro) {
+      this.mostrarErro(erro.message);
+    }
+  }
+
+  // Altera o período da taxa equivalente (i2) no modo taxas equivalentes
+  alterarPeriodoI2() {
+    if (!this.seletorI2Periodo) return;
+    
+    const novoPeriodo = this.seletorI2Periodo.value;
+    if (!novoPeriodo) return;
+
+    try {
+      this.calculosTaxasEquivalentes.definirVariavel('periodoEquivalente', novoPeriodo);
+      
+      // Se há valores definidos, recalcula automaticamente
+      if (this.calculosTaxasEquivalentes.contarVariaveisDefinidas() >= 2) {
+        this.calcularTaxasEquivalentesFaltante();
+      }
     } catch (erro) {
       this.mostrarErro(erro.message);
     }

@@ -9,7 +9,8 @@ export class CalculosTaxasEquivalentes {
     this.valores = {
       taxaOriginal: null,    // Taxa efetiva no período original (%)
       numeroPeríodos: null,  // Número de períodos para conversão
-      periodoOriginal: 'month' // Período da taxa original
+      periodoOriginal: 'month', // Período da taxa original
+      periodoEquivalente: 'month' // Período da taxa equivalente
     };
 
     // Mapeamento de períodos para número de períodos por ano
@@ -28,7 +29,7 @@ export class CalculosTaxasEquivalentes {
    * @param {number|string} valor - Valor a ser atribuído
    */
   definirVariavel(variavel, valor) {
-    const variaveisValidas = ['taxaOriginal', 'numeroPeríodos', 'periodoOriginal'];
+    const variaveisValidas = ['taxaOriginal', 'numeroPeríodos', 'periodoOriginal', 'periodoEquivalente'];
     
     if (!variaveisValidas.includes(variavel)) throw new Error(`Variável ${variavel} não é válida. Use: ${variaveisValidas.join(', ')}`);
     
@@ -38,7 +39,9 @@ export class CalculosTaxasEquivalentes {
       if (variavel === 'numeroPeríodos' && valor <= 0) throw new Error('Número de períodos deve ser maior que zero');
     }
     
-    if (variavel === 'periodoOriginal' && !this.periodos[valor]) throw new Error(`Período ${valor} não é válido. Use: ${Object.keys(this.periodos).join(', ')}`);
+    if ((variavel === 'periodoOriginal' || variavel === 'periodoEquivalente') && !this.periodos[valor]) {
+      throw new Error(`Período ${valor} não é válido. Use: ${Object.keys(this.periodos).join(', ')}`);
+    }
 
     this.valores[variavel] = valor;
   }
@@ -65,7 +68,7 @@ export class CalculosTaxasEquivalentes {
    * @returns {object} Objeto com a taxa equivalente calculada
    */
   calcularTaxaEquivalente() {
-    const { taxaOriginal, numeroPeríodos, periodoOriginal } = this.valores;
+    const { taxaOriginal, numeroPeríodos, periodoOriginal, periodoEquivalente } = this.valores;
 
     // Validar se os valores essenciais estão definidos
     if (taxaOriginal === null || taxaOriginal === undefined) throw new Error('Taxa original deve ser definida');
@@ -78,9 +81,31 @@ export class CalculosTaxasEquivalentes {
     if (taxaDecimal <= -1) throw new Error('Taxa original deve ser maior que -100%');
     if (numeroPeríodos <= 0) throw new Error('Número de períodos deve ser maior que zero');
 
-    // Calcular a taxa equivalente usando a fórmula: (1 + i)^n - 1
-    // onde n é o número de períodos da taxa original
-    const taxaEquivalente = (Math.pow(1 + taxaDecimal, numeroPeríodos) - 1) * 100;
+    // Calcular a relação entre os períodos
+    const periodosOriginaisPorAno = this.periodos[periodoOriginal];
+    const periodosEquivalentesPorAno = this.periodos[periodoEquivalente];
+    
+    let taxaEquivalente;
+    
+    // Determina se estamos convertendo entre períodos ou aplicando capitalização
+    if (periodoOriginal === periodoEquivalente) {
+      // Mesmo período: aplicar capitalização simples
+      // Fórmula: (1 + i)^n - 1
+      taxaEquivalente = (Math.pow(1 + taxaDecimal, numeroPeríodos) - 1) * 100;
+    } else {
+      if (periodosOriginaisPorAno < periodosEquivalentesPorAno) {
+        // Convertendo de período maior para menor (ex: ano para mês)
+        // A taxa original já representa o período completo, n representa quantos sub-períodos
+        taxaEquivalente = (Math.pow(1 + taxaDecimal, 1 / numeroPeríodos) - 1) * 100;
+      } else if (periodosOriginaisPorAno > periodosEquivalentesPorAno) {
+        // Convertendo de período menor para maior (ex: mês para ano)
+        // Aplicamos capitalização: taxa mensal elevada a n meses = taxa anual
+        taxaEquivalente = (Math.pow(1 + taxaDecimal, numeroPeríodos) - 1) * 100;
+      } else {
+        // Períodos iguais mas n diferente de 1 - capitalização simples
+        taxaEquivalente = (Math.pow(1 + taxaDecimal, numeroPeríodos) - 1) * 100;
+      }
+    }
 
     // Validar resultado
     if (isNaN(taxaEquivalente) || !isFinite(taxaEquivalente)) throw new Error('Resultado inválido - verifique os valores de entrada');
@@ -95,13 +120,15 @@ export class CalculosTaxasEquivalentes {
     };
 
     const nomeOriginal = nomesPeriodos[periodoOriginal] || 'mensal';
+    const nomeEquivalente = nomesPeriodos[periodoEquivalente] || 'mensal';
 
     return {
       taxaOriginal: taxaOriginal,
       numeroPeríodos: numeroPeríodos,
       periodoOriginal: nomeOriginal,
+      periodoEquivalente: nomeEquivalente,
       taxaEquivalente: taxaEquivalente,
-      descrição: `Ieq: ${taxaEquivalente.toFixed(6)}%`
+      descrição: `Ieq (${nomeEquivalente}): ${taxaEquivalente.toFixed(6)}%`
     };
   }
 
@@ -112,7 +139,8 @@ export class CalculosTaxasEquivalentes {
     this.valores = {
       taxaOriginal: null,
       numeroPeríodos: null,
-      periodoOriginal: 'month'
+      periodoOriginal: 'month',
+      periodoEquivalente: 'month'
     };
   }
 
@@ -131,7 +159,8 @@ export class CalculosTaxasEquivalentes {
   todasVariaveisDefinidas() {
     return this.valores.taxaOriginal !== null && 
            this.valores.numeroPeríodos !== null &&
-           this.valores.periodoOriginal !== null;
+           this.valores.periodoOriginal !== null &&
+           this.valores.periodoEquivalente !== null;
   }
 
   /**
