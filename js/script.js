@@ -58,6 +58,8 @@ class CalculadoraFinanceira {
     this.seletorPeriodo = document.getElementById('periodSelector');
     this.seletorI1Periodo = document.getElementById('i1PeriodSelector');
     this.seletorI2Periodo = document.getElementById('i2PeriodSelector');
+    this.seletorIkPeriodo = document.getElementById('ikPeriodSelector');
+    this.seletorIePeriodo = document.getElementById('iePeriodSelector');
     
     // Seletor de modo
     this.seletorModo = document.getElementById('modeSelector');
@@ -141,6 +143,9 @@ class CalculadoraFinanceira {
       
       // Atualiza a interface para refletir o modo inicial
       this.atualizarDisplayOperacao();
+      
+      // Inicializa visibilidade dos seletores de capitalização baseado no modo inicial
+      this.gerenciarSeletoresCapitalizacao(this.modoAtual);
     }
   }
 
@@ -183,6 +188,14 @@ class CalculadoraFinanceira {
     
     // Seletor de período
     this.seletorPeriodo.addEventListener('change', () => this.alterarTipoPeriodo());
+    
+    // Seletores de período para capitalização
+    if (this.seletorIkPeriodo) {
+      this.seletorIkPeriodo.addEventListener('change', () => this.alterarPeriodoIk());
+    }
+    if (this.seletorIePeriodo) {
+      this.seletorIePeriodo.addEventListener('change', () => this.alterarPeriodoIe());
+    }
     
     // Seletor de modo
     this.seletorModo.addEventListener('change', () => this.alterarModoCalculadora());
@@ -433,6 +446,33 @@ class CalculadoraFinanceira {
 
     // Adiciona a classe correspondente se o modo estiver no mapa
     if (mapaClassesModo[modo]) statusDisplay.classList.add(mapaClassesModo[modo]);
+    
+    // Gerencia visibilidade dos seletores de capitalização
+    this.gerenciarSeletoresCapitalizacao(modo);
+  }
+
+  /**
+   * Gerencia a visibilidade dos seletores de período no modo capitalização
+   * @param {string} modo - Modo atual
+   */
+  gerenciarSeletoresCapitalizacao(modo) {
+    if (modo === 'capitalizacao') {
+      // Mostra os seletores no modo capitalização
+      if (this.seletorIkPeriodo) {
+        this.seletorIkPeriodo.style.display = 'inline-block';
+      }
+      if (this.seletorIePeriodo) {
+        this.seletorIePeriodo.style.display = 'inline-block';
+      }
+    } else {
+      // Esconde os seletores em outros modos
+      if (this.seletorIkPeriodo) {
+        this.seletorIkPeriodo.style.display = 'none';
+      }
+      if (this.seletorIePeriodo) {
+        this.seletorIePeriodo.style.display = 'none';
+      }
+    }
   }
 
   /**
@@ -1285,6 +1325,16 @@ class CalculadoraFinanceira {
         }
       }
     });
+
+    // Mantém os seletores de período sempre visíveis no modo capitalização
+    if (this.modoAtual === 'capitalizacao') {
+      if (this.seletorIkPeriodo) {
+        this.seletorIkPeriodo.style.display = 'inline-block';
+      }
+      if (this.seletorIePeriodo) {
+        this.seletorIePeriodo.style.display = 'inline-block';
+      }
+    }
   }
 
   // ==================== MODOS DE TAXAS EQUIVALENTES ====================
@@ -2199,6 +2249,52 @@ class CalculadoraFinanceira {
     }
     
     this.atualizarDisplay();
+  }
+
+  // Altera o período da taxa nominal (ik)
+  alterarPeriodoIk() {
+    if (!this.seletorIkPeriodo) return;
+    
+    const novoPeriodo = this.seletorIkPeriodo.value;
+    if (!novoPeriodo) return;
+
+    const periodoAnterior = this.calculosCapitalizacao.obterPeriodo('ik');
+    
+    // Converte o valor atual da taxa nominal se existir
+    if (this.calculosCapitalizacao.valorDefinido('ik')) {
+      const valorAtualIk = this.calculosCapitalizacao.obterValores().ik;
+      const ikConvertida = this.calculosCapitalizacao.converterTaxaEntrePeriodos(valorAtualIk, periodoAnterior, novoPeriodo);
+      
+      this.calculosCapitalizacao.definirVariavel('ik', ikConvertida);
+      this.calculosCapitalizacao.definirPeriodo('ik', novoPeriodo);
+      this.atualizarDisplayStatusCapitalizacao();
+    } else {
+      // Apenas define o período se não há valor
+      this.calculosCapitalizacao.definirPeriodo('ik', novoPeriodo);
+    }
+  }
+
+  // Altera o período da taxa efetiva (ie)
+  alterarPeriodoIe() {
+    if (!this.seletorIePeriodo) return;
+    
+    const novoPeriodo = this.seletorIePeriodo.value;
+    if (!novoPeriodo) return;
+
+    const periodoAnterior = this.calculosCapitalizacao.obterPeriodo('ie');
+    
+    // Converte o valor atual da taxa efetiva se existir
+    if (this.calculosCapitalizacao.valorDefinido('ie')) {
+      const valorAtualIe = this.calculosCapitalizacao.obterValores().ie;
+      const ieConvertida = this.calculosCapitalizacao.converterTaxaEntrePeriodos(valorAtualIe, periodoAnterior, novoPeriodo);
+      
+      this.calculosCapitalizacao.definirVariavel('ie', ieConvertida);
+      this.calculosCapitalizacao.definirPeriodo('ie', novoPeriodo);
+      this.atualizarDisplayStatusCapitalizacao();
+    } else {
+      // Apenas define o período se não há valor
+      this.calculosCapitalizacao.definirPeriodo('ie', novoPeriodo);
+    }
   }
 }
 

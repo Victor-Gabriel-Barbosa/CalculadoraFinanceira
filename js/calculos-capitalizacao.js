@@ -12,6 +12,12 @@ export class CalculosCapitalizacao {
       ie: null,   // Taxa efetiva
       k: null     // Períodos de capitalização
     };
+    
+    // Períodos das taxas (day, month, year)
+    this.periodosCapitalizacao = {
+      ik: 'month',  // Período da taxa nominal
+      ie: 'month'   // Período da taxa efetiva
+    };
   }
 
   /**
@@ -27,6 +33,77 @@ export class CalculosCapitalizacao {
 
     this.valoresCapitalizacao[variavel] = valor;
     return valor;
+  }
+
+  /**
+   * Define o período de uma taxa
+   * @param {string} taxa - Taxa (ik ou ie)
+   * @param {string} periodo - Período (day, month, year)
+   */
+  definirPeriodo(taxa, periodo) {
+    if (!this.periodosCapitalizacao) {
+      this.periodosCapitalizacao = { ik: 'month', ie: 'month' };
+    }
+    this.periodosCapitalizacao[taxa] = periodo;
+  }
+
+  /**
+   * Obtém o período de uma taxa
+   * @param {string} taxa - Taxa (ik ou ie)
+   * @returns {string} Período (day, month, year)
+   */
+  obterPeriodo(taxa) {
+    if (!this.periodosCapitalizacao) {
+      this.periodosCapitalizacao = { ik: 'month', ie: 'month' };
+    }
+    return this.periodosCapitalizacao[taxa] || 'month';
+  }
+
+  /**
+   * Converte taxa entre períodos
+   * @param {number} taxa - Taxa em porcentagem
+   * @param {string} periodoOrigem - Período original
+   * @param {string} periodoDestino - Período de destino
+   * @returns {number} Taxa convertida
+   */
+  converterTaxaEntrePeriodos(taxa, periodoOrigem, periodoDestino) {
+    if (periodoOrigem === periodoDestino) return taxa;
+
+    const taxaDecimal = taxa / 100;
+    let taxaAnual;
+
+    // Converte para taxa anual primeiro
+    switch (periodoOrigem) {
+      case 'day':
+        taxaAnual = Math.pow(1 + taxaDecimal, 365) - 1;
+        break;
+      case 'month':
+        taxaAnual = Math.pow(1 + taxaDecimal, 12) - 1;
+        break;
+      case 'year':
+        taxaAnual = taxaDecimal;
+        break;
+      default:
+        throw new Error('Período de origem inválido');
+    }
+
+    // Converte da taxa anual para o período de destino
+    let taxaConvertida;
+    switch (periodoDestino) {
+      case 'day':
+        taxaConvertida = Math.pow(1 + taxaAnual, 1/365) - 1;
+        break;
+      case 'month':
+        taxaConvertida = Math.pow(1 + taxaAnual, 1/12) - 1;
+        break;
+      case 'year':
+        taxaConvertida = taxaAnual;
+        break;
+      default:
+        throw new Error('Período de destino inválido');
+    }
+
+    return taxaConvertida * 100;
   }
 
   /**
@@ -53,18 +130,46 @@ export class CalculosCapitalizacao {
 
     if (!variavelFaltante) throw new Error('Nenhuma variável faltante encontrada');
 
-    const { ik, ie, k } = this.valoresCapitalizacao;
+    let { ik, ie, k } = this.valoresCapitalizacao;
     let valorCalculado;
+
+    // Normaliza as taxas para o mesmo período antes do cálculo
+    if (ik !== null && ie !== null) {
+      const periodoIk = this.obterPeriodo('ik');
+      const periodoIe = this.obterPeriodo('ie');
+      
+      // Converte ambas as taxas para o período anual para uniformizar os cálculos
+      ik = this.converterTaxaEntrePeriodos(ik, periodoIk, 'year');
+      ie = this.converterTaxaEntrePeriodos(ie, periodoIe, 'year');
+    }
 
     // Deduz automaticamente qual fórmula usar baseado na variável faltante
     if (variavelFaltante === 'ie' && ik !== null && k !== null) {
-      // Calcula taxa efetiva a partir da nominal: ie = (1 + ik/k)^k - 1
-      valorCalculado = this.calcularTaxaEfetiva(ik, k);
+      // Converte ik para o período anual se necessário
+      const periodoIk = this.obterPeriodo('ik');
+      const ikAnual = this.converterTaxaEntrePeriodos(ik, periodoIk, 'year');
+      
+      // Calcula taxa efetiva anual: ie = (1 + ik/k)^k - 1
+      const ieAnual = this.calcularTaxaEfetiva(ikAnual, k);
+      
+      // Converte a taxa efetiva para o período desejado
+      const periodoIe = this.obterPeriodo('ie');
+      valorCalculado = this.converterTaxaEntrePeriodos(ieAnual, 'year', periodoIe);
+      
     } else if (variavelFaltante === 'ik' && ie !== null && k !== null) {
-      // Calcula taxa nominal a partir da efetiva: ik = k * ((1 + ie)^(1/k) - 1)
-      valorCalculado = this.calcularTaxaNominal(ie, k);
+      // Converte ie para o período anual se necessário
+      const periodoIe = this.obterPeriodo('ie');
+      const ieAnual = this.converterTaxaEntrePeriodos(ie, periodoIe, 'year');
+      
+      // Calcula taxa nominal anual: ik = k * ((1 + ie)^(1/k) - 1)
+      const ikAnual = this.calcularTaxaNominal(ieAnual, k);
+      
+      // Converte a taxa nominal para o período desejado
+      const periodoIk = this.obterPeriodo('ik');
+      valorCalculado = this.converterTaxaEntrePeriodos(ikAnual, 'year', periodoIk);
+      
     } else if (variavelFaltante === 'k' && ik !== null && ie !== null) {
-      // Calcula k iterativamente
+      // Calcula k iterativamente usando taxas anuais
       valorCalculado = this.calcularPeriodosCapitalizacao(ik, ie);
     } else throw new Error('Combinação de valores inválida para o cálculo');
 
@@ -159,6 +264,10 @@ export class CalculosCapitalizacao {
       ie: null,
       k: null
     };
+    // Mantém os períodos definidos
+    if (!this.periodosCapitalizacao) {
+      this.periodosCapitalizacao = { ik: 'month', ie: 'month' };
+    }
   }
 
   /**
@@ -167,6 +276,17 @@ export class CalculosCapitalizacao {
    */
   obterValores() {
     return { ...this.valoresCapitalizacao };
+  }
+
+  /**
+   * Obtém todos os períodos atuais
+   * @returns {Object} Objeto com todos os períodos
+   */
+  obterPeriodos() {
+    if (!this.periodosCapitalizacao) {
+      this.periodosCapitalizacao = { ik: 'month', ie: 'month' };
+    }
+    return { ...this.periodosCapitalizacao };
   }
 
   /**
