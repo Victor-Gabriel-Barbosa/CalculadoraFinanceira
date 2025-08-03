@@ -235,11 +235,11 @@ body {
   background: #2a2a2a;
   border: 1px solid #555;
   border-radius: 6px;
-  padding: 12px;
-  margin-bottom: 15px;
+  padding: 10px;
+  margin-bottom: 12px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .status-item {
@@ -348,12 +348,6 @@ body {
 .status-display.modo-taxas-equivalentes .status-item:nth-child(3),
 .status-display.modo-taxas-equivalentes .status-item:nth-child(4) {
   display: none; /* PV, FV, i, n */
-}
-
-/* Ajustes para labels mais longos em taxas equivalentes */
-.status-display.modo-taxas-equivalentes .status-item .label {
-  font-size: 13px;
-  line-height: 1.2;
 }
 
 /* Seletor de período visível apenas no primeiro campo (taxa original) */
@@ -489,7 +483,7 @@ body {
   border: none;
   border-radius: 12px;
   padding: 10px 6px;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 1000;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -605,7 +599,6 @@ body {
   border-color: rgba(255, 255, 255, 0.2) !important;
   border-top-color: rgba(255, 255, 255, 0.4) !important;
   border-bottom-color: rgba(0, 0, 0, 0.3) !important;
-  font-size: 20px;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
   
   box-shadow:
@@ -811,13 +804,34 @@ body {
 
   .status-display {
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 10px;
+    gap: 8px;
+    padding: 8px;
   }
 
   .status-display.modo-desconto {
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+  }
+
+  .status-item {
+    font-size: 12px;
+  }
+
+  .status-item .label {
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+
+  .status-item .value {
+    font-size: 16px;
+  }
+
+  .mode-selector,
+  .rate-selector,
+  .value-selector,
+  .period-selector {
+    font-size: 15px;
+    padding: 1px;
+    margin-top: 1px;
   }
 
   .status-display.modo-desconto .status-item.juros-field {
@@ -826,6 +840,41 @@ body {
 
   .calculator-header h2 {
     font-size: 12px;
+  }
+}
+
+/* Responsividade para telas muito pequenas */
+@media (max-width: 360px) {
+  .calculator {
+    padding: 10px;
+  }
+
+  .status-display {
+    padding: 6px;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .status-item .label {
+    font-size: 12px;
+  }
+
+  .status-item .value {
+    font-size: 14px;
+  }
+
+  .status-item {
+    font-size: 11px;
+  }
+
+  .display-section {
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+
+  .main-display {
+    font-size: 18px;
+    padding: 6px;
   }
 }
 

@@ -608,9 +608,9 @@ class CalculadoraFinanceira {
     if (!primeiraLinha || !segundaLinha) return;
 
     primeiraLinha.innerHTML = `
-      <button class="btn financial-btn" data-function="ie">iₑ</button>
+      <button class="btn financial-btn" data-function="ie">ie</button>
       <button class="btn financial-btn" data-function="k">k</button>
-      <button class="btn financial-btn" data-function="ik">iₖ</button>
+      <button class="btn financial-btn" data-function="ik">ik</button>
       <button class="btn financial-btn empty-btn" disabled></button>
       <button class="btn financial-btn empty-btn" disabled></button>
     `;
