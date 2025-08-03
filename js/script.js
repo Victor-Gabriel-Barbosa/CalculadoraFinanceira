@@ -190,21 +190,13 @@ class CalculadoraFinanceira {
     this.seletorPeriodo.addEventListener('change', () => this.alterarTipoPeriodo());
     
     // Seletores de período para capitalização
-    if (this.seletorIkPeriodo) {
-      this.seletorIkPeriodo.addEventListener('change', () => this.alterarPeriodoIk());
-    }
-    if (this.seletorIePeriodo) {
-      this.seletorIePeriodo.addEventListener('change', () => this.alterarPeriodoIe());
-    }
-    
+    if (this.seletorIkPeriodo) this.seletorIkPeriodo.addEventListener('change', () => this.alterarPeriodoIk());
+    if (this.seletorIePeriodo) this.seletorIePeriodo.addEventListener('change', () => this.alterarPeriodoIe());
+
     // Seletores de período para taxas equivalentes
-    if (this.seletorI1Periodo) {
-      this.seletorI1Periodo.addEventListener('change', () => this.alterarPeriodoI1());
-    }
-    if (this.seletorI2Periodo) {
-      this.seletorI2Periodo.addEventListener('change', () => this.alterarPeriodoI2());
-    }
-    
+    if (this.seletorI1Periodo) this.seletorI1Periodo.addEventListener('change', () => this.alterarPeriodoI1());
+    if (this.seletorI2Periodo) this.seletorI2Periodo.addEventListener('change', () => this.alterarPeriodoI2());
+
     // Seletor de modo
     this.seletorModo.addEventListener('change', () => this.alterarModoCalculadora());
     
@@ -465,40 +457,26 @@ class CalculadoraFinanceira {
    */
   gerenciarSeletoresCapitalizacao(modo) {
     if (modo === 'capitalizacao') {
-      // Mostra os seletores no modo capitalização
-      if (this.seletorIkPeriodo) {
-        this.seletorIkPeriodo.style.display = 'inline-block';
-      }
-      if (this.seletorIePeriodo) {
-        this.seletorIePeriodo.style.display = 'inline-block';
-      }
+      // Esconde o seletor de ik pois a taxa nominal é representativa do valor k
+      if (this.seletorIkPeriodo) this.seletorIkPeriodo.style.display = 'none';
+    
+      // Mostra apenas o seletor da taxa efetiva
+      if (this.seletorIePeriodo) this.seletorIePeriodo.style.display = 'inline-block';
     } else {
       // Esconde os seletores em outros modos
-      if (this.seletorIkPeriodo) {
-        this.seletorIkPeriodo.style.display = 'none';
-      }
-      if (this.seletorIePeriodo) {
-        this.seletorIePeriodo.style.display = 'none';
-      }
+      if (this.seletorIkPeriodo) this.seletorIkPeriodo.style.display = 'none';
+      if (this.seletorIePeriodo) this.seletorIePeriodo.style.display = 'none';
     }
 
     // Gerencia seletores de taxas equivalentes
     if (modo === 'taxas-equivalentes') {
       // Mostra o seletor no modo taxas equivalentes
-      if (this.seletorI1Periodo) {
-        this.seletorI1Periodo.style.display = 'inline-block';
-      }
-      if (this.seletorI2Periodo) {
-        this.seletorI2Periodo.style.display = 'inline-block';
-      }
+      if (this.seletorI1Periodo) this.seletorI1Periodo.style.display = 'inline-block';
+      if (this.seletorI2Periodo) this.seletorI2Periodo.style.display = 'inline-block';
     } else {
       // Esconde o seletor em outros modos
-      if (this.seletorI1Periodo) {
-        this.seletorI1Periodo.style.display = 'none';
-      }
-      if (this.seletorI2Periodo) {
-        this.seletorI2Periodo.style.display = 'none';
-      }
+      if (this.seletorI1Periodo) this.seletorI1Periodo.style.display = 'none';
+      if (this.seletorI2Periodo) this.seletorI2Periodo.style.display = 'none';
     }
   }
 
@@ -630,9 +608,9 @@ class CalculadoraFinanceira {
     if (!primeiraLinha || !segundaLinha) return;
 
     primeiraLinha.innerHTML = `
-      <button class="btn financial-btn" data-function="ik">iₖ</button>
       <button class="btn financial-btn" data-function="ie">iₑ</button>
       <button class="btn financial-btn" data-function="k">k</button>
+      <button class="btn financial-btn" data-function="ik">iₖ</button>
       <button class="btn financial-btn empty-btn" disabled></button>
       <button class="btn financial-btn empty-btn" disabled></button>
     `;
@@ -1364,12 +1342,11 @@ class CalculadoraFinanceira {
 
     // Mantém os seletores de período sempre visíveis no modo capitalização
     if (this.modoAtual === 'capitalizacao') {
-      if (this.seletorIkPeriodo) {
-        this.seletorIkPeriodo.style.display = 'inline-block';
-      }
-      if (this.seletorIePeriodo) {
-        this.seletorIePeriodo.style.display = 'inline-block';
-      }
+      // Esconde o seletor ik pois a taxa nominal é representativa do valor k
+      if (this.seletorIkPeriodo) this.seletorIkPeriodo.style.display = 'none';
+    
+      // Mostra apenas o seletor da taxa efetiva
+      if (this.seletorIePeriodo) this.seletorIePeriodo.style.display = 'inline-block';
     }
   }
 
@@ -1398,13 +1375,9 @@ class CalculadoraFinanceira {
       this.calculosTaxasEquivalentes.definirVariavel(variavel, valor);
       
       // Também define os períodos atuais dos seletores
-      if (this.seletorI1Periodo) {
-        this.calculosTaxasEquivalentes.definirVariavel('periodoOriginal', this.seletorI1Periodo.value);
-      }
-      if (this.seletorI2Periodo) {
-        this.calculosTaxasEquivalentes.definirVariavel('periodoEquivalente', this.seletorI2Periodo.value);
-      }
-      
+      if (this.seletorI1Periodo) this.calculosTaxasEquivalentes.definirVariavel('periodoOriginal', this.seletorI1Periodo.value);
+      if (this.seletorI2Periodo) this.calculosTaxasEquivalentes.definirVariavel('periodoEquivalente', this.seletorI2Periodo.value);
+
       this.ultimaVariavel = variavel;
       this.atualizarDisplayStatusTaxasEquivalentes();
       
@@ -2313,27 +2286,11 @@ class CalculadoraFinanceira {
     this.atualizarDisplay();
   }
 
-  // Altera o período da taxa nominal (ik)
+  // Altera o período da taxa nominal (ik) - Função desabilitada
+  // A taxa nominal é representativa do valor k e não precisa de conversão de período
   alterarPeriodoIk() {
-    if (!this.seletorIkPeriodo) return;
-    
-    const novoPeriodo = this.seletorIkPeriodo.value;
-    if (!novoPeriodo) return;
-
-    const periodoAnterior = this.calculosCapitalizacao.obterPeriodo('ik');
-    
-    // Converte o valor atual da taxa nominal se existir
-    if (this.calculosCapitalizacao.valorDefinido('ik')) {
-      const valorAtualIk = this.calculosCapitalizacao.obterValores().ik;
-      const ikConvertida = this.calculosCapitalizacao.converterTaxaEntrePeriodos(valorAtualIk, periodoAnterior, novoPeriodo);
-      
-      this.calculosCapitalizacao.definirVariavel('ik', ikConvertida);
-      this.calculosCapitalizacao.definirPeriodo('ik', novoPeriodo);
-      this.atualizarDisplayStatusCapitalizacao();
-    } else {
-      // Apenas define o período se não há valor
-      this.calculosCapitalizacao.definirPeriodo('ik', novoPeriodo);
-    }
+    // Taxa nominal não precisa de conversão de período pois é representativa do valor k
+    return;
   }
 
   // Altera o período da taxa efetiva (ie)
@@ -2370,9 +2327,7 @@ class CalculadoraFinanceira {
       this.calculosTaxasEquivalentes.definirVariavel('periodoOriginal', novoPeriodo);
       
       // Se há valores definidos, recalcula automaticamente
-      if (this.calculosTaxasEquivalentes.contarVariaveisDefinidas() >= 2) {
-        this.calcularTaxasEquivalentesFaltante();
-      }
+      if (this.calculosTaxasEquivalentes.contarVariaveisDefinidas() >= 2) this.calcularTaxasEquivalentesFaltante();
     } catch (erro) {
       this.mostrarErro(erro.message);
     }

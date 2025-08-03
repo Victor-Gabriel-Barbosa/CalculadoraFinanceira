@@ -1,7 +1,17 @@
 /**
  * CÁLCULOS DE CAPITALIZAÇÃO
  * Sistema para cálculos de capitalização de juros 
- * Suporta conversão entre taxa nominal (ik), taxa efetiva (ie) e períodos de capitalização (k)
+ * Suporta conversão entre taxa nominal (ik), taxa efetiva por período (ie) e períodos de capitalização (k)
+ * 
+ * Conceitos:
+ * - Taxa nominal (ik): Taxa total dividida pelo número de períodos de capitalização
+ * - Taxa efetiva por período (ie): Taxa que efetivamente incide em cada período
+ * - Períodos de capitalização (k): Número de vezes que os juros são capitalizados
+ * 
+ * Fórmulas:
+ * - ik = ie × k (taxa nominal = taxa efetiva por período × períodos)
+ * - ie = ik / k (taxa efetiva por período = taxa nominal / períodos)
+ * - k = ik / ie (períodos = taxa nominal / taxa efetiva por período)
  */
 
 export class CalculosCapitalizacao {
@@ -133,43 +143,20 @@ export class CalculosCapitalizacao {
     let { ik, ie, k } = this.valoresCapitalizacao;
     let valorCalculado;
 
-    // Normaliza as taxas para o mesmo período antes do cálculo
-    if (ik !== null && ie !== null) {
-      const periodoIk = this.obterPeriodo('ik');
-      const periodoIe = this.obterPeriodo('ie');
-      
-      // Converte ambas as taxas para o período anual para uniformizar os cálculos
-      ik = this.converterTaxaEntrePeriodos(ik, periodoIk, 'year');
-      ie = this.converterTaxaEntrePeriodos(ie, periodoIe, 'year');
-    }
+    // Para capitalização simples: ik = ie × k, ie = ik / k, k = ik / ie
+    // Não precisa conversão de períodos para ik pois é sempre considerada em relação ao período base
 
     // Deduz automaticamente qual fórmula usar baseado na variável faltante
     if (variavelFaltante === 'ie' && ik !== null && k !== null) {
-      // Converte ik para o período anual se necessário
-      const periodoIk = this.obterPeriodo('ik');
-      const ikAnual = this.converterTaxaEntrePeriodos(ik, periodoIk, 'year');
-      
-      // Calcula taxa efetiva anual: ie = (1 + ik/k)^k - 1
-      const ieAnual = this.calcularTaxaEfetiva(ikAnual, k);
-      
-      // Converte a taxa efetiva para o período desejado
-      const periodoIe = this.obterPeriodo('ie');
-      valorCalculado = this.converterTaxaEntrePeriodos(ieAnual, 'year', periodoIe);
+      // Calcula taxa efetiva por período: ie = ik / k
+      valorCalculado = this.calcularTaxaEfetiva(ik, k);
       
     } else if (variavelFaltante === 'ik' && ie !== null && k !== null) {
-      // Converte ie para o período anual se necessário
-      const periodoIe = this.obterPeriodo('ie');
-      const ieAnual = this.converterTaxaEntrePeriodos(ie, periodoIe, 'year');
-      
-      // Calcula taxa nominal anual: ik = k * ((1 + ie)^(1/k) - 1)
-      const ikAnual = this.calcularTaxaNominal(ieAnual, k);
-      
-      // Converte a taxa nominal para o período desejado
-      const periodoIk = this.obterPeriodo('ik');
-      valorCalculado = this.converterTaxaEntrePeriodos(ikAnual, 'year', periodoIk);
+      // Calcula taxa nominal: ik = ie × k
+      valorCalculado = this.calcularTaxaNominal(ie, k);
       
     } else if (variavelFaltante === 'k' && ik !== null && ie !== null) {
-      // Calcula k iterativamente usando taxas anuais
+      // Calcula períodos de capitalização: k = ik / ie
       valorCalculado = this.calcularPeriodosCapitalizacao(ik, ie);
     } else throw new Error('Combinação de valores inválida para o cálculo');
 
@@ -187,60 +174,41 @@ export class CalculosCapitalizacao {
   }
 
   /**
-   * Calcula taxa efetiva a partir da nominal
+   * Calcula taxa efetiva por período a partir da nominal
    * @param {number} ik - Taxa nominal (%)
    * @param {number} k - Períodos de capitalização
-   * @returns {number} Taxa efetiva (%)
+   * @returns {number} Taxa efetiva por período (%)
    */
   calcularTaxaEfetiva(ik, k) {
-    const ikDecimal = ik / 100;
-    return (Math.pow(1 + ikDecimal / k, k) - 1) * 100;
+    // Para taxa efetiva por período: ie = ik / k
+    // Onde ik é a taxa nominal e k é o número de períodos
+    return ik / k;
   }
 
   /**
    * Calcula taxa nominal a partir da efetiva
-   * @param {number} ie - Taxa efetiva (%)
+   * @param {number} ie - Taxa efetiva por período (%)
    * @param {number} k - Períodos de capitalização
    * @returns {number} Taxa nominal (%)
    */
   calcularTaxaNominal(ie, k) {
-    const ieDecimal = ie / 100;
-    return k * (Math.pow(1 + ieDecimal, 1 / k) - 1) * 100;
+    // Para taxa nominal: ik = ie × k
+    // Onde ie é a taxa efetiva por período e k é o número de períodos
+    return ie * k;
   }
 
   /**
-   * Calcula períodos de capitalização usando método iterativo
+   * Calcula períodos de capitalização
    * @param {number} ik - Taxa nominal (%)
-   * @param {number} ie - Taxa efetiva (%)
+   * @param {number} ie - Taxa efetiva por período (%)
    * @returns {number} Períodos de capitalização
    */
   calcularPeriodosCapitalizacao(ik, ie) {
-    const ikDecimal = ik / 100;
-    const ieDecimal = ie / 100;
+    if (ie <= 0) throw new Error('Taxa efetiva deve ser positiva');
     
-    if (ieDecimal <= 0 || ikDecimal <= 0) throw new Error('Taxas devem ser positivas');
-    
-    // Método iterativo para encontrar k
-    let kTentativa = 1;
-    let erro = 1;
-    const maxIteracoes = 100;
-    let iteracao = 0;
-    
-    while (Math.abs(erro) > 0.0001 && iteracao < maxIteracoes) {
-      const ieCalculada = Math.pow(1 + ikDecimal / kTentativa, kTentativa) - 1;
-      erro = ieCalculada - ieDecimal;
-      
-      // Ajusta k baseado no erro
-      if (erro > 0) kTentativa += 0.1;
-      else kTentativa -= 0.1;
-      
-      if (kTentativa <= 0) kTentativa = 0.1;
-      iteracao++;
-    }
-    
-    if (iteracao >= maxIteracoes) throw new Error('Não foi possível convergir para um valor de k válido');
-    
-    return kTentativa;
+    // Para períodos de capitalização: k = ik / ie
+    // Onde ik é a taxa nominal e ie é a taxa efetiva por período
+    return ik / ie;
   }
 
   /**
