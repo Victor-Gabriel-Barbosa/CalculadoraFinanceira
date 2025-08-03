@@ -1597,7 +1597,7 @@ class CalculadoraFinanceira {
       const conversao = this.calculosFinanceiros.converterTaxaAutomatica(tipoConversao, taxaAtual);
       
       // Atualiza o display
-      this.entradaAtual = conversao.resultado.toFixed(6);
+      this.entradaAtual = conversao.resultado.toFixed(2);
       this.novaEntrada = true;
       this.atualizarDisplay();
       
@@ -1931,9 +1931,9 @@ class CalculadoraFinanceira {
     // Limita casas decimais para evitar números muito longos
     if (Math.abs(num) < 0.001 && num !== 0) return num.toExponential(2);
 
-    return parseFloat(num.toFixed(6)).toLocaleString('pt-BR', {
+    return parseFloat(num.toFixed(2)).toLocaleString('pt-BR', {
       minimumFractionDigits: 0,
-      maximumFractionDigits: 6
+      maximumFractionDigits: 2
     });
   }
 

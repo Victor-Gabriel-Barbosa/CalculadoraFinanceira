@@ -149,7 +149,7 @@ class CalculosTaxas {
   displayResults(result) {
     // Mostrar ic (em %)
     if (result.ic !== undefined) {
-      this.icResult.textContent = (result.ic * 100).toFixed(4) + '%';
+      this.icResult.textContent = (result.ic * 100).toFixed(2) + '%';
       this.icResult.classList.add('updated');
     }
 
@@ -162,7 +162,7 @@ class CalculosTaxas {
 
     // Mostrar i (em %)
     if (result.i !== undefined) {
-      this.iTaxaResult.textContent = (result.i * 100).toFixed(4) + '%';
+      this.iTaxaResult.textContent = (result.i * 100).toFixed(2) + '%';
       this.iTaxaResult.classList.add('updated');
     }
 
