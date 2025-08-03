@@ -8,20 +8,37 @@ export class CalculosTaxasEquivalentes {
     // Valores para conversão de taxas equivalentes
     this.valores = {
       taxaOriginal: null,    // Taxa efetiva no período original (%)
-      numeroPeríodos: null   // Número de períodos para conversão
+      numeroPeríodos: null,  // Número de períodos para conversão
+      periodoOriginal: 'month' // Período da taxa original
+    };
+
+    // Mapeamento de períodos para número de períodos por ano
+    this.periodos = {
+      'day': 365,
+      'month': 12,
+      'year': 1,
+      'semester': 2,
+      'quarter': 4
     };
   }
 
   /**
    * Define uma variável para conversão de taxas equivalentes
-   * @param {string} variavel - Variável a ser definida (taxaOriginal, numeroPeríodos)
-   * @param {number} valor - Valor a ser atribuído
+   * @param {string} variavel - Variável a ser definida (taxaOriginal, numeroPeríodos, periodoOriginal)
+   * @param {number|string} valor - Valor a ser atribuído
    */
   definirVariavel(variavel, valor) {
-    if (!['taxaOriginal', 'numeroPeríodos'].includes(variavel)) throw new Error(`Variável ${variavel} não é válida. Use: taxaOriginal ou numeroPeríodos`);
-    if (isNaN(valor)) throw new Error('Valor deve ser numérico');
-    if (variavel === 'taxaOriginal' && valor <= -100) throw new Error('Taxa original deve ser maior que -100%');
-    if (variavel === 'numeroPeríodos' && valor <= 0) throw new Error('Número de períodos deve ser maior que zero');
+    const variaveisValidas = ['taxaOriginal', 'numeroPeríodos', 'periodoOriginal'];
+    
+    if (!variaveisValidas.includes(variavel)) throw new Error(`Variável ${variavel} não é válida. Use: ${variaveisValidas.join(', ')}`);
+    
+    if (variavel === 'taxaOriginal' || variavel === 'numeroPeríodos') {
+      if (isNaN(valor)) throw new Error('Valor deve ser numérico');
+      if (variavel === 'taxaOriginal' && valor <= -100) throw new Error('Taxa original deve ser maior que -100%');
+      if (variavel === 'numeroPeríodos' && valor <= 0) throw new Error('Número de períodos deve ser maior que zero');
+    }
+    
+    if (variavel === 'periodoOriginal' && !this.periodos[valor]) throw new Error(`Período ${valor} não é válido. Use: ${Object.keys(this.periodos).join(', ')}`);
 
     this.valores[variavel] = valor;
   }
@@ -48,9 +65,9 @@ export class CalculosTaxasEquivalentes {
    * @returns {object} Objeto com a taxa equivalente calculada
    */
   calcularTaxaEquivalente() {
-    const { taxaOriginal, numeroPeríodos } = this.valores;
+    const { taxaOriginal, numeroPeríodos, periodoOriginal } = this.valores;
 
-    // Validar se ambos os valores estão definidos
+    // Validar se os valores essenciais estão definidos
     if (taxaOriginal === null || taxaOriginal === undefined) throw new Error('Taxa original deve ser definida');
     if (numeroPeríodos === null || numeroPeríodos === undefined) throw new Error('Número de períodos deve ser definido');
 
@@ -61,24 +78,30 @@ export class CalculosTaxasEquivalentes {
     if (taxaDecimal <= -1) throw new Error('Taxa original deve ser maior que -100%');
     if (numeroPeríodos <= 0) throw new Error('Número de períodos deve ser maior que zero');
 
-    let taxaEquivalente;
-    
-    // Se n = 1, a taxa equivalente é igual à original
-    if (numeroPeríodos === 1) taxaEquivalente = taxaOriginal;
-    else {
-      // Calcular taxa equivalente usando a fórmula de equivalência
-      const fatorConversao = Math.pow(1 + taxaDecimal, 1 / numeroPeríodos);
-      taxaEquivalente = (fatorConversao - 1) * 100;
-    }
+    // Calcular a taxa equivalente usando a fórmula: (1 + i)^n - 1
+    // onde n é o número de períodos da taxa original
+    const taxaEquivalente = (Math.pow(1 + taxaDecimal, numeroPeríodos) - 1) * 100;
 
     // Validar resultado
     if (isNaN(taxaEquivalente) || !isFinite(taxaEquivalente)) throw new Error('Resultado inválido - verifique os valores de entrada');
 
+    // Obter nome do período para descrição
+    const nomesPeriodos = {
+      'day': 'diária',
+      'month': 'mensal',
+      'year': 'anual',
+      'semester': 'semestral',
+      'quarter': 'trimestral'
+    };
+
+    const nomeOriginal = nomesPeriodos[periodoOriginal] || 'mensal';
+
     return {
       taxaOriginal: taxaOriginal,
       numeroPeríodos: numeroPeríodos,
+      periodoOriginal: nomeOriginal,
       taxaEquivalente: taxaEquivalente,
-      descrição: `ieq: ${taxaEquivalente.toFixed(2)}%`
+      descrição: `Ieq: ${taxaEquivalente.toFixed(6)}%`
     };
   }
 
@@ -88,7 +111,8 @@ export class CalculosTaxasEquivalentes {
   limparTodosValores() {
     this.valores = {
       taxaOriginal: null,
-      numeroPeríodos: null
+      numeroPeríodos: null,
+      periodoOriginal: 'month'
     };
   }
 
@@ -105,7 +129,9 @@ export class CalculosTaxasEquivalentes {
    * @returns {boolean} True se todas estão definidas
    */
   todasVariaveisDefinidas() {
-    return Object.values(this.valores).every(v => v !== null && v !== undefined);
+    return this.valores.taxaOriginal !== null && 
+           this.valores.numeroPeríodos !== null &&
+           this.valores.periodoOriginal !== null;
   }
 
   /**
@@ -113,7 +139,11 @@ export class CalculosTaxasEquivalentes {
    * @returns {number} Número de variáveis definidas
    */
   contarVariaveisDefinidas() {
-    return Object.values(this.valores).filter(v => v !== null && v !== undefined).length;
+    let count = 0;
+    if (this.valores.taxaOriginal !== null) count++;
+    if (this.valores.numeroPeríodos !== null) count++;
+    // Períodos sempre têm valores padrão, então não contamos
+    return count;
   }
 
   /**
@@ -133,43 +163,6 @@ export class CalculosTaxasEquivalentes {
     return {
       valida: true,
       mensagem: 'Configuração válida para cálculo'
-    };
-  }
-
-  /**
-   * Método auxiliar para conversões comuns
-   * @param {number} taxaOriginal - Taxa original em %
-   * @param {string} periodoOriginal - Período original (anual, mensal, diário)
-   * @param {string} periodoDesejado - Período desejado (anual, mensal, diário)
-   * @returns {object} Resultado do cálculo com descrição
-   */
-  converterTaxa(taxaOriginal, periodoOriginal, periodoDesejado) {
-    // Mapeamento de períodos para número de conversões
-    const periodos = {
-      'anual': 1,
-      'mensal': 12,
-      'diário': 365,
-      'semestral': 2,
-      'trimestral': 4,
-      'quinzenal': 24,
-      'semanal': 52
-    };
-
-    if (!periodos[periodoOriginal] || !periodos[periodoDesejado]) throw new Error('Período não suportado. Use: anual, mensal, diário, semestral, trimestral, quinzenal, semanal');
-
-    // Calcular o fator de conversão
-    const fatorrConversao = periodos[periodoDesejado] / periodos[periodoOriginal];
-    
-    this.definirVariavel('taxaOriginal', taxaOriginal);
-    this.definirVariavel('numeroPeríodos', fatorrConversao);
-    
-    const resultado = this.calcularTaxaEquivalente();
-    
-    return {
-      ...resultado,
-      periodoOriginal,
-      periodoDesejado,
-      descrição: `Taxa ${periodoOriginal} de ${taxaOriginal.toFixed(2)}% equivale a ${resultado.taxaEquivalente.toFixed(2)}% ${periodoDesejado}`
     };
   }
 }

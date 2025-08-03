@@ -57,7 +57,6 @@ class CalculadoraFinanceira {
     this.seletorD = document.getElementById('dSelector');
     this.seletorPeriodo = document.getElementById('periodSelector');
     this.seletorI1Periodo = document.getElementById('i1PeriodSelector');
-    this.seletorI2Periodo = document.getElementById('i2PeriodSelector');
     this.seletorIkPeriodo = document.getElementById('ikPeriodSelector');
     this.seletorIePeriodo = document.getElementById('iePeriodSelector');
     
@@ -195,6 +194,11 @@ class CalculadoraFinanceira {
     }
     if (this.seletorIePeriodo) {
       this.seletorIePeriodo.addEventListener('change', () => this.alterarPeriodoIe());
+    }
+    
+    // Seletores de período para taxas equivalentes
+    if (this.seletorI1Periodo) {
+      this.seletorI1Periodo.addEventListener('change', () => this.alterarPeriodoI1());
     }
     
     // Seletor de modo
@@ -473,6 +477,19 @@ class CalculadoraFinanceira {
         this.seletorIePeriodo.style.display = 'none';
       }
     }
+
+    // Gerencia seletores de taxas equivalentes
+    if (modo === 'taxas-equivalentes') {
+      // Mostra o seletor no modo taxas equivalentes
+      if (this.seletorI1Periodo) {
+        this.seletorI1Periodo.style.display = 'inline-block';
+      }
+    } else {
+      // Esconde o seletor em outros modos
+      if (this.seletorI1Periodo) {
+        this.seletorI1Periodo.style.display = 'none';
+      }
+    }
   }
 
   /**
@@ -643,6 +660,15 @@ class CalculadoraFinanceira {
       <button class="btn operation-btn" data-function="sinal">+/-</button>
       <button class="btn operation-btn" data-function="porcento">%</button>
     `;
+
+    // Inicializa o período baseado no seletor atual
+    if (this.seletorI1Periodo) {
+      try {
+        this.calculosTaxasEquivalentes.definirVariavel('periodoOriginal', this.seletorI1Periodo.value);
+      } catch (erro) {
+        console.warn('Erro ao inicializar período:', erro.message);
+      }
+    }
 
     // Atualiza event listeners para os novos botões
     this.atualizarEventListenersTaxasEquivalentes();
@@ -1360,6 +1386,12 @@ class CalculadoraFinanceira {
 
     try {
       this.calculosTaxasEquivalentes.definirVariavel(variavel, valor);
+      
+      // Também define o período atual do seletor original
+      if (this.seletorI1Periodo) {
+        this.calculosTaxasEquivalentes.definirVariavel('periodoOriginal', this.seletorI1Periodo.value);
+      }
+      
       this.ultimaVariavel = variavel;
       this.atualizarDisplayStatusTaxasEquivalentes();
       
@@ -2294,6 +2326,23 @@ class CalculadoraFinanceira {
     } else {
       // Apenas define o período se não há valor
       this.calculosCapitalizacao.definirPeriodo('ie', novoPeriodo);
+    }
+  }
+
+  // Altera o período da taxa original (i1) no modo taxas equivalentes
+  alterarPeriodoI1() {
+    if (!this.seletorI1Periodo) return;
+    
+    const novoPeriodo = this.seletorI1Periodo.value;
+    if (!novoPeriodo) return;
+
+    try {
+      this.calculosTaxasEquivalentes.definirVariavel('periodoOriginal', novoPeriodo);
+      
+      // Se há valores definidos, recalcula automaticamente
+      if (this.calculosTaxasEquivalentes.contarVariaveisDefinidas() >= 2) this.calcularTaxasEquivalentesFaltante();
+    } catch (erro) {
+      this.mostrarErro(erro.message);
     }
   }
 }

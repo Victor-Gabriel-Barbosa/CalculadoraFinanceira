@@ -356,6 +356,14 @@ body {
   line-height: 1.2;
 }
 
+/* Seletor de período visível apenas no primeiro campo (taxa original) */
+.status-display.modo-taxas-equivalentes .status-item.equivalentes-field:first-of-type .rate-selector {
+  display: inline-block !important;
+  margin-left: 5px;
+  font-size: 11px;
+  padding: 2px 4px;
+}
+
 /* Esconde o último campo não utilizado */
 .status-display.modo-taxas-equivalentes .status-item.equivalentes-field:nth-last-child(1) {
   display: none;
