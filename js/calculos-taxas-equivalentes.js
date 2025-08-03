@@ -78,7 +78,7 @@ export class CalculosTaxasEquivalentes {
       taxaOriginal: taxaOriginal,
       numeroPeríodos: numeroPeríodos,
       taxaEquivalente: taxaEquivalente,
-      descrição: `ieq: ${taxaEquivalente.toFixed(6)}%`
+      descrição: `ieq: ${taxaEquivalente.toFixed(2)}%`
     };
   }
 
@@ -169,7 +169,7 @@ export class CalculosTaxasEquivalentes {
       ...resultado,
       periodoOriginal,
       periodoDesejado,
-      descrição: `Taxa ${periodoOriginal} de ${taxaOriginal.toFixed(4)}% equivale a ${resultado.taxaEquivalente.toFixed(6)}% ${periodoDesejado}`
+      descrição: `Taxa ${periodoOriginal} de ${taxaOriginal.toFixed(2)}% equivale a ${resultado.taxaEquivalente.toFixed(2)}% ${periodoDesejado}`
     };
   }
 }
