@@ -159,3 +159,61 @@
     padding: 4px 8px;
   }
 }
+
+.additional-tools-footer {
+  margin-bottom: 15px;
+}
+
+.tools-label {
+  display: block;
+  font-size: 14px;
+  color: #bdc3c7;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.tools-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tool-footer-link {
+  color: #27ae60;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  background: rgba(39, 174, 96, 0.1);
+  border: 1px solid rgba(39, 174, 96, 0.3);
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.tool-footer-link:hover {
+  color: #2ecc71;
+  background: rgba(46, 204, 113, 0.2);
+  border-color: rgba(46, 204, 113, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+.tool-footer-link:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(39, 174, 96, 0.2);
+}
+
+/* Responsivo para ferramentas no footer */
+@media (max-width: 480px) {
+  .tools-label {
+    font-size: 12px;
+  }
+  
+  .tool-footer-link {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+}

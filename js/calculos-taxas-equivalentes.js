@@ -132,9 +132,7 @@ export class CalculosTaxasEquivalentes {
     };
   }
 
-  /**
-   * Limpa todos os valores
-   */
+  // Limpa todos os valores
   limparTodosValores() {
     this.valores = {
       taxaOriginal: null,

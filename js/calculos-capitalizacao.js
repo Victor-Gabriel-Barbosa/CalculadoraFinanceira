@@ -13,7 +13,6 @@
  * - ie = ik / k (taxa efetiva por período = taxa nominal / períodos)
  * - k = ik / ie (períodos = taxa nominal / taxa efetiva por período)
  */
-
 export class CalculosCapitalizacao {
   constructor() {
     // Valores para capitalização
@@ -51,9 +50,7 @@ export class CalculosCapitalizacao {
    * @param {string} periodo - Período (day, month, year)
    */
   definirPeriodo(taxa, periodo) {
-    if (!this.periodosCapitalizacao) {
-      this.periodosCapitalizacao = { ik: 'month', ie: 'month' };
-    }
+    if (!this.periodosCapitalizacao) this.periodosCapitalizacao = { ik: 'month', ie: 'month' };
     this.periodosCapitalizacao[taxa] = periodo;
   }
 
@@ -63,9 +60,7 @@ export class CalculosCapitalizacao {
    * @returns {string} Período (day, month, year)
    */
   obterPeriodo(taxa) {
-    if (!this.periodosCapitalizacao) {
-      this.periodosCapitalizacao = { ik: 'month', ie: 'month' };
-    }
+    if (!this.periodosCapitalizacao) this.periodosCapitalizacao = { ik: 'month', ie: 'month' };
     return this.periodosCapitalizacao[taxa] || 'month';
   }
 
@@ -150,11 +145,9 @@ export class CalculosCapitalizacao {
     if (variavelFaltante === 'ie' && ik !== null && k !== null) {
       // Calcula taxa efetiva por período: ie = ik / k
       valorCalculado = this.calcularTaxaEfetiva(ik, k);
-      
     } else if (variavelFaltante === 'ik' && ie !== null && k !== null) {
       // Calcula taxa nominal: ik = ie × k
       valorCalculado = this.calcularTaxaNominal(ie, k);
-      
     } else if (variavelFaltante === 'k' && ik !== null && ie !== null) {
       // Calcula períodos de capitalização: k = ik / ie
       valorCalculado = this.calcularPeriodosCapitalizacao(ik, ie);
@@ -233,9 +226,7 @@ export class CalculosCapitalizacao {
       k: null
     };
     // Mantém os períodos definidos
-    if (!this.periodosCapitalizacao) {
-      this.periodosCapitalizacao = { ik: 'month', ie: 'month' };
-    }
+    if (!this.periodosCapitalizacao) this.periodosCapitalizacao = { ik: 'month', ie: 'month' };
   }
 
   /**
@@ -251,9 +242,7 @@ export class CalculosCapitalizacao {
    * @returns {Object} Objeto com todos os períodos
    */
   obterPeriodos() {
-    if (!this.periodosCapitalizacao) {
-      this.periodosCapitalizacao = { ik: 'month', ie: 'month' };
-    }
+    if (!this.periodosCapitalizacao) this.periodosCapitalizacao = { ik: 'month', ie: 'month' };
     return { ...this.periodosCapitalizacao };
   }
 

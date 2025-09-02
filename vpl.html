@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="images/favicon/favicon.ico">
+  <link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/png" href="images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="images/favicon/favicon.svg">
+  <link rel="apple-touch-icon" href="images/favicon/apple-touch-icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de VPL - Valor Presente Líquido</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/vpl.css">
+</head>
+
+<body>
+  <div class="vpl-container">
+    <!-- Header -->
+    <div class="calc-header">
+      <h1>Calculadora de VPL</h1>
+      <p>Valor Presente Líquido - Análise de Viabilidade de Investimentos</p>
+    </div>
+
+    <!-- Seção de Entrada de Dados -->
+    <div class="input-section">
+      <h2>Dados do Investimento</h2>
+
+      <div class="input-grid">
+        <div class="input-group">
+          <label for="investimento">Investimento Inicial (R$)</label>
+          <input type="number" id="investimento" step="0.01" placeholder="Ex: 100000.00">
+        </div>
+
+        <div class="input-group">
+          <label for="taxa">Taxa de Desconto (% ao período)</label>
+          <input type="number" id="taxa" step="0.01" placeholder="Ex: 10.5">
+        </div>
+
+        <div class="input-group">
+          <label for="valorResidual">Valor Residual (R$)</label>
+          <input type="number" id="valorResidual" step="0.01" placeholder="Ex: 20000.00" value="0">
+        </div>
+
+        <div class="input-group">
+          <label for="periodoResidual">Período do Valor Residual</label>
+          <input type="number" id="periodoResidual" min="0" placeholder="Ex: 5" value="0">
+        </div>
+      </div>
+
+      <!-- Seção de Fluxos de Caixa -->
+      <div class="cash-flows-section">
+        <div class="cash-flows-header">
+          <h3>Fluxos de Caixa por Período</h3>
+          <button type="button" class="add-period-btn" onclick="adicionarPeriodo()">+ Adicionar Período</button>
+        </div>
+
+        <div id="cashFlowsContainer">
+          <!-- Períodos serão adicionados dinamicamente -->
+        </div>
+      </div>
+
+      <button type="button" class="calculate-btn" onclick="calcularVPL()">Calcular VPL</button>
+    </div>
+
+    <!-- Seção de Resultados -->
+    <div class="result-section" id="resultSection" style="display: none;">
+      <h2>Resultado</h2>
+
+      <div id="vplResult" class="vpl-result">
+        R$ 0,00
+      </div>
+
+      <div id="resultInterpretation" class="result-interpretation">
+        <!-- Interpretação será inserida aqui -->
+      </div>
+
+      <div class="calculation-details" id="calculationDetails">
+        <h3>Detalhamento do Cálculo</h3>
+        <div id="calculationSteps">
+          <!-- Passos do cálculo serão inseridos aqui -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Links de Navegação -->
+    <div class="navigation-links">
+      <a href="index.html" class="nav-link">Calculadora Principal</a>
+      <a href="amortizacao.html" class="nav-link">Amortização</a>
+    </div>
+  </div>
+
+  <script src="js/calculos-vpl.js"></script>
+</body>
+
+</html>

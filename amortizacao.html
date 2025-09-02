@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="images/favicon/favicon.ico">
+  <link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/png" href="images/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="images/favicon/favicon.svg">
+  <link rel="apple-touch-icon" href="images/favicon/apple-touch-icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Amortização - SAC</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/amortizacao.css">
+</head>
+
+<body>
+  <div class="amortization-container">
+    <div class="calc-header">
+      <h1>Calculadora de Amortização</h1>
+      <p>Sistema de Amortização Constante (SAC)</p>
+    </div>
+
+    <button class="btn-back" onclick="window.location.href='index.html'">
+      ← Voltar
+    </button>
+
+    <div class="input-section">
+      <h2>Dados do Financiamento</h2>
+      <form id="amortizationForm">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="valorFinanciamento">Valor do Financiamento (VP)</label>
+            <input type="number" id="valorFinanciamento" step="0.01" min="0" required placeholder="200000.00">
+          </div>
+
+          <div class="input-group">
+            <label for="taxaJuros">Taxa de Juros (% ao mês)</label>
+            <input type="number" id="taxaJuros" step="0.001" min="0" required placeholder="1.5">
+          </div>
+
+          <div class="input-group">
+            <label for="numeroMeses">Número de Parcelas (n)</label>
+            <input type="number" id="numeroMeses" min="1" required placeholder="360">
+          </div>
+
+          <div class="input-group">
+            <label for="tipoCalculo">Tipo de Cálculo</label>
+            <select id="tipoCalculo" required>
+              <option value="tabela">Gerar Tabela Completa</option>
+              <option value="parcela">Calcular Parcela Específica</option>
+            </select>
+          </div>
+
+          <div class="input-group" id="parcelaEspecificaGroup" style="display: none;">
+            <label for="parcelaEspecifica">Número da Parcela</label>
+            <input type="number" id="parcelaEspecifica" min="1" placeholder="12">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-calculate">
+          Calcular Amortização
+        </button>
+
+        <div class="error-message" id="errorMessage"></div>
+      </form>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+      <h2>Resultados</h2>
+
+      <div class="summary-cards" id="summaryCards">
+        <!-- Cards de resumo serão inseridos aqui -->
+      </div>
+
+      <div class="table-container" id="tableContainer">
+        <!-- Tabela será inserida aqui -->
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/calculos-amortização.js"></script>
+</body>
+
+</html>
