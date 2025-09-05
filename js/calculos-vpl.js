@@ -10,13 +10,13 @@ function adicionarPeriodo() {
   periodoDiv.id = `periodo-${proximoPeriodo}`;
 
   periodoDiv.innerHTML = `
-      <label>Período ${proximoPeriodo}:</label>
-      <input type="number" 
-        id="fluxo-${proximoPeriodo}" 
-        step="0.01" 
-        placeholder="Valor do fluxo de caixa">
-      <button type="button" class="remove-btn" onclick="removerPeriodo(${proximoPeriodo})">Remover</button>
-    `;
+    <label>Período ${proximoPeriodo}:</label>
+    <input type="number" 
+      id="fluxo-${proximoPeriodo}" 
+      step="0.01" 
+      placeholder="Valor do fluxo de caixa">
+    <button type="button" class="remove-btn" onclick="removerPeriodo(${proximoPeriodo})">Remover</button>
+  `;
 
   container.appendChild(periodoDiv);
   proximoPeriodo++;
@@ -141,7 +141,6 @@ function exibirResultado(resultado) {
   const resultSection = document.getElementById('resultSection');
   const vplResultDiv = document.getElementById('vplResult');
   const interpretationDiv = document.getElementById('resultInterpretation');
-  const calculationStepsDiv = document.getElementById('calculationSteps');
 
   // Formatar e exibir o VPL
   const vplFormatado = formatarMoeda(resultado.vpl);
@@ -165,74 +164,11 @@ function exibirResultado(resultado) {
     interpretationDiv.textContent = '⚖️ Projeto NEUTRO - O VPL é zero, indicando que o projeto não gera nem destrói valor.';
   }
 
-  // Gerar detalhamento do cálculo
-  gerarDetalhamentoCalculo(resultado, calculationStepsDiv);
-
   // Exibir seção de resultado
   resultSection.style.display = 'block';
 
   // Scroll suave para o resultado
   resultSection.scrollIntoView({ behavior: 'smooth' });
-}
-
-// Gera o detalhamento passo a passo do cálculo
-function gerarDetalhamentoCalculo(resultado, container) {
-  container.innerHTML = '';
-
-  // Fórmula do VPL
-  const formulaDiv = document.createElement('div');
-  formulaDiv.className = 'calculation-step';
-  formulaDiv.innerHTML = `
-    <strong>Fórmula do VPL:</strong><br>
-    VPL = -I₀ + Σ(FCt / (1 + r)^t) + VR / (1 + r)^n<br>
-    Onde: I₀ = Investimento inicial, FCt = Fluxo de caixa no período t, r = Taxa de desconto, VR = Valor residual
-  `;
-  container.appendChild(formulaDiv);
-
-  // Dados utilizados
-  const dadosDiv = document.createElement('div');
-  dadosDiv.className = 'calculation-step';
-  dadosDiv.innerHTML = `
-    <strong>Dados utilizados:</strong><br>
-    • Investimento inicial: ${formatarMoeda(resultado.investimento)}<br>
-    • Taxa de desconto: ${resultado.taxa}% ao período<br>
-    ${resultado.valorResidual > 0 ? `• Valor residual: ${formatarMoeda(resultado.valorResidual)} no período ${resultado.periodoResidual}` : ''}
-  `;
-  container.appendChild(dadosDiv);
-
-  // Cálculo passo a passo
-  resultado.passos.forEach((passo, index) => {
-    const passoDiv = document.createElement('div');
-    passoDiv.className = 'calculation-step';
-
-    if (passo.periodo === 0) {
-      passoDiv.innerHTML = `
-        <strong>Passo ${index + 1}:</strong> ${passo.descricao}<br>
-        Valor: ${formatarMoeda(passo.valorPresente)}
-      `;
-    } else {
-      passoDiv.innerHTML = `
-        <strong>Passo ${index + 1}:</strong> ${passo.descricao}<br>
-        Cálculo: ${formatarMoeda(passo.fluxo)} ÷ (1 + ${resultado.taxa / 100})^${passo.periodo}<br>
-        Fator de desconto: ${passo.fatorDesconto.toFixed(6)}<br>
-        Valor presente: ${formatarMoeda(passo.valorPresente)}
-      `;
-    }
-
-    container.appendChild(passoDiv);
-  });
-
-  // Resultado final
-  const finalDiv = document.createElement('div');
-  finalDiv.className = 'calculation-step';
-  finalDiv.style.backgroundColor = '#e3f2fd';
-  finalDiv.style.borderLeftColor = '#2196f3';
-  finalDiv.innerHTML = `
-    <strong>Resultado Final:</strong><br>
-    VPL = ${resultado.passos.map(p => formatarMoeda(p.valorPresente)).join(' + ')}<br>
-    VPL = ${formatarMoeda(resultado.vpl)}
-  `;
-  container.appendChild(finalDiv);
 }
 
 // Formata um valor como moeda brasileira
@@ -280,7 +216,6 @@ function exportarResultados() {
 
   const vplValue = document.getElementById('vplResult').textContent;
   const interpretation = document.getElementById('resultInterpretation').textContent;
-  const calculationSteps = document.getElementById('calculationSteps').innerText;
 
   const exportText = `
     RESULTADO DO CÁLCULO DE VPL
@@ -288,9 +223,6 @@ function exportarResultados() {
 
     VPL Calculado: ${vplValue}
     Interpretação: ${interpretation}
-
-    DETALHAMENTO DO CÁLCULO:
-    ${calculationSteps}
 
     Gerado em: ${new Date().toLocaleString('pt-BR')}
   `;
