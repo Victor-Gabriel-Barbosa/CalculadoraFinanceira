@@ -37,8 +37,19 @@
           </div>
 
           <div class="input-group">
-            <label for="taxaJuros">Taxa de Juros (% ao mês)</label>
+            <label for="taxaJuros">Taxa de Juros (%)</label>
             <input type="number" id="taxaJuros" step="0.001" min="0" required placeholder="1.5">
+          </div>
+
+          <div class="input-group">
+            <label for="periodoTaxa">Período da Taxa</label>
+            <select id="periodoTaxa" required>
+              <option value="mensal">ao mês</option>
+              <option value="anual">ao ano</option>
+              <option value="trimestral">ao trimestre</option>
+              <option value="semestral">ao semestre</option>
+              <option value="diario">ao dia</option>
+            </select>
           </div>
 
           <div class="input-group">
@@ -120,7 +131,7 @@
     </div>
   </footer>
 
-  <script type="module" src="js/calculos-amortização.js"></script>
+  <script type="module" src="js/calculos-amortizacao.js"></script>
 </body>
 
 </html>

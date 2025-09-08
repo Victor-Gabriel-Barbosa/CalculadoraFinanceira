@@ -12,6 +12,8 @@ class CalculadoraAmortizacao {
   constructor() {
     this.valorFinanciamento = 0;
     this.taxaJuros = 0;
+    this.taxaOriginal = 0;
+    this.periodoTaxa = 'mensal';
     this.numeroMeses = 0;
     this.amortizacaoConstante = 0;
     this.tabelaAmortizacao = [];
@@ -44,6 +46,43 @@ class CalculadoraAmortizacao {
     document.getElementById('valorFinanciamento').addEventListener('input', (e) => {
       this.formatarMoeda(e.target);
     });
+  }
+
+  // Converte taxa de juros para taxa mensal equivalente
+  converterTaxaParaMensal(taxaOriginal, periodoTaxa) {
+    // Taxa já em decimal (por exemplo, 1.5% = 0.015)
+    const taxa = taxaOriginal;
+    
+    switch (periodoTaxa) {
+      // Já está em taxa mensal
+      case 'mensal': return taxa; 
+
+      // Converte taxa anual para mensal: (1 + i_anual)^(1/12) - 1
+      case 'anual': return Math.pow(1 + taxa, 1/12) - 1;
+        
+      // Converte taxa trimestral para mensal: (1 + i_trimestral)^(1/3) - 1
+      case 'trimestral': return Math.pow(1 + taxa, 1/3) - 1;
+        
+      // Converte taxa semestral para mensal: (1 + i_semestral)^(1/6) - 1
+      case 'semestral': return Math.pow(1 + taxa, 1/6) - 1;
+        
+      // Converte taxa diária para mensal: (1 + i_diaria)^30 - 1
+      case 'diario': return Math.pow(1 + taxa, 30) - 1;
+        
+      default: return taxa;
+    }
+  }
+
+  // Traduz período da taxa para português
+  traduzirPeriodoTaxa(periodo) {
+    const traducoes = {
+      'mensal': 'ao mês',
+      'anual': 'ao ano',
+      'trimestral': 'ao trimestre',
+      'semestral': 'ao semestre',
+      'diario': 'ao dia'
+    };
+    return traducoes[periodo] || periodo;
   }
 
   // Formata campo monetário
@@ -102,10 +141,14 @@ class CalculadoraAmortizacao {
 
     // Captura os valores do formulário
     this.valorFinanciamento = parseFloat(document.getElementById('valorFinanciamento').value);
-    this.taxaJuros = parseFloat(document.getElementById('taxaJuros').value) / 100; // Converte % para decimal
+    this.taxaOriginal = parseFloat(document.getElementById('taxaJuros').value) / 100; // Converte % para decimal
+    this.periodoTaxa = document.getElementById('periodoTaxa').value;
     this.numeroMeses = parseInt(document.getElementById('numeroMeses').value);
     const tipoCalculo = document.getElementById('tipoCalculo').value;
     const parcelaEspecifica = parseInt(document.getElementById('parcelaEspecifica').value) || 0;
+
+    // Converte a taxa para taxa mensal equivalente
+    this.taxaJuros = this.converterTaxaParaMensal(this.taxaOriginal, this.periodoTaxa);
 
     // Calcula a amortização constante (VP / n)
     this.amortizacaoConstante = this.valorFinanciamento / this.numeroMeses;
@@ -339,7 +382,11 @@ class CalculadoraAmortizacao {
           <td>${this.formatarValor(parcela.saldoAnterior)}</td>
         </tr>
         <tr>
-          <td><strong>Taxa de Juros</strong></td>
+          <td><strong>Taxa Original</strong></td>
+          <td>${(this.taxaOriginal * 100).toFixed(3)}% ${this.traduzirPeriodoTaxa(this.periodoTaxa)}</td>
+        </tr>
+        <tr>
+          <td><strong>Taxa Mensal Equivalente</strong></td>
           <td>${(this.taxaJuros * 100).toFixed(3)}% ao mês</td>
         </tr>
         <tr>
