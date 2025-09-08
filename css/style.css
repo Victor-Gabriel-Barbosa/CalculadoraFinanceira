@@ -17,6 +17,22 @@ body {
   gap: 20px;
 }
 
+.btn-back {
+  background: linear-gradient(145deg, #434343, #2a2a2a, #1a1a1a);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.btn-back:hover {
+  background: linear-gradient(145deg, #5a6268, #434343, #2a2a2a);
+}
+
 /* Container da calculadora */
 .calculator-container {
   perspective: 1000px;

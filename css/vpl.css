@@ -23,17 +23,24 @@
   margin: 0;
 }
 
+input {
+  color: white;
+  background: #000;
+}
+
 .input-section {
-  background: white;
-  border-radius: 8px;
+  background: linear-gradient(145deg, #434343, #2a2a2a, #1a1a1a);
+  border-radius: 20px;
   padding: 2rem;
   margin-bottom: 2rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e9ecef;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.3);
 }
 
 .input-section h2 {
-  color: #2c3e50;
+  color: white;
   margin: 0 0 1.5rem 0;
   font-size: 1.5rem;
   font-weight: 400;
@@ -54,19 +61,20 @@
 
 .input-group label {
   font-weight: 500;
-  color: #495057;
+  color: white;
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
 }
 
 .input-group input,
 .input-group select {
+  color: white;
   padding: 0.75rem;
   border: 1px solid #ced4da;
   border-radius: 4px;
   font-size: 1rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  background: white;
+  background: #000;
 }
 
 .input-group input:focus,
@@ -88,7 +96,7 @@
 }
 
 .cash-flows-header h3 {
-  color: #2c3e50;
+  color: white;
   margin: 0;
   font-size: 1.2rem;
   font-weight: 500;
@@ -110,19 +118,20 @@
 }
 
 .cash-flow-item {
+  color: white;
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 1rem;
   align-items: center;
   padding: 0.75rem;
-  background: #f8f9fa;
+  background: #000;
   border-radius: 4px;
   margin-bottom: 0.5rem;
 }
 
 .cash-flow-item label {
   font-weight: 500;
-  color: #495057;
+  color: white;
   min-width: 80px;
 }
 
@@ -166,16 +175,18 @@
 }
 
 .result-section {
-  background: white;
-  border-radius: 8px;
+  background: linear-gradient(145deg, #434343, #2a2a2a, #1a1a1a);
+  border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e9ecef;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.3);
   text-align: center;
 }
 
 .result-section h2 {
-  color: #2c3e50;
+  color: white;
   margin: 0 0 1rem 0;
   font-size: 1.5rem;
   font-weight: 400;
@@ -217,19 +228,19 @@
 
 .interpretation-positive {
   background: rgba(40, 167, 69, 0.1);
-  color: #155724;
+  color: green;
   border: 1px solid rgba(40, 167, 69, 0.3);
 }
 
 .interpretation-negative {
   background: rgba(220, 53, 69, 0.1);
-  color: #721c24;
+  color: red;
   border: 1px solid rgba(220, 53, 69, 0.3);
 }
 
 .interpretation-zero {
   background: rgba(108, 117, 125, 0.1);
-  color: #383d41;
+  color: #9eabb6;
   border: 1px solid rgba(108, 117, 125, 0.3);
 }
 
@@ -239,7 +250,7 @@
 }
 
 .calculation-details h3 {
-  color: #2c3e50;
+  color: white;
   margin-bottom: 1rem;
   font-size: 1.2rem;
 }

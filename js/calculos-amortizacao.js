@@ -347,7 +347,7 @@ class CalculadoraAmortizacao {
     // Linha de totais
     const totais = this.calcularTotais();
     const totalRow = document.createElement('tr');
-    totalRow.style.backgroundColor = '#f0f0f0';
+    totalRow.style.backgroundColor = 'gray';
     totalRow.style.fontWeight = 'bold';
     totalRow.innerHTML = `
       <td>TOTAL</td>
@@ -397,7 +397,7 @@ class CalculadoraAmortizacao {
           <td><strong>Amortização</strong></td>
           <td>${this.formatarValor(parcela.amortizacao)}</td>
         </tr>
-        <tr style="background-color: #f0f0f0;">
+        <tr style="background-color: gray;">
           <td><strong>Prestação</strong></td>
           <td><strong>${this.formatarValor(parcela.prestacao)}</strong></td>
         </tr>

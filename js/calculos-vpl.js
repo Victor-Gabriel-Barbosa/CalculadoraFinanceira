@@ -10,7 +10,7 @@ function adicionarPeriodo() {
   periodoDiv.id = `periodo-${proximoPeriodo}`;
 
   periodoDiv.innerHTML = `
-    <label>Período ${proximoPeriodo}:</label>
+    <label for="fluxo-${proximoPeriodo}">Período ${proximoPeriodo}:</label>
     <input type="number" 
       id="fluxo-${proximoPeriodo}" 
       step="0.01" 
