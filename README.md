@@ -1,25 +1,31 @@
-# 🧮 Calculadora Financeira
+# 🧮 Calculadora Financeira - Suite Completa
 
-Uma calculadora financeira completa e profissional no estilo de calculadoras HP tradicionais, desenvolvida com HTML, CSS e JavaScript puro. Suporta múltiplos modos de cálculo financeiro incluindo juros simples, compostos e descontos.
+Uma suíte financeira completa e profissional no estilo de calculadoras HP tradicionais, desenvolvida com HTML, CSS e JavaScript puro. Oferece múltiplas ferramentas especializadas para análise financeira, incluindo calculadora principal, amortização SAC e análise de VPL.
 
 ## 🌐 Demo Online
 
 **[🔗 Acesse a Calculadora](https://victor-gabriel-barbosa.github.io/CalculadoraFinanceira/)**
 
-Experimente a calculadora diretamente no seu navegador através do GitHub Pages.
+Experimente toda a suíte de ferramentas financeiras diretamente no seu navegador através do GitHub Pages.
 
 ## ⭐ Características Principais
 
 - 🧮 **Interface Profissional**: Design inspirado nas famosas calculadoras HP financeiras
-- 📊 **4 Modos de Cálculo**: Juros Simples, Compostos, Desconto Racional e Comercial  
+- 📊 **7 Modos de Cálculo**: Juros Simples, Compostos, Descontos, Capitalização e Taxas Equivalentes
+- 🏠 **Calculadora de Amortização SAC**: Tabela completa do Sistema de Amortização Constante
+- 📈 **Análise de VPL**: Calculadora de Valor Presente Líquido para análise de investimentos
 - 💱 **Múltiplas Moedas**: Suporte a Real (R$), Dólar (US$) e Euro (€)
 - ⏱️ **Períodos Flexíveis**: Cálculos por dia, mês ou ano com conversão automática
 - ⌨️ **Entrada Completa**: Teclado físico, clique e função colar (Ctrl+V)
 - 📱 **Totalmente Responsivo**: Funciona perfeitamente em desktop, tablet e mobile
 
-## 📋 Funcionalidades Detalhadas
+## 📋 Ferramentas da Suíte Financeira
 
-### 🔢 Variáveis Financeiras
+### 🧮 Calculadora Financeira Principal
+
+Calculadora multimodo com interface HP-style para cálculos financeiros essenciais.
+
+#### 🔢 Variáveis Financeiras
 
 - **PV** (Present Value) - Valor Presente/Atual
 - **FV** (Future Value) - Valor Futuro/Montante
@@ -27,31 +33,37 @@ Experimente a calculadora diretamente no seu navegador através do GitHub Pages.
 - **i** (Interest Rate) - Taxa de Juros por período
 - **n** (Number of Periods) - Número de períodos
 
-### 📊 Modos de Cálculo Disponíveis
+#### 📊 Modos de Cálculo Disponíveis
 
-#### 1. **Juros Compostos** (Padrão)
+1. **Juros Simples** - Capitalização linear para operações de curto prazo
+2. **Juros Compostos** - Capitalização composta para investimentos de longo prazo
+3. **Desconto Racional** - Desconto calculado sobre o valor atual (por dentro)
+4. **Desconto Comercial** - Desconto calculado sobre o valor nominal (por fora)
+5. **Taxa Desconto Comercial** - Cálculo específico de taxas para descontos comerciais
+6. **Taxa Capitalização** - Análise de taxas de capitalização e rendimento
+7. **Taxas Equivalentes** - Conversão entre diferentes períodos e regimes de capitalização
 
-- Capitalização composta para investimentos
-- Ideal para análises de longo prazo
-- Fórmula: `FV = PV × (1 + i)ⁿ`
+### 🏠 Calculadora de Amortização SAC
 
-#### 2. **Juros Simples**
+Ferramenta especializada para calcular tabelas de amortização pelo Sistema de Amortização Constante.
 
-- Capitalização simples linear
-- Útil para operações de curto prazo
-- Fórmula: `FV = PV × (1 + i × n)`
+**Funcionalidades:**
 
-#### 3. **Desconto Racional** (Por Dentro)
+- Geração completa da tabela SAC
+- Cálculo de prestações decrescentes
+- Análise detalhada de juros e amortização
+- Valores totais e resumo financeiro
 
-- Desconto calculado sobre o valor atual
-- Mais justo para o devedor
-- Variáveis: N (Valor Nominal), Va (Valor Atual), D (Desconto)
+### 📈 Calculadora de VPL (Valor Presente Líquido)
 
-#### 4. **Desconto Comercial** (Por Fora)
+Análise avançada de viabilidade de investimentos e projetos.
 
-- Desconto calculado sobre o valor nominal
-- Mais comum no mercado financeiro
-- Variáveis: N (Valor Nominal), Va (Valor Atual), D (Desconto)
+**Funcionalidades:**
+
+- Cálculo do Valor Presente Líquido
+- Análise de múltiplos fluxos de caixa
+- Taxa de desconto personalizável
+- Indicadores de viabilidade do investimento
 
 ### ⚡ Operações Especiais
 
@@ -64,13 +76,15 @@ Experimente a calculadora diretamente no seu navegador através do GitHub Pages.
 - **x²** - Potência ao quadrado
 - **←** - Backspace para correção
 
-### 🌍 Recursos Avançados
+### 🌍 Recursos Avançados Compartilhados
 
 - **Conversão de Moedas**: Real ↔ Dólar ↔ Euro (taxas demonstrativas)
 - **Conversão de Períodos**: Dia ↔ Mês ↔ Ano com cálculos automáticos
 - **Seletores Inteligentes**: Aparecem automaticamente quando relevantes
 - **Validação Robusta**: Verificação de entrada e tratamento de erros
 - **Precisão Financeira**: Cálculos com até 6 casas decimais
+- **Navegação Fluida**: Links de acesso rápido entre todas as ferramentas
+- **Design Consistente**: Interface unificada em toda a suíte
 
 ### 📥 Métodos de Entrada
 
@@ -83,10 +97,20 @@ Experimente a calculadora diretamente no seu navegador através do GitHub Pages.
 
 ## 🚀 Como Usar
 
-### 1. **Selecionar Modo de Cálculo**
+### 🧭 Navegação Entre Ferramentas
+
+A suíte oferece três ferramentas principais acessíveis através do rodapé:
+
+- **Calculadora Financeira**: Ferramenta principal com múltiplos modos de cálculo
+- **Calculadora de Amortização SAC**: Especializada em sistemas de amortização
+- **Calculadora de VPL**: Focada em análise de viabilidade de investimentos
+
+### 1. **Calculadora Financeira Principal**
+
+#### Selecionar Modo de Cálculo
 
 - Use o seletor "Modo" no topo da calculadora
-- Escolha entre: Juros Simples, Compostos, Desconto Racional ou Comercial
+- Escolha entre: Juros Simples, Compostos, Descontos, Capitalização e Taxas Equivalentes
 
 ### 2. **Definir Valores Conhecidos**
 
@@ -121,42 +145,61 @@ Modo: Desconto Comercial
 CPT           (Calcula D = R$ 250,00)
 ```
 
+### 2. **Calculadora de Amortização SAC**
+
+#### Exemplo: Financiamento Habitacional
+
+```text
+Valor do Empréstimo: R$ 200.000,00
+Taxa de Juros: 0,8% ao mês
+Prazo: 240 meses (20 anos)
+Resultado: Tabela SAC completa com prestações decrescentes
+```
+
+### 3. **Calculadora de VPL**
+
+#### Exemplo: Análise de Investimento
+
+```text
+Investimento Inicial: R$ 100.000,00
+Taxa de Desconto: 12% ao ano
+Fluxos de Caixa: R$ 30.000 (anos 1-4)
+Resultado: VPL = R$ 8.124,49 (Projeto viável)
+```
+
 ### 5. **Recursos Especiais**
 
 - **Moedas**: Clique no valor PV/FV/J para alterar moeda
 - **Períodos**: Clique em i/n para alterar unidade de tempo
 - **Colar**: Use Ctrl+V para colar valores ou expressões matemáticas
 
-## 💡 Tipos de Cálculo Suportados
+## 💡 Resumo das Ferramentas Disponíveis
 
-### Juros Compostos
+### 🧮 Calculadora Principal
 
-- Capitalização composta para investimentos
-- Ideal para análises de longo prazo
-- Fórmula: `FV = PV × (1 + i)ⁿ`
+- **Juros Simples e Compostos**: Análise de investimentos e empréstimos
+- **Descontos Racional e Comercial**: Cálculo de descontos em títulos
+- **Taxas de Capitalização**: Análise de rendimentos
+- **Taxas Equivalentes**: Conversão entre diferentes períodos
 
-### Juros Simples
+### 🏠 Amortização SAC
 
-- Capitalização simples linear
-- Útil para operações de curto prazo
-- Fórmula: `FV = PV × (1 + i × n)`
+- **Tabela Completa**: Prestações, juros e amortização
+- **Sistema Decrescente**: Prestações diminuem ao longo do tempo
+- **Análise Total**: Valores totais pagos e economizados
 
-### Desconto Racional (Por Dentro)
+### 📈 Análise VPL
 
-- Desconto calculado sobre o valor atual
-- Fórmula: `D = N × i × n / (1 + i × n)`
-
-### Desconto Comercial (Por Fora)
-
-- Desconto calculado sobre o valor nominal
-- Fórmula: `D = N × i × n`
+- **Valor Presente Líquido**: Análise de viabilidade de projetos
+- **Múltiplos Fluxos**: Suporte a diferentes padrões de entrada/saída
+- **Taxa de Desconto**: Configuração personalizada da taxa mínima
 
 ## 🔧 Tecnologias Utilizadas
 
-- **HTML5** - Estrutura semântica moderna
-- **CSS3** - Design responsivo com gradientes e animações
-- **JavaScript ES6+** - Lógica modular da calculadora e cálculos financeiros
-- **Módulos ES6** - Separação de responsabilidades (script.js + calculos-financeiros.js)
+- **HTML5** - Estrutura semântica moderna para múltiplas páginas especializadas
+- **CSS3** - Design responsivo com gradientes, animações e temas especializados
+- **JavaScript ES6+** - Arquitetura modular com engines especializadas para cada tipo de cálculo
+- **Módulos ES6** - Separação completa de responsabilidades em múltiplos arquivos especializados
 
 ## 📐 Fórmulas Matemáticas Implementadas
 
@@ -243,9 +286,12 @@ A calculadora se adapta perfeitamente a diferentes dispositivos:
 
 ## 🌟 Diferenciais do Projeto
 
-- **Arquitetura Modular**: Código organizado em módulos ES6
-- **Zero Dependências**: Desenvolvido com JavaScript puro
+- **Suíte Completa**: Três ferramentas especializadas integradas
+- **Arquitetura Modular**: Código organizado em múltiplos módulos ES6 especializados
+- **Zero Dependências**: Desenvolvido inteiramente com JavaScript puro
 - **Performance Otimizada**: Carregamento rápido e operações fluidas
+- **Navegação Intuitiva**: Interface unificada com acesso fácil entre ferramentas
+- **Especialização**: Cada ferramenta otimizada para seu tipo específico de cálculo
 - **Acessibilidade**: Suporte a navegação por teclado e leitores de tela
 - **Código Limpo**: Documentação completa e boas práticas
 
@@ -253,15 +299,26 @@ A calculadora se adapta perfeitamente a diferentes dispositivos:
 
 ```text
 CalculadoraFinanceira/
-├── index.html              # Estrutura principal da aplicação
+├── index.html                      # Calculadora financeira principal
+├── amortizacao.html               # Calculadora de Amortização SAC
+├── vpl.html                       # Calculadora de VPL
 ├── css/
-│   └── style.css          # Estilos e design responsivo
+│   ├── style.css                  # Estilos base e design responsivo
+│   ├── custom.css                 # Personalizações da interface
+│   ├── footer.css                 # Estilos do rodapé
+│   ├── amortizacao.css           # Estilos da calculadora SAC
+│   └── vpl.css                   # Estilos da calculadora VPL
 ├── js/
-│   ├── script.js          # Lógica principal da calculadora
-│   └── calculos-financeiros.js  # Engine de cálculos financeiros
+│   ├── script.js                  # Lógica principal da calculadora
+│   ├── calculos-financeiros.js   # Engine de cálculos financeiros
+│   ├── calculos-amortizacao.js   # Lógica da amortização SAC
+│   ├── calculos-vpl.js           # Lógica do VPL
+│   ├── calculos-capitalizacao.js # Cálculos de capitalização
+│   ├── calculos-taxas.js         # Cálculos de taxas especializadas
+│   └── calculos-taxas-equivalentes.js # Conversão de taxas
 ├── images/
-│   └── favicon/           # Ícones e favicons
-└── README.md              # Documentação completa
+│   └── favicon/                   # Ícones e favicons da aplicação
+└── README.md                      # Documentação completa
 ```
 
 ## � Executar Localmente
@@ -290,11 +347,12 @@ npx serve .
 2. Abra `index.html` diretamente no navegador
 3. Comece a usar imediatamente
 
-## 🧪 Casos de Teste
+## 🧪 Casos de Teste - Todas as Ferramentas
 
-### Teste 1: Investimento Poupança
+### Teste 1: Calculadora Financeira - Investimento
 
 ```text
+Ferramenta: Calculadora Financeira
 Modo: Juros Compostos
 PV: -1000 (Investimento inicial)
 i: 0.5 (Taxa mensal de 0,5%)
@@ -302,24 +360,35 @@ n: 24 (24 meses)
 CPT → FV: R$ 1.127,16
 ```
 
-### Teste 2: Financiamento
+### Teste 2: Calculadora Financeira - Desconto
 
 ```text
-Modo: Juros Simples  
-PV: -15000 (Valor financiado)
-i: 1.5 (Taxa mensal de 1,5%)
-n: 12 (12 meses)
-CPT → FV: R$ 17.700,00
-```
-
-### Teste 3: Desconto de Título
-
-```text
+Ferramenta: Calculadora Financeira
 Modo: Desconto Comercial
 N: 10000 (Valor nominal)
 i: 3.0 (Taxa mensal de 3%)
 n: 2 (2 meses)
 CPT → D: R$ 600,00
+```
+
+### Teste 3: Amortização SAC - Financiamento
+
+```text
+Ferramenta: Calculadora de Amortização
+Valor: R$ 150.000,00
+Taxa: 0,9% ao mês
+Prazo: 180 meses
+Resultado: Tabela SAC com 180 prestações decrescentes
+```
+
+### Teste 4: VPL - Análise de Projeto
+
+```text
+Ferramenta: Calculadora de VPL
+Investimento: R$ 50.000,00
+Taxa de Desconto: 10% ao ano
+Fluxos: R$ 15.000 por 4 anos
+Resultado: VPL positivo = Projeto viável
 ```
 
 ## 🤝 Como Contribuir
@@ -340,14 +409,24 @@ CPT → D: R$ 600,00
 - Correções de bugs
 - Otimizações de performance
 
-## 📋 Roadmap Futuro
+## 📋 Roadmap - Status e Futuro
 
+### ✅ Funcionalidades Implementadas
+
+- [x] **Calculadora Financeira Principal**: Completa com 7 modos de cálculo
+- [x] **Amortização SAC**: Sistema de Amortização Constante implementado
+- [x] **Análise VPL**: Valor Presente Líquido para análise de investimentos
+- [x] **Taxas Equivalentes**: Conversão entre diferentes períodos
+- [x] **Interface Responsiva**: Design adaptativo para todos os dispositivos
+
+### 🚀 Próximas Funcionalidades
+
+- [ ] **Sistema PRICE**: Tabela de amortização com prestações fixas
+- [ ] **Análise TIR**: Taxa Interna de Retorno
 - [ ] **Gráficos**: Visualização de evolução dos investimentos
-- [ ] **Amortização**: Tabelas SAC e PRICE
-- [ ] **Fluxo de Caixa**: Análise VPL e TIR
 - [ ] **Exportação**: PDF e Excel dos cálculos
 - [ ] **Histórico**: Salvamento de cálculos anteriores
-- [ ] **Temas**: Múltiplos esquemas de cores
+- [ ] **Calculadora de Bonds**: Análise de títulos de renda fixa
 - [ ] **PWA**: Instalação como app nativo
 
 ## 📄 Licença
