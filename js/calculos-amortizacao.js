@@ -41,11 +41,6 @@ class CalculadoraAmortizacao {
         document.getElementById('parcelaEspecifica').required = false;
       }
     });
-
-    // Formatação automática de valores monetários
-    document.getElementById('valorFinanciamento').addEventListener('input', (e) => {
-      this.formatarMoeda(e.target);
-    });
   }
 
   // Converte taxa de juros para taxa mensal equivalente
@@ -83,13 +78,6 @@ class CalculadoraAmortizacao {
       'diario': 'ao dia'
     };
     return traducoes[periodo] || periodo;
-  }
-
-  // Formata campo monetário
-  formatarMoeda(input) {
-    let valor = input.value.replace(/\D/g, '');
-    valor = (valor / 100).toFixed(2);
-    input.value = valor;
   }
 
   // Valida os dados de entrada
@@ -347,7 +335,7 @@ class CalculadoraAmortizacao {
     // Linha de totais
     const totais = this.calcularTotais();
     const totalRow = document.createElement('tr');
-    totalRow.style.backgroundColor = 'gray';
+    totalRow.style.backgroundColor = 'blue';
     totalRow.style.fontWeight = 'bold';
     totalRow.innerHTML = `
       <td>TOTAL</td>
@@ -397,7 +385,7 @@ class CalculadoraAmortizacao {
           <td><strong>Amortização</strong></td>
           <td>${this.formatarValor(parcela.amortizacao)}</td>
         </tr>
-        <tr style="background-color: gray;">
+        <tr style="background-color: blue;">
           <td><strong>Prestação</strong></td>
           <td><strong>${this.formatarValor(parcela.prestacao)}</strong></td>
         </tr>
@@ -449,12 +437,12 @@ class ExportadorDados {
 }
 
 // Adiciona botão de exportação após gerar tabela completa
-function adicionarBotaoExportar(calculadora) {
+function adicionarBtnExportar(calculadora) {
   const resultsSection = document.getElementById('resultsSection');
 
   // Remove botão anterior se existir
-  const botaoExistente = document.getElementById('btnExportar');
-  if (botaoExistente) botaoExistente.remove();
+  const btnExistente = document.getElementById('btnExportar');
+  if (btnExistente) btnExistente.remove();
 
   if (calculadora.tabelaAmortizacao.length > 1) {
     const btnExportar = document.createElement('button');
@@ -479,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const originalExibirResultados = calculadora.exibirResultados;
   calculadora.exibirResultados = function (tipoCalculo, parcelaEspecifica) {
     originalExibirResultados.call(this, tipoCalculo, parcelaEspecifica);
-    adicionarBotaoExportar(this);
+    adicionarBtnExportar(this);
   };
 });
 

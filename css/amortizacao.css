@@ -166,7 +166,7 @@
 }
 
 .amortization-table th {
-  background: gray;
+  background: blue;
   color: white;
   padding: 1rem 0.75rem;
   text-align: center;
@@ -184,7 +184,7 @@
 }
 
 .amortization-table tbody tr:hover {
-  background-color: gray;
+  background-color: blue;
 }
 
 .error-message {
